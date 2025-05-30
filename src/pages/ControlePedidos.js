@@ -169,14 +169,12 @@ const ControlePedidos = () => {
   return (
     <div>
       {/* Cabeçalho */}
-      <div className="bg-orange-500 text-white py-6">
+      <div className="bg-gradient-to-r from-orange-600 to-amber-600 text-white py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-2">
             {/* Logo e Título */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
-                🦉
-              </div>
+              <div className="flex items-center justify-center">🦉</div>
               <h1 className="text-2xl font-bold">Corujão Marmitas</h1>
             </div>
 

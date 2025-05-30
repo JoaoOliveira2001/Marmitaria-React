@@ -123,7 +123,7 @@ const Home = () => {
     });
     message += `%0A*Total: R$ ${getTotalPrice()}*%0A%0APor favor, confirme meu pedido!`;
 
-    const phoneNumber = "5511999999999"; // Substitua pelo número real
+    const phoneNumber = "5511998341875"; // Substitua pelo número real
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
   };
 
