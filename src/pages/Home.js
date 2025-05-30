@@ -8,6 +8,7 @@ import {
   Users,
   Phone,
   MapPin,
+  MessageSquare,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -87,7 +88,7 @@ const Home = () => {
         )
       );
     } else {
-      setCart([...cart, { ...marmita, quantity: 1 }]);
+      setCart([...cart, { ...marmita, quantity: 1, observations: "" }]);
     }
   };
 
@@ -102,6 +103,12 @@ const Home = () => {
         )
       );
     }
+  };
+
+  const updateObservations = (id, observations) => {
+    setCart(
+      cart.map((item) => (item.id === id ? { ...item, observations } : item))
+    );
   };
 
   const getTotalPrice = () => {
@@ -119,9 +126,15 @@ const Home = () => {
     cart.forEach((item) => {
       message += `• ${item.name} (${item.quantity}x) - R$ ${(
         item.price * item.quantity
-      ).toFixed(2)}%0A`;
+      ).toFixed(2)}`;
+
+      if (item.observations && item.observations.trim()) {
+        message += `%0A  📝 Obs: ${item.observations}`;
+      }
+
+      message += `%0A%0A`;
     });
-    message += `%0A*Total: R$ ${getTotalPrice()}*%0A%0APor favor, confirme meu pedido!`;
+    message += `*Total: R$ ${getTotalPrice()}*%0A%0APor favor, confirme meu pedido!`;
 
     const phoneNumber = "5511998341875"; // Substitua pelo número real
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
@@ -265,30 +278,54 @@ const Home = () => {
                     {cart.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between bg-gray-50 p-4 rounded-lg"
+                        className="bg-gray-50 p-4 rounded-lg space-y-3"
                       >
-                        <div className="flex-1">
-                          <h4 className="font-semibold">{item.name}</h4>
-                          <p className="text-orange-600 font-bold">
-                            R$ {item.price.toFixed(2)}
-                          </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-semibold">{item.name}</h4>
+                            <p className="text-orange-600 font-bold">
+                              R$ {item.price.toFixed(2)}
+                            </p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <span className="mx-2 font-semibold">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() => addToCart(item)}
+                              className="bg-green-500 text-white p-1 rounded-full hover:bg-green-600 transition-colors"
+                            >
+                              <Plus size={14} />
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => removeFromCart(item.id)}
-                            className="bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
-                          >
-                            <Minus size={14} />
-                          </button>
-                          <span className="mx-2 font-semibold">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => addToCart(item)}
-                            className="bg-green-500 text-white p-1 rounded-full hover:bg-green-600 transition-colors"
-                          >
-                            <Plus size={14} />
-                          </button>
+
+                        {/* Campo de Observações */}
+                        <div className="w-full">
+                          <div className="flex items-center mb-2">
+                            <MessageSquare
+                              size={14}
+                              className="text-gray-500 mr-1"
+                            />
+                            <label className="text-sm text-gray-600 font-medium">
+                              Observações:
+                            </label>
+                          </div>
+                          <textarea
+                            value={item.observations || ""}
+                            onChange={(e) =>
+                              updateObservations(item.id, e.target.value)
+                            }
+                            placeholder="Ex: sem cebola, caprichar no tempero..."
+                            className="w-full p-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            rows="2"
+                          />
                         </div>
                       </div>
                     ))}
@@ -336,11 +373,11 @@ const Home = () => {
               <div className="space-y-2 text-gray-400">
                 <div className="flex items-center">
                   <Phone size={16} className="mr-2" />
-                  (11) 99999-9999
+                  (11) 4002-8922
                 </div>
                 <div className="flex items-center">
                   <MapPin size={16} className="mr-2" />
-                  São Paulo - SP
+                  Cabreúva, SP
                 </div>
               </div>
             </div>
