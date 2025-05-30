@@ -24,7 +24,7 @@ const Home = () => {
       name: "Marmita Executiva",
       description: "Arroz, feijão, bife grelhado, batata frita e salada",
       price: 18.9,
-      image: "🍱",
+      image: "https://i.imgur.com/irH6zDT.png",
       rating: 4.8,
       time: "25-35 min",
     },
@@ -33,7 +33,7 @@ const Home = () => {
       name: "Marmita Frango",
       description: "Arroz, feijão, frango grelhado, farofa e legumes",
       price: 16.9,
-      image: "🍗",
+      image: "https://i.imgur.com/fNkPi7U.png",
       rating: 4.9,
       time: "20-30 min",
     },
@@ -42,7 +42,8 @@ const Home = () => {
       name: "Marmita Peixe",
       description: "Arroz, feijão, peixe grelhado, purê e salada verde",
       price: 19.9,
-      image: "🐟",
+      image:
+        "https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=300&h=300&fit=crop&crop=center",
       rating: 4.7,
       time: "30-40 min",
     },
@@ -52,7 +53,8 @@ const Home = () => {
       description:
         "Arroz integral, feijão, proteína de soja, legumes refogados",
       price: 15.9,
-      image: "🥗",
+      image:
+        "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&h=300&fit=crop&crop=center",
       rating: 4.6,
       time: "20-30 min",
     },
@@ -61,7 +63,8 @@ const Home = () => {
       name: "Marmita Premium",
       description: "Arroz, feijão tropeiro, picanha, mandioca e vinagrete",
       price: 24.9,
-      image: "🥩",
+      image:
+        "https://images.unsplash.com/photo-1558030006-450675393462?w=300&h=300&fit=crop&crop=center",
       rating: 5.0,
       time: "35-45 min",
     },
@@ -71,7 +74,8 @@ const Home = () => {
       description:
         "Arroz integral, feijão, peito de frango, batata doce e brócolis",
       price: 17.9,
-      image: "💪",
+      image:
+        "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=300&h=300&fit=crop&crop=center",
       rating: 4.8,
       time: "25-35 min",
     },
@@ -122,22 +126,26 @@ const Home = () => {
   };
 
   const sendWhatsAppOrder = () => {
-    let message = "🦉 *Pedido Corujão Marmitas*%0A%0A";
+    let message = "🦉 *Pedido Corujão Marmitas*\n\n";
     cart.forEach((item) => {
       message += `• ${item.name} (${item.quantity}x) - R$ ${(
         item.price * item.quantity
       ).toFixed(2)}`;
 
       if (item.observations && item.observations.trim()) {
-        message += `%0A  📝 Obs: ${item.observations}`;
+        message += `\n  📝 Obs: ${item.observations}`;
       }
 
-      message += `%0A%0A`;
+      message += `\n\n`;
     });
-    message += `*Total: R$ ${getTotalPrice()}*%0A%0APor favor, confirme meu pedido!`;
+    message += `*Total: R$ ${getTotalPrice()}*\n\nPor favor, confirme meu pedido!`;
 
     const phoneNumber = "5511998341875"; // Substitua pelo número real
-    window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
+    const encodedMessage = encodeURIComponent(message);
+    window.open(
+      `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
+      "_blank"
+    );
   };
 
   return (
@@ -216,7 +224,17 @@ const Home = () => {
                 >
                   <div className="p-6">
                     <div className="text-center mb-4">
-                      <div className="text-6xl mb-2">{marmita.image}</div>
+                      <div className="mb-2">
+                        <img
+                          src={marmita.image}
+                          alt={marmita.name}
+                          className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
+                          onError={(e) => {
+                            e.target.src =
+                              "https://via.placeholder.com/150x150/f97316/ffffff?text=Marmita";
+                          }}
+                        />
+                      </div>
                       <h3 className="text-xl font-bold text-gray-800">
                         {marmita.name}
                       </h3>
