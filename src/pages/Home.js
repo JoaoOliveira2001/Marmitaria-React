@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
   Plus,
@@ -10,14 +11,11 @@ import {
   MapPin,
   MessageSquare,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
-
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
-
   const marmitas = [
     {
       id: 1,
@@ -27,6 +25,7 @@ const Home = () => {
       image: "https://i.imgur.com/irH6zDT.png",
       rating: 4.8,
       time: "25-35 min",
+      type: "marmita",
     },
     {
       id: 2,
@@ -36,6 +35,7 @@ const Home = () => {
       image: "https://i.imgur.com/fNkPi7U.png",
       rating: 4.9,
       time: "20-30 min",
+      type: "marmita",
     },
     {
       id: 3,
@@ -46,6 +46,7 @@ const Home = () => {
         "https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=300&h=300&fit=crop&crop=center",
       rating: 4.7,
       time: "30-40 min",
+      type: "marmita",
     },
     {
       id: 4,
@@ -57,6 +58,7 @@ const Home = () => {
         "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&h=300&fit=crop&crop=center",
       rating: 4.6,
       time: "20-30 min",
+      type: "marmita",
     },
     {
       id: 5,
@@ -67,6 +69,7 @@ const Home = () => {
         "https://images.unsplash.com/photo-1558030006-450675393462?w=300&h=300&fit=crop&crop=center",
       rating: 5.0,
       time: "35-45 min",
+      type: "marmita",
     },
     {
       id: 6,
@@ -78,21 +81,87 @@ const Home = () => {
         "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=300&h=300&fit=crop&crop=center",
       rating: 4.8,
       time: "25-35 min",
+      type: "marmita",
     },
   ];
 
-  const addToCart = (marmita) => {
-    const existingItem = cart.find((item) => item.id === marmita.id);
+  const bebidas = [
+    {
+      id: 7,
+      name: "Coca-Cola",
+      description: "Refrigerante Coca-Cola 350ml",
+      price: 10.0,
+      image:
+        "https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=300&h=300&fit=crop&crop=center",
+      type: "bebida",
+      icon: "🥤",
+    },
+    {
+      id: 8,
+      name: "Sprite",
+      description: "Refrigerante Sprite 350ml",
+      price: 10.0,
+      image:
+        "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=300&h=300&fit=crop&crop=center",
+      type: "bebida",
+      icon: "🥤",
+    },
+    {
+      id: 9,
+      name: "Água",
+      description: "Água mineral 500ml",
+      price: 10.0,
+      image:
+        "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&h=300&fit=crop&crop=center",
+      type: "bebida",
+      icon: "💧",
+    },
+    {
+      id: 10,
+      name: "Itubaina",
+      description: "Refrigerante Itubaina 350ml",
+      price: 10.0,
+      image: "https://via.placeholder.com/300x300/ff6b35/ffffff?text=Itubaina",
+      type: "bebida",
+      icon: "🥤",
+    },
+    {
+      id: 11,
+      name: "Coca-Cola Zero",
+      description: "Refrigerante Coca-Cola Zero 350ml",
+      price: 10.0,
+      image:
+        "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=300&h=300&fit=crop&crop=center",
+      type: "bebida",
+      icon: "🥤",
+    },
+  ];
+
+  const adicionais = [
+    {
+      id: 12,
+      name: "Batata Frita Extra",
+      description: "Porção extra de batata frita crocante",
+      price: 10.0,
+      image:
+        "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300&h=300&fit=crop&crop=center",
+      type: "adicional",
+      icon: "🍟",
+    },
+  ];
+
+  const addToCart = (item) => {
+    const existingItem = cart.find((cartItem) => cartItem.id === item.id);
     if (existingItem) {
       setCart(
-        cart.map((item) =>
-          item.id === marmita.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+        cart.map((cartItem) =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            : cartItem
         )
       );
     } else {
-      setCart([...cart, { ...marmita, quantity: 1, observations: "" }]);
+      setCart([...cart, { ...item, quantity: 1, observations: "" }]);
     }
   };
 
@@ -127,20 +196,40 @@ const Home = () => {
 
   const sendWhatsAppOrder = () => {
     let message = "🦉 *Pedido Corujão Marmitas*\n\n";
-    cart.forEach((item) => {
-      message += `• ${item.name} (${item.quantity}x) - R$ ${(
-        item.price * item.quantity
-      ).toFixed(2)}`;
 
-      if (item.observations && item.observations.trim()) {
-        message += `\n  📝 Obs: ${item.observations}`;
-      }
+    const marmitasInCart = cart.filter((item) => item.type === "marmita");
+    const adicionaisInCart = cart.filter(
+      (item) => item.type === "bebida" || item.type === "adicional"
+    );
 
-      message += `\n\n`;
-    });
+    if (marmitasInCart.length > 0) {
+      message += "*🍱 Marmitas:*\n";
+      marmitasInCart.forEach((item) => {
+        message += `• ${item.name} (${item.quantity}x) - R$ ${(
+          item.price * item.quantity
+        ).toFixed(2)}`;
+
+        if (item.observations && item.observations.trim()) {
+          message += `\n  📝 Obs: ${item.observations}`;
+        }
+        message += `\n`;
+      });
+      message += `\n`;
+    }
+
+    if (adicionaisInCart.length > 0) {
+      message += "*🥤 Adicionais:*\n";
+      adicionaisInCart.forEach((item) => {
+        message += `• ${item.name} (${item.quantity}x) - R$ ${(
+          item.price * item.quantity
+        ).toFixed(2)}\n`;
+      });
+      message += `\n`;
+    }
+
     message += `*Total: R$ ${getTotalPrice()}*\n\nPor favor, confirme meu pedido!`;
 
-    const phoneNumber = "5511998341875"; // Substitua pelo número real
+    const phoneNumber = "5511998341875";
     const encodedMessage = encodeURIComponent(message);
     window.open(
       `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
@@ -161,26 +250,27 @@ const Home = () => {
                 <p className="text-orange-100">Sabor que conquista!</p>
               </div>
             </div>
-            <button
-              onClick={() => setShowCart(!showCart)}
-              className="relative bg-white text-orange-600 px-6 py-3 rounded-full font-semibold hover:bg-orange-50 transition-all transform hover:scale-105 shadow-lg"
-            >
-              <ShoppingCart className="inline mr-2" size={20} />
-              Carrinho ({getTotalItems()})
-              {getTotalItems() > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">
-                  {getTotalItems()}
-                </span>
-              )}
-            </button>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setShowCart(!showCart)}
+                className="relative bg-white text-orange-600 px-6 py-3 rounded-full font-semibold hover:bg-orange-50 transition-all transform hover:scale-105 shadow-lg"
+              >
+                <ShoppingCart className="inline mr-2" size={20} />
+                Carrinho ({getTotalItems()})
+                {getTotalItems() > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">
+                    {getTotalItems()}
+                  </span>
+                )}
+              </button>
 
-            {/* 👉 Botão para Controle de Pedidos */}
-            <button
-              onClick={() => navigate("/controle-pedidos")}
-              className="bg-white text-orange-600 px-4 py-3 rounded-full font-semibold hover:bg-orange-100 transition-all transform hover:scale-105 shadow-lg"
-            >
-              📋 Controle de Pedidos
-            </button>
+              <button
+                onClick={() => navigate("/controle-pedidos")}
+                className="bg-white text-orange-600 px-4 py-3 rounded-full font-semibold hover:bg-orange-100 transition-all transform hover:scale-105 shadow-lg"
+              >
+                📋 Controle de Pedidos
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -213,10 +303,11 @@ const Home = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Menu */}
           <div className="lg:w-2/3">
+            {/* Marmitas Section */}
             <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-              Nosso Cardápio
+              🍱 Nosso Cardápio
             </h2>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-6 mb-12">
               {marmitas.map((marmita) => (
                 <div
                   key={marmita.id}
@@ -273,6 +364,114 @@ const Home = () => {
                 </div>
               ))}
             </div>
+
+            {/* Bebidas Section */}
+            <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+              🥤 Bebidas
+            </h2>
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              {bebidas.map((bebida) => (
+                <div
+                  key={bebida.id}
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  <div className="p-6">
+                    <div className="text-center mb-4">
+                      <div className="mb-2">
+                        <div className="text-4xl mb-2">{bebida.icon}</div>
+                        <img
+                          src={bebida.image}
+                          alt={bebida.name}
+                          className="w-20 h-20 object-cover rounded-full mx-auto shadow-lg"
+                          onError={(e) => {
+                            e.target.src =
+                              "https://via.placeholder.com/150x150/3b82f6/ffffff?text=" +
+                              bebida.icon;
+                          }}
+                        />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-800">
+                        {bebida.name}
+                      </h3>
+                    </div>
+
+                    <p className="text-gray-600 text-center mb-4 text-sm">
+                      {bebida.description}
+                    </p>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-xl font-bold text-blue-600">
+                        R$ {bebida.price.toFixed(2)}
+                      </span>
+                      <button
+                        onClick={() => addToCart(bebida)}
+                        className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-full hover:from-blue-600 hover:to-indigo-600 transition-all transform hover:scale-105 shadow-lg"
+                      >
+                        <Plus size={14} className="inline mr-1" />
+                        Comprar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Adicionais Section */}
+            {adicionais.length > 0 && (
+              <>
+                <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+                  🍟 Adicionais
+                </h2>
+                <div className="grid md:grid-cols-3 gap-6">
+                  {adicionais.map((adicional) => (
+                    <div
+                      key={adicional.id}
+                      className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                    >
+                      <div className="p-6">
+                        <div className="text-center mb-4">
+                          <div className="mb-2">
+                            <div className="text-4xl mb-2">
+                              {adicional.icon}
+                            </div>
+                            <img
+                              src={adicional.image}
+                              alt={adicional.name}
+                              className="w-20 h-20 object-cover rounded-full mx-auto shadow-lg"
+                              onError={(e) => {
+                                e.target.src =
+                                  "https://via.placeholder.com/150x150/f97316/ffffff?text=" +
+                                  adicional.icon;
+                              }}
+                            />
+                          </div>
+                          <h3 className="text-lg font-bold text-gray-800">
+                            {adicional.name}
+                          </h3>
+                        </div>
+
+                        <p className="text-gray-600 text-center mb-4 text-sm">
+                          {adicional.description}
+                        </p>
+
+                        <div className="flex justify-between items-center">
+                          <span className="text-xl font-bold text-orange-600">
+                            R$ {adicional.price.toFixed(2)}
+                          </span>
+                          <button
+                            onClick={() => addToCart(adicional)}
+                            className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-2 rounded-full hover:from-orange-600 hover:to-amber-600 transition-all transform hover:scale-105 shadow-lg"
+                          >
+                            <Plus size={14} className="inline mr-1" />
+                            Comprar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Cart Sidebar */}
@@ -300,7 +499,12 @@ const Home = () => {
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
-                            <h4 className="font-semibold">{item.name}</h4>
+                            <div className="flex items-center">
+                              {item.type !== "marmita" && (
+                                <span className="mr-2">{item.icon}</span>
+                              )}
+                              <h4 className="font-semibold">{item.name}</h4>
+                            </div>
                             <p className="text-orange-600 font-bold">
                               R$ {item.price.toFixed(2)}
                             </p>
@@ -324,27 +528,28 @@ const Home = () => {
                           </div>
                         </div>
 
-                        {/* Campo de Observações */}
-                        <div className="w-full">
-                          <div className="flex items-center mb-2">
-                            <MessageSquare
-                              size={14}
-                              className="text-gray-500 mr-1"
+                        {item.type === "marmita" && (
+                          <div className="w-full">
+                            <div className="flex items-center mb-2">
+                              <MessageSquare
+                                size={14}
+                                className="text-gray-500 mr-1"
+                              />
+                              <label className="text-sm text-gray-600 font-medium">
+                                Observações:
+                              </label>
+                            </div>
+                            <textarea
+                              value={item.observations || ""}
+                              onChange={(e) =>
+                                updateObservations(item.id, e.target.value)
+                              }
+                              placeholder="Ex: sem cebola, caprichar no tempero..."
+                              className="w-full p-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                              rows="2"
                             />
-                            <label className="text-sm text-gray-600 font-medium">
-                              Observações:
-                            </label>
                           </div>
-                          <textarea
-                            value={item.observations || ""}
-                            onChange={(e) =>
-                              updateObservations(item.id, e.target.value)
-                            }
-                            placeholder="Ex: sem cebola, caprichar no tempero..."
-                            className="w-full p-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                            rows="2"
-                          />
-                        </div>
+                        )}
                       </div>
                     ))}
                   </div>
