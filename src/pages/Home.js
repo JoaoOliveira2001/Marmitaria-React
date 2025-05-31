@@ -251,18 +251,7 @@ const Home = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setShowCart(!showCart)}
-                className="relative bg-white text-orange-600 px-6 py-3 rounded-full font-semibold hover:bg-orange-50 transition-all transform hover:scale-105 shadow-lg"
-              >
-                <ShoppingCart className="inline mr-2" size={20} />
-                Carrinho ({getTotalItems()})
-                {getTotalItems() > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">
-                    {getTotalItems()}
-                  </span>
-                )}
-              </button>
+
 
               <button
                 onClick={() => navigate("/controle-pedidos")}
@@ -564,6 +553,7 @@ const Home = () => {
 
                     <button
                       onClick={() => navigate("/Carrinho-Marmitas")}
+
                       className="bg-orange-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-orange-600 transition-all duration-300 flex items-center gap-2 shadow-lg"
                     >
                       🛒 Continuar Pedido
