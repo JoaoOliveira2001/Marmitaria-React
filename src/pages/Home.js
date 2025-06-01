@@ -16,6 +16,8 @@ const Home = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [nome, setNome] = useState("");
+  const [telefone, setTelefone] = useState("");
   const marmitas = [
     {
       id: 1,
@@ -235,6 +237,48 @@ const Home = () => {
       `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
       "_blank"
     );
+  };
+
+  const enviarPedido = async () => {
+    if (cart.length === 0) {
+      alert("Seu carrinho está vazio!");
+      return;
+    }
+
+    const pedido = {
+      nome: "Cliente Anônimo", // ou pegue de um formulário
+      telefone: "000000000",   // idem
+      produtos: cart
+        .map(
+          (item) =>
+            `${item.name} x${item.quantity}${item.observations ? ` (Obs: ${item.observations})` : ""
+            }`
+        )
+        .join(" | "),
+      quantidade: cart.reduce((total, item) => total + item.quantity, 0),
+      total: getTotalPrice(),
+      pagamento: "Pix", // ou defina dinamicamente depois
+      status: "Pendente",
+    };
+
+    try {
+      const response = await fetch("http://localhost:3001/enviar-pedido", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pedido),
+      });
+
+      if (response.ok) {
+        alert("Pedido enviado com sucesso!");
+        // Se quiser, pode navegar depois:
+        //navigate("/Carrinho-Marmitas"); parei de mandar para o outro menu, precisamos tirar do codigo dps
+      } else {
+        alert("Erro ao enviar pedido.");
+      }
+    } catch (error) {
+      console.error("Erro:", error);
+      alert("Erro ao enviar pedido.");
+    }
   };
 
   return (
@@ -552,12 +596,12 @@ const Home = () => {
                     </div>
 
                     <button
-                      onClick={() => navigate("/Carrinho-Marmitas")}
-
+                      onClick={enviarPedido}
                       className="bg-orange-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-orange-600 transition-all duration-300 flex items-center gap-2 shadow-lg"
                     >
                       🛒 Continuar Pedido
                     </button>
+
                   </div>
                 </>
               )}
