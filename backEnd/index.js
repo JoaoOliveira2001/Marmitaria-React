@@ -20,33 +20,38 @@ app.post("/enviar-pedido", async (req, res) => {
 
     const spreadsheetId = "1jCpEFIits62fOS4aAdrzKwnx7Zj193eJn8aRCar6Lnc"; // sua planilha
 
-    const {
+   const {
+  nome,
+  telefone,
+  endereco,
+  produtos,
+  quantidade,
+  total,
+  pagamento,
+  status,
+  observacoes
+} = req.body;
+
+await sheets.spreadsheets.values.append({
+  spreadsheetId,
+  range: "Pedidos!A1",
+  valueInputOption: "USER_ENTERED",
+  resource: {
+    values: [[
+      new Date().toLocaleString("pt-BR"),
       nome,
       telefone,
+      endereco,
       produtos,
       quantidade,
       total,
       pagamento,
-      status
-    } = req.body;
+      status,
+      observacoes
+    ]],
+  },
+});
 
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: "Pedidos!A1",
-      valueInputOption: "USER_ENTERED",
-      resource: {
-        values: [[
-          new Date().toLocaleString("pt-BR"),
-          nome,
-          telefone,
-          produtos,
-          quantidade,
-          total,
-          pagamento,
-          status
-        ]],
-      },
-    });
 
     res.send("Pedido salvo com sucesso!");
   } catch (error) {

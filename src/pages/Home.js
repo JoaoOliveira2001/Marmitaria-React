@@ -12,12 +12,23 @@ import {
   MessageSquare,
 } from "lucide-react";
 
+
+
 const Home = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [endereco, setEndereco] = useState("");
+  const [numero, setNumero] = useState("");
+  const [complemento, setComplemento] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [referencia, setReferencia] = useState("");
+  const [pagamento, setPagamento] = useState("Pix");
+  const [troco, setTroco] = useState("");
+  const [observacoes, setObservacoes] = useState("");
   const marmitas = [
     {
       id: 1,
@@ -246,20 +257,21 @@ const Home = () => {
     }
 
     const pedido = {
-      nome: "Cliente Anônimo", // ou pegue de um formulário
-      telefone: "000000000",   // idem
-      produtos: cart
-        .map(
-          (item) =>
-            `${item.name} x${item.quantity}${item.observations ? ` (Obs: ${item.observations})` : ""
-            }`
-        )
-        .join(" | "),
+      nome,
+      telefone,
+      endereco: `${endereco}, ${numero} ${complemento ? "- " + complemento : ""}`,
+      produtos: cart.map(
+        (item) =>
+          `${item.name} x${item.quantity}${item.observations ? ` (Obs: ${item.observations})` : ""}`
+      ).join(" | "),
       quantidade: cart.reduce((total, item) => total + item.quantity, 0),
       total: getTotalPrice(),
-      pagamento: "Pix", // ou defina dinamicamente depois
+      pagamento: pagamento === "Dinheiro" && troco ? `Dinheiro (Troco para R$ ${troco})` : pagamento,
       status: "Pendente",
+      observacoes,
     };
+
+
 
     try {
       const response = await fetch("http://localhost:3001/enviar-pedido", {
@@ -593,6 +605,121 @@ const Home = () => {
                       <span className="text-2xl font-bold text-orange-600">
                         R$ {getTotalPrice()}
                       </span>
+                    </div>
+                    <div className="bg-white rounded-2xl shadow-lg p-6 mt-8 space-y-4">
+                      <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-orange-500" />
+                        Informações para Entrega
+                      </h3>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input
+                          type="text"
+                          placeholder="Nome Completo"
+                          value={nome}
+                          onChange={(e) => setNome(e.target.value)}
+                          className="p-3 border border-gray-300 rounded-lg w-full"
+                        />
+
+                        <input
+                          type="tel"
+                          placeholder="Telefone"
+                          value={telefone}
+                          onChange={(e) => setTelefone(e.target.value)}
+                          className="p-3 border border-gray-300 rounded-lg w-full"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Endereço"
+                          value={endereco}
+                          onChange={(e) => setEndereco(e.target.value)}
+                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Número"
+                          value={numero}
+                          onChange={(e) => setNumero(e.target.value)}
+                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Complemento"
+                          value={complemento}
+                          onChange={(e) => setComplemento(e.target.value)}
+                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Bairro"
+                          value={bairro}
+                          onChange={(e) => setBairro(e.target.value)}
+                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Cidade"
+                          value={cidade}
+                          onChange={(e) => setCidade(e.target.value)}
+                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Referência (opcional)"
+                          value={referencia}
+                          onChange={(e) => setReferencia(e.target.value)}
+                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+
+
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Forma de Pagamento
+                        </label>
+                        <select
+                          value={pagamento}
+                          onChange={(e) => setPagamento(e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        >
+                          <option value="Pix">Pix</option>
+                          <option value="Dinheiro">Dinheiro</option>
+                          <option value="Cartão">Cartão</option>
+                        </select>
+                      </div>
+
+                      {pagamento === "Dinheiro" && (
+                        <input
+                          type="text"
+                          placeholder="Troco para quanto?"
+                          value={troco}
+                          onChange={(e) => setTroco(e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                      )}
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Observações Gerais
+                        </label>
+                        <textarea
+                          placeholder="Ex: tocar a campainha, entregar na portaria..."
+                          value={observacoes}
+                          onChange={(e) => setObservacoes(e.target.value)}
+                          rows="3"
+                          className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+
+                      </div>
+
+                      <button
+                        onClick={enviarPedido}
+                        className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md mt-4"
+                      >
+                        <Phone className="w-5 h-5" />
+                        Finalizar Pedido
+                      </button>
                     </div>
 
                     <button
