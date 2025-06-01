@@ -17,28 +17,12 @@ app.post("/enviar-pedido", async (req, res) => {
   try {
     const client = await auth.getClient();
     const sheets = google.sheets({ version: "v4", auth: client });
+    const id = Math.random().toString(36).substr(2, 9).toUpperCase();
+    const dataAtual = new Date().toLocaleString("pt-BR");
 
     const spreadsheetId = "1jCpEFIits62fOS4aAdrzKwnx7Zj193eJn8aRCar6Lnc"; // sua planilha
 
-   const {
-  nome,
-  telefone,
-  endereco,
-  produtos,
-  quantidade,
-  total,
-  pagamento,
-  status,
-  observacoes
-} = req.body;
-
-await sheets.spreadsheets.values.append({
-  spreadsheetId,
-  range: "Pedidos!A1",
-  valueInputOption: "USER_ENTERED",
-  resource: {
-    values: [[
-      new Date().toLocaleString("pt-BR"),
+    const {
       nome,
       telefone,
       endereco,
@@ -48,9 +32,28 @@ await sheets.spreadsheets.values.append({
       pagamento,
       status,
       observacoes
-    ]],
-  },
-});
+    } = req.body;
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: "Pedidos!A1",
+      valueInputOption: "USER_ENTERED",
+      resource: {
+        values: [[
+          id,
+          dataAtual,
+          nome,
+          telefone,
+          endereco,
+          produtos,
+          quantidade,
+          total,
+          pagamento,
+          status,
+          observacoes
+        ]],
+      },
+    });
 
 
     res.send("Pedido salvo com sucesso!");

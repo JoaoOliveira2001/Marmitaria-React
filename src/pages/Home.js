@@ -722,12 +722,6 @@ const Home = () => {
                       </button>
                     </div>
 
-                    <button
-                      onClick={enviarPedido}
-                      className="bg-orange-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-orange-600 transition-all duration-300 flex items-center gap-2 shadow-lg"
-                    >
-                      🛒 Continuar Pedido
-                    </button>
 
                   </div>
                 </>
