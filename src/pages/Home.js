@@ -11,7 +11,8 @@ import {
   MapPin,
   MessageSquare,
 } from "lucide-react";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 const Home = () => {
@@ -29,6 +30,19 @@ const Home = () => {
   const [pagamento, setPagamento] = useState("Pix");
   const [troco, setTroco] = useState("");
   const [observacoes, setObservacoes] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [senha, setSenha] = useState("");
+
+  const verificarSenha = () => {
+    if (senha === "marmita123") {
+      localStorage.setItem("autorizado", "true");
+      navigate("/controle-pedidos");
+    } else {
+      alert("Senha incorreta");
+    }
+  };
+
+
   const marmitas = [
     {
       id: 1,
@@ -176,7 +190,14 @@ const Home = () => {
     } else {
       setCart([...cart, { ...item, quantity: 1, observations: "" }]);
     }
+
+    // Exibe o toast de confirmação
+    toast.success(`${item.name} adicionado ao carrinho!`, {
+      position: "bottom-right",
+      autoClose: 2000,
+    });
   };
+
 
   const removeFromCart = (id) => {
     const existingItem = cart.find((item) => item.id === id);
@@ -307,12 +328,7 @@ const Home = () => {
             <div className="flex items-center space-x-4">
 
 
-              <button
-                onClick={() => navigate("/controle-pedidos")}
-                className="bg-white text-orange-600 px-4 py-3 rounded-full font-semibold hover:bg-orange-100 transition-all transform hover:scale-105 shadow-lg"
-              >
-                📋 Controle de Pedidos
-              </button>
+
             </div>
           </div>
         </div>
@@ -775,6 +791,32 @@ const Home = () => {
           </div>
         </div>
       </footer>
+      <ToastContainer />
+   
+                 {!mostrarSenha ? (
+                <button
+                  onClick={() => setMostrarSenha(true)}
+                  className="bg-blue-1000 text-black px-4 py-2 rounded"
+                >
+                  📋 Controle de Pedidos
+                </button>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="password"
+                    placeholder="Senha"
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    className="p-2 rounded border"
+                  />
+                  <button
+                    onClick={verificarSenha}
+                    className="bg-orange-500 text-black px-4 py-2 rounded"
+                  >
+                    Entrar
+                  </button>
+                </div>
+              )}
     </div>
   );
 };

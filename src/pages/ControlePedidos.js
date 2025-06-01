@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Clock, User, CheckCircle, AlertCircle, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import LoginPedidos from "../components/LoginPedidos";
 
 const ControlePedidos = () => {
   const navigate = useNavigate();
+  const [autorizado, setAutorizado] = useState(false);
 
-  const [pedidos, setPedidos] = useState([
+const [pedidos, setPedidos] = useState([
     {
       id: 1,
       cliente: "Maria Silva",
@@ -51,6 +53,17 @@ const ControlePedidos = () => {
       status: "pendente",
     },
   ]);
+
+  useEffect(() => {
+    const autorizadoLocal = localStorage.getItem("autorizado");
+    setAutorizado(autorizadoLocal === "true");
+  }, []);
+
+  if (!autorizado) {
+    return <LoginPedidos onLogin={() => setAutorizado(true)} />;
+  }
+
+  
 
   const marcarComoConcluido = (id) => {
     setPedidos(
@@ -172,13 +185,10 @@ const ControlePedidos = () => {
       <div className="bg-gradient-to-r from-orange-600 to-amber-600 text-white py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-2">
-            {/* Logo e Título */}
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center">🦉</div>
               <h1 className="text-2xl font-bold">Corujão Marmitas</h1>
             </div>
-
-            {/* Botão */}
             <button
               onClick={() => navigate("/")}
               className="bg-white text-orange-600 font-semibold px-4 py-2 rounded shadow hover:bg-orange-100 transition"
@@ -186,7 +196,6 @@ const ControlePedidos = () => {
               ⬅ Voltar para Home
             </button>
           </div>
-
           <h2 className="text-xl font-semibold">Controle de Pedidos</h2>
           <p className="text-orange-100">Gerencie os pedidos da cozinha</p>
         </div>
@@ -246,7 +255,6 @@ const ControlePedidos = () => {
           </div>
         )}
 
-        {/* Nenhum Pedido */}
         {pedidos.length === 0 && (
           <div className="text-center py-12">
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
