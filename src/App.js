@@ -9,7 +9,6 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/controle-pedidos" element={<ControlePedidos />} />
       <Route path="/Carrinho-Marmitas" element={<CarrinhoMarmitas />} />
-      <Route path="/Home" element={<Home />} />
     </Routes>
   );
 }
