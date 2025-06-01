@@ -282,8 +282,6 @@ const Home = () => {
 
       if (response.ok) {
         alert("Pedido enviado com sucesso!");
-        // Se quiser, pode navegar depois:
-        //navigate("/Carrinho-Marmitas"); parei de mandar para o outro menu, precisamos tirar do codigo dps
       } else {
         alert("Erro ao enviar pedido.");
       }
