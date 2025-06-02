@@ -217,13 +217,13 @@ const Home = () => {
   };
 
   const sendWhatsAppOrder = () => {
-    let message = "🦉 *Pedido Corujão Marmitas*\n\n";
+    let message = " *Pedido Corujão Marmitas*\n\n";
 
-    message += `👤 *Cliente:* ${nome || "Não informado"}\n`;
-    message += `📱 *Telefone:* ${telefone || "Não informado"}\n`;
-    message += `📍 *Endereço:* ${endereco}, ${numero} - ${bairro}, ${cidade}\n`;
-    if (complemento) message += `🏠 *Complemento:* ${complemento}\n`;
-    if (referencia) message += `📌 *Referência:* ${referencia}\n`;
+    message += ` *Cliente:* ${nome || "Não informado"}\n`;
+    message += ` *Telefone:* ${telefone || "Não informado"}\n`;
+    message += ` *Endereço:* ${endereco}, ${numero} - ${bairro}, ${cidade}\n`;
+    if (complemento) message += ` *Complemento:* ${complemento}\n`;
+    if (referencia) message += ` *Referência:* ${referencia}\n`;
     message += `\n`;
 
     const marmitasInCart = cart.filter((item) => item.type === "marmita");
@@ -232,13 +232,13 @@ const Home = () => {
     );
 
     if (marmitasInCart.length > 0) {
-      message += "*🍱 Marmitas:*\n";
+      message += "* Marmitas:*\n";
       marmitasInCart.forEach((item) => {
         message += `• ${item.name} (${item.quantity}x) - R$ ${(
           item.price * item.quantity
         ).toFixed(2)}`;
         if (item.observations && item.observations.trim()) {
-          message += `\n  📝 Obs: ${item.observations}`;
+          message += `\n   Obs: ${item.observations}`;
         }
         message += `\n`;
       });
@@ -246,7 +246,7 @@ const Home = () => {
     }
 
     if (adicionaisInCart.length > 0) {
-      message += "*🥤 Adicionais:*\n";
+      message += "* Adicionais:*\n";
       adicionaisInCart.forEach((item) => {
         message += `• ${item.name} (${item.quantity}x) - R$ ${(
           item.price * item.quantity
@@ -255,17 +255,17 @@ const Home = () => {
       message += `\n`;
     }
 
-    message += `*💳 Pagamento:* ${pagamento}`;
+    message += `* Pagamento:* ${pagamento}`;
     if (pagamento === "Dinheiro" && troco) {
       message += ` (Troco para R$ ${troco})`;
     }
     message += `\n`;
 
     if (observacoes && observacoes.trim()) {
-      message += `\n*📋 Observações Gerais:*\n${observacoes}`;
+      message += `\n* Observações Gerais:*\n${observacoes}`;
     }
 
-    message += `\n\n*Total: R$ ${getTotalPrice()}*\n✅ Por favor, confirme meu pedido!`;
+    message += `\n\n*Total: R$ ${getTotalPrice()}*\n Por favor, confirme meu pedido!`;
 
     const phoneNumber = "5511998341875";
     const encodedMessage = encodeURIComponent(message);
