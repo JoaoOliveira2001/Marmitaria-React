@@ -116,49 +116,40 @@ const Home = () => {
       name: "Coca-Cola",
       description: "Refrigerante Coca-Cola 350ml",
       price: 10.0,
-      image:
-        "https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=300&h=300&fit=crop&crop=center",
+      image: "https://i.imgur.com/ttICFKW.png",
       type: "bebida",
-      icon: "🥤",
     },
     {
       id: 8,
       name: "Sprite",
       description: "Refrigerante Sprite 350ml",
       price: 10.0,
-      image:
-        "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=300&h=300&fit=crop&crop=center",
+      image: "https://i.imgur.com/FPi7DxS.png",
       type: "bebida",
-      icon: "🥤",
     },
     {
       id: 9,
       name: "Água",
       description: "Água mineral 500ml",
       price: 10.0,
-      image:
-        "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&h=300&fit=crop&crop=center",
+      image: "https://i.imgur.com/O1IFuSy.png",
       type: "bebida",
-      icon: "💧",
     },
     {
       id: 10,
       name: "Itubaina",
       description: "Refrigerante Itubaina 350ml",
       price: 10.0,
-      image: "https://via.placeholder.com/300x300/ff6b35/ffffff?text=Itubaina",
+      image: "https://i.imgur.com/b9HaJqS.png",
       type: "bebida",
-      icon: "🥤",
     },
     {
       id: 11,
       name: "Coca-Cola Zero",
       description: "Refrigerante Coca-Cola Zero 350ml",
       price: 10.0,
-      image:
-        "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=300&h=300&fit=crop&crop=center",
+      image: "https://i.imgur.com/WQJp15f.png",
       type: "bebida",
-      icon: "🥤",
     },
   ];
 
