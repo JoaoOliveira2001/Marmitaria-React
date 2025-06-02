@@ -14,7 +14,6 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 const Home = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
@@ -41,7 +40,6 @@ const Home = () => {
       alert("Senha incorreta");
     }
   };
-
 
   const marmitas = [
     {
@@ -198,7 +196,6 @@ const Home = () => {
     });
   };
 
-
   const removeFromCart = (id) => {
     const existingItem = cart.find((item) => item.id === id);
     if (existingItem.quantity === 1) {
@@ -231,6 +228,13 @@ const Home = () => {
   const sendWhatsAppOrder = () => {
     let message = "🦉 *Pedido Corujão Marmitas*\n\n";
 
+    message += `👤 *Cliente:* ${nome || "Não informado"}\n`;
+    message += `📱 *Telefone:* ${telefone || "Não informado"}\n`;
+    message += `📍 *Endereço:* ${endereco}, ${numero} - ${bairro}, ${cidade}\n`;
+    if (complemento) message += `🏠 *Complemento:* ${complemento}\n`;
+    if (referencia) message += `📌 *Referência:* ${referencia}\n`;
+    message += `\n`;
+
     const marmitasInCart = cart.filter((item) => item.type === "marmita");
     const adicionaisInCart = cart.filter(
       (item) => item.type === "bebida" || item.type === "adicional"
@@ -242,7 +246,6 @@ const Home = () => {
         message += `• ${item.name} (${item.quantity}x) - R$ ${(
           item.price * item.quantity
         ).toFixed(2)}`;
-
         if (item.observations && item.observations.trim()) {
           message += `\n  📝 Obs: ${item.observations}`;
         }
@@ -261,7 +264,17 @@ const Home = () => {
       message += `\n`;
     }
 
-    message += `*Total: R$ ${getTotalPrice()}*\n\nPor favor, confirme meu pedido!`;
+    message += `*💳 Pagamento:* ${pagamento}`;
+    if (pagamento === "Dinheiro" && troco) {
+      message += ` (Troco para R$ ${troco})`;
+    }
+    message += `\n`;
+
+    if (observacoes && observacoes.trim()) {
+      message += `\n*📋 Observações Gerais:*\n${observacoes}`;
+    }
+
+    message += `\n\n*Total: R$ ${getTotalPrice()}*\n✅ Por favor, confirme meu pedido!`;
 
     const phoneNumber = "5511998341875";
     const encodedMessage = encodeURIComponent(message);
@@ -280,19 +293,26 @@ const Home = () => {
     const pedido = {
       nome,
       telefone,
-      endereco: `${endereco}, ${numero} ${complemento ? "- " + complemento : ""}`,
-      produtos: cart.map(
-        (item) =>
-          `${item.name} x${item.quantity}${item.observations ? ` (Obs: ${item.observations})` : ""}`
-      ).join(" | "),
+      endereco: `${endereco}, ${numero} ${
+        complemento ? "- " + complemento : ""
+      }`,
+      produtos: cart
+        .map(
+          (item) =>
+            `${item.name} x${item.quantity}${
+              item.observations ? ` (Obs: ${item.observations})` : ""
+            }`
+        )
+        .join(" | "),
       quantidade: cart.reduce((total, item) => total + item.quantity, 0),
       total: getTotalPrice(),
-      pagamento: pagamento === "Dinheiro" && troco ? `Dinheiro (Troco para R$ ${troco})` : pagamento,
+      pagamento:
+        pagamento === "Dinheiro" && troco
+          ? `Dinheiro (Troco para R$ ${troco})`
+          : pagamento,
       status: "Pendente",
       observacoes,
     };
-
-
 
     try {
       const response = await fetch("http://localhost:3001/enviar-pedido", {
@@ -325,11 +345,7 @@ const Home = () => {
                 <p className="text-orange-100">Sabor que conquista!</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-
-
-
-            </div>
+            <div className="flex items-center space-x-4"></div>
           </div>
         </div>
       </header>
@@ -684,8 +700,6 @@ const Home = () => {
                           onChange={(e) => setReferencia(e.target.value)}
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
-
-
                       </div>
 
                       <div>
@@ -724,19 +738,16 @@ const Home = () => {
                           rows="3"
                           className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
-
                       </div>
 
                       <button
-                        onClick={enviarPedido}
+                        onClick={sendWhatsAppOrder}
                         className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md mt-4"
                       >
                         <Phone className="w-5 h-5" />
                         Finalizar Pedido
                       </button>
                     </div>
-
-
                   </div>
                 </>
               )}
@@ -792,31 +803,31 @@ const Home = () => {
         </div>
       </footer>
       <ToastContainer />
-   
-                 {!mostrarSenha ? (
-                <button
-                  onClick={() => setMostrarSenha(true)}
-                  className="bg-blue-1000 text-black px-4 py-2 rounded"
-                >
-                  📋 Controle de Pedidos
-                </button>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="password"
-                    placeholder="Senha"
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                    className="p-2 rounded border"
-                  />
-                  <button
-                    onClick={verificarSenha}
-                    className="bg-orange-500 text-black px-4 py-2 rounded"
-                  >
-                    Entrar
-                  </button>
-                </div>
-              )}
+
+      {!mostrarSenha ? (
+        <button
+          onClick={() => setMostrarSenha(true)}
+          className="bg-blue-1000 text-black px-4 py-2 rounded"
+        >
+          📋 Controle de Pedidos
+        </button>
+      ) : (
+        <div className="flex items-center space-x-2">
+          <input
+            type="password"
+            placeholder="Senha"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            className="p-2 rounded border"
+          />
+          <button
+            onClick={verificarSenha}
+            className="bg-orange-500 text-black px-4 py-2 rounded"
+          >
+            Entrar
+          </button>
+        </div>
+      )}
     </div>
   );
 };
