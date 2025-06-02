@@ -232,7 +232,7 @@ const Home = () => {
     );
 
     if (marmitasInCart.length > 0) {
-      message += "* Marmitas:*\n";
+      message += "*Marmitas:*\n";
       marmitasInCart.forEach((item) => {
         message += `• ${item.name} (${item.quantity}x) - R$ ${(
           item.price * item.quantity
@@ -255,14 +255,14 @@ const Home = () => {
       message += `\n`;
     }
 
-    message += `* Pagamento:* ${pagamento}`;
+    message += `*Pagamento:* ${pagamento}`;
     if (pagamento === "Dinheiro" && troco) {
       message += ` (Troco para R$ ${troco})`;
     }
     message += `\n`;
 
     if (observacoes && observacoes.trim()) {
-      message += `\n* Observações Gerais:*\n${observacoes}`;
+      message += `\n*Observações Gerais:*\n${observacoes}`;
     }
 
     message += `\n\n*Total: R$ ${getTotalPrice()}*\n Por favor, confirme meu pedido!`;
