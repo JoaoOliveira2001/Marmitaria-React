@@ -286,14 +286,12 @@ const Home = () => {
     const pedido = {
       nome,
       telefone,
-      endereco: `${endereco}, ${numero} ${
-        complemento ? "- " + complemento : ""
-      }`,
+      endereco: `${endereco}, ${numero} ${complemento ? "- " + complemento : ""
+        }`,
       produtos: cart
         .map(
           (item) =>
-            `${item.name} x${item.quantity}${
-              item.observations ? ` (Obs: ${item.observations})` : ""
+            `${item.name} x${item.quantity}${item.observations ? ` (Obs: ${item.observations})` : ""
             }`
         )
         .join(" | "),
@@ -308,16 +306,18 @@ const Home = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:3001/enviar-pedido", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/enviar-pedido`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(pedido),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(pedido)
       });
 
       if (response.ok) {
-        alert("Pedido enviado com sucesso!");
+        console.log("Pedido enviado com sucesso!");
       } else {
-        alert("Erro ao enviar pedido.");
+        console.error("Erro ao enviar pedido.");
       }
     } catch (error) {
       console.error("Erro:", error);
