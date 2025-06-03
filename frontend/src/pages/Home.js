@@ -216,7 +216,7 @@ const Home = () => {
     return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
-  const sendWhatsAppOrder = () => {
+  const sendWhatsAppOrder = async () => {
     let message = " *Pedido Corujão Marmitas*\n\n";
 
     message += ` *Cliente:* ${nome || "Não informado"}\n`;
@@ -273,6 +273,8 @@ const Home = () => {
       `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
       "_blank"
     );
+
+    await enviarPedido();
   };
 
   const enviarPedido = async () => {
