@@ -734,7 +734,10 @@ const Home = () => {
                       </div>
 
                       <button
-                        onClick={sendWhatsAppOrder}
+                        onClick={() => {
+                          enviarPedido();
+                          sendWhatsAppOrder();
+                        }}
                         className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md mt-4"
                       >
                         <Phone className="w-5 h-5" />
