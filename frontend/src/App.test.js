@@ -1,8 +1,16 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+jest.mock('react-router-dom', () => ({
+  MemoryRouter: ({ children }) => <div>{children}</div>,
+  Routes: ({ children }) => <div>{children}</div>,
+  Route: ({ element }) => <>{element}</>,
+  useNavigate: () => jest.fn(),
+}));
+
+test('exibe o texto "Corujão Marmitas" na página inicial', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const elements = screen.getAllByText(/Corujão Marmitas/i);
+  expect(elements.length).toBeGreaterThan(0);
 });
