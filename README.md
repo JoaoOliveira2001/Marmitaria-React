@@ -68,3 +68,19 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### Backend
+
+The `backEnd/` folder contains a small Node.js API used by the front-end. Its main
+dependencies are **express**, **cors**, **body-parser** and **googleapis**.
+
+To install the dependencies and run the server:
+
+```bash
+cd backEnd
+npm install
+npm start
+```
+
+The backend listens on [http://localhost:3001](http://localhost:3001). The React
+application consumes this API locally.
