@@ -321,7 +321,7 @@ const Home = () => {
         alert("Pedido enviado com sucesso!");
         return true;
       } else {
-        alert("Erro ao enviar pedido.");
+        //alert("Erro ao enviar pedido.");
         return false;
       }
     } catch (error) {
