@@ -284,14 +284,12 @@ const Home = () => {
     const pedido = {
       nome,
       telefone,
-      endereco: `${endereco}, ${numero} ${
-        complemento ? "- " + complemento : ""
-      }`,
+      endereco: `${endereco}, ${numero} ${complemento ? "- " + complemento : ""
+        }`,
       produtos: cart
         .map(
           (item) =>
-            `${item.name} x${item.quantity}${
-              item.observations ? ` (Obs: ${item.observations})` : ""
+            `${item.name} x${item.quantity}${item.observations ? ` (Obs: ${item.observations})` : ""
             }`
         )
         .join(" | "),
@@ -306,9 +304,11 @@ const Home = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:3001/enviar-pedido", {
+      fetch("https://marmitaria-backend.up.railway.app/enviar-pedido", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(pedido),
       });
 
