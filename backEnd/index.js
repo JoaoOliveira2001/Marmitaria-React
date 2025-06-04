@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { google } = require("googleapis");
-const keys = require("./credentials.json");
+const keys = JSON.parse(process.env.CREDENTIALS_JSON);
 
 const app = express();
 app.use(cors());
@@ -12,6 +12,9 @@ const auth = new google.auth.GoogleAuth({
   credentials: keys,
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
 app.post("/enviar-pedido", async (req, res) => {
   try {
