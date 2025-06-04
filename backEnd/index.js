@@ -2,20 +2,18 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { google } = require("googleapis");
-
-// Usa as credenciais do ambiente da Railway
 const keys = JSON.parse(process.env.CREDENTIALS_JSON);
 
 const app = express();
 
-// CORS: libera Vercel
 app.use(cors({
-  origin: "https://marmitaria-react.vercel.app",
+  origin: [
+    "http://localhost:3000",
+    "https://marmitaria-react.vercel.app"
+  ],
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type"]
 }));
-
-// Para garantir resposta ao preflight CORS
 app.options("*", cors());
 
 app.use(bodyParser.json());
@@ -29,17 +27,21 @@ app.post("/enviar-pedido", async (req, res) => {
   try {
     const client = await auth.getClient();
     const sheets = google.sheets({ version: "v4", auth: client });
+    const id = Math.random().toString(36).substr(2, 9).toUpperCase();
+    const dataAtual = new Date().toLocaleString("pt-BR");
 
     const spreadsheetId = "1jCpEFIits62fOS4aAdrzKwnx7Zj193eJn8aRCar6Lnc";
 
     const {
       nome,
       telefone,
+      endereco,
       produtos,
       quantidade,
       total,
       pagamento,
-      status
+      status,
+      observacoes
     } = req.body;
 
     await sheets.spreadsheets.values.append({
@@ -48,19 +50,22 @@ app.post("/enviar-pedido", async (req, res) => {
       valueInputOption: "USER_ENTERED",
       resource: {
         values: [[
-          new Date().toLocaleString("pt-BR"),
+          id,
+          dataAtual,
           nome,
           telefone,
+          endereco,
           produtos,
           quantidade,
           total,
           pagamento,
-          status
-        ]]
-      }
+          status,
+          observacoes
+        ]],
+      },
     });
 
-    res.status(200).send("Pedido salvo com sucesso!");
+    res.send("Pedido salvo com sucesso!");
   } catch (error) {
     console.error("Erro ao salvar pedido:", error);
     res.status(500).send("Erro ao salvar pedido");
