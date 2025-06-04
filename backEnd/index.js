@@ -2,12 +2,22 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { google } = require("googleapis");
-//const keys = JSON.parse(process.env.CREDENTIALS_JSON);
-const keys = require("./credentials.json");
 
+// Usa as credenciais do ambiente da Railway
+const keys = JSON.parse(process.env.CREDENTIALS_JSON);
 
 const app = express();
-app.use(cors());
+
+// CORS: libera Vercel
+app.use(cors({
+  origin: "https://marmitaria-react.vercel.app",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
+}));
+
+// Para garantir resposta ao preflight CORS
+app.options("*", cors());
+
 app.use(bodyParser.json());
 
 const auth = new google.auth.GoogleAuth({
@@ -15,28 +25,21 @@ const auth = new google.auth.GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
-
 app.post("/enviar-pedido", async (req, res) => {
   try {
     const client = await auth.getClient();
     const sheets = google.sheets({ version: "v4", auth: client });
-    const id = Math.random().toString(36).substr(2, 9).toUpperCase();
-    const dataAtual = new Date().toLocaleString("pt-BR");
 
-    const spreadsheetId = "1jCpEFIits62fOS4aAdrzKwnx7Zj193eJn8aRCar6Lnc"; // sua planilha
+    const spreadsheetId = "1jCpEFIits62fOS4aAdrzKwnx7Zj193eJn8aRCar6Lnc";
 
     const {
       nome,
       telefone,
-      endereco,
       produtos,
       quantidade,
       total,
       pagamento,
-      status,
-      observacoes
+      status
     } = req.body;
 
     await sheets.spreadsheets.values.append({
@@ -45,27 +48,24 @@ app.post("/enviar-pedido", async (req, res) => {
       valueInputOption: "USER_ENTERED",
       resource: {
         values: [[
-          id,
-          dataAtual,
+          new Date().toLocaleString("pt-BR"),
           nome,
           telefone,
-          endereco,
           produtos,
           quantidade,
           total,
           pagamento,
-          status,
-          observacoes
-        ]],
-      },
+          status
+        ]]
+      }
     });
 
-
-    res.send("Pedido salvo com sucesso!");
+    res.status(200).send("Pedido salvo com sucesso!");
   } catch (error) {
     console.error("Erro ao salvar pedido:", error);
     res.status(500).send("Erro ao salvar pedido");
   }
 });
 
-app.listen(3001, () => console.log("Servidor backend rodando em http://localhost:3001"));
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
