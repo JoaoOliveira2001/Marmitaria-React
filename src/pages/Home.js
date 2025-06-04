@@ -284,14 +284,12 @@ const Home = () => {
     const pedido = {
       nome,
       telefone,
-      endereco: `${endereco}, ${numero} ${
-        complemento ? "- " + complemento : ""
-      }`,
+      endereco: `${endereco}, ${numero} ${complemento ? "- " + complemento : ""
+        }`,
       produtos: cart
         .map(
           (item) =>
-            `${item.name} x${item.quantity}${
-              item.observations ? ` (Obs: ${item.observations})` : ""
+            `${item.name} x${item.quantity}${item.observations ? ` (Obs: ${item.observations})` : ""
             }`
         )
         .join(" | "),
@@ -318,7 +316,7 @@ const Home = () => {
       );
 
       if (response.ok) {
-       // alert("Pedido enviado com sucesso!");
+        // alert("Pedido enviado com sucesso!");
         return true;
       } else {
         //alert("Erro ao enviar pedido.");
@@ -747,7 +745,8 @@ const Home = () => {
                       </div>
 
                       <button
-                        onClick={finalizarPedido}
+                        onClick={sendWhatsAppOrder}
+                  
                         className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md mt-4"
                       >
                         <Phone className="w-5 h-5" />
