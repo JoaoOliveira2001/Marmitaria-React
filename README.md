@@ -74,11 +74,14 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 The `backEnd/` folder contains a small Node.js API used by the front-end. Its main
 dependencies are **express**, **cors**, **body-parser** and **googleapis**.
 
-To install the dependencies and run the server:
+To install the dependencies and run the server. Set the `GOOGLE_SERVICE_ACCOUNT`
+environment variable with your service account JSON encoded in base64:
 
 ```bash
 cd backEnd
 npm install
+# GOOGLE_SERVICE_ACCOUNT should contain your service account JSON encoded in base64
+export GOOGLE_SERVICE_ACCOUNT=$(cat /path/to/your/service-account.json | base64 -w0)
 npm start
 ```
 

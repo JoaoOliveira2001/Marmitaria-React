@@ -2,7 +2,17 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { google } = require("googleapis");
-const keys = require("./credentials.json");
+
+const serviceAccountEncoded = process.env.GOOGLE_SERVICE_ACCOUNT;
+if (!serviceAccountEncoded) {
+  throw new Error(
+    "GOOGLE_SERVICE_ACCOUNT environment variable not set."
+  );
+}
+
+const keys = JSON.parse(
+  Buffer.from(serviceAccountEncoded, "base64").toString("utf8")
+);
 
 const app = express();
 app.use(cors());
