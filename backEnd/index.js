@@ -14,6 +14,9 @@ app.use(cors({
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type"]
 }));
+
+app.options("/enviar-pedido", cors());
+
 app.options("*", cors());
 
 app.use(bodyParser.json());
