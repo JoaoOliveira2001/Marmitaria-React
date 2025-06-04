@@ -318,7 +318,7 @@ const Home = () => {
       );
 
       if (response.ok) {
-        alert("Pedido enviado com sucesso!");
+       // alert("Pedido enviado com sucesso!");
         return true;
       } else {
         //alert("Erro ao enviar pedido.");
@@ -326,7 +326,7 @@ const Home = () => {
       }
     } catch (error) {
       console.error("Erro:", error);
-      alert("Erro ao enviar pedido.");
+      //alert("Erro ao enviar pedido.");
       return false;
     }
   };
