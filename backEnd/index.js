@@ -2,7 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { google } = require("googleapis");
-const keys = JSON.parse(process.env.CREDENTIALS_JSON);
+//const keys = JSON.parse(process.env.CREDENTIALS_JSON);
+const keys = require("./credentials.json");
+
 
 const app = express();
 app.use(cors());
