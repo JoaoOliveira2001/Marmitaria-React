@@ -246,7 +246,7 @@ const Home = () => {
     }
 
     if (adicionaisInCart.length > 0) {
-      message += "* Adicionais:*\n";
+      message += "*Adicionais:*\n";
       adicionaisInCart.forEach((item) => {
         message += `• ${item.name} (${item.quantity}x) - R$ ${(
           item.price * item.quantity
@@ -284,12 +284,14 @@ const Home = () => {
     const pedido = {
       nome,
       telefone,
-      endereco: `${endereco}, ${numero} ${complemento ? "- " + complemento : ""
-        }`,
+      endereco: `${endereco}, ${numero} ${
+        complemento ? "- " + complemento : ""
+      }`,
       produtos: cart
         .map(
           (item) =>
-            `${item.name} x${item.quantity}${item.observations ? ` (Obs: ${item.observations})` : ""
+            `${item.name} x${item.quantity}${
+              item.observations ? ` (Obs: ${item.observations})` : ""
             }`
         )
         .join(" | "),
