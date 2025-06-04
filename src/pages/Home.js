@@ -304,22 +304,35 @@ const Home = () => {
     };
 
     try {
-      fetch("https://marmitaria-backend.up.railway.app/enviar-pedido", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(pedido),
-      });
+      const response = await fetch(
+        "https://marmitaria-backend.up.railway.app/enviar-pedido",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(pedido),
+        }
+      );
 
       if (response.ok) {
         alert("Pedido enviado com sucesso!");
+        return true;
       } else {
         alert("Erro ao enviar pedido.");
+        return false;
       }
     } catch (error) {
       console.error("Erro:", error);
       alert("Erro ao enviar pedido.");
+      return false;
+    }
+  };
+
+  const finalizarPedido = async () => {
+    const enviado = await enviarPedido();
+    if (enviado) {
+      sendWhatsAppOrder();
     }
   };
 
@@ -732,7 +745,7 @@ const Home = () => {
                       </div>
 
                       <button
-                        onClick={sendWhatsAppOrder}
+                        onClick={finalizarPedido}
                         className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md mt-4"
                       >
                         <Phone className="w-5 h-5" />
