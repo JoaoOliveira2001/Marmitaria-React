@@ -267,7 +267,7 @@ const Home = () => {
 
     message += `\n\n*Total: R$ ${getTotalPrice()}*\n Por favor, confirme meu pedido!`;
 
-    const phoneNumber = "5511998341875";
+    const phoneNumber = "11936186513";
     const encodedMessage = encodeURIComponent(message);
     window.open(
       `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
@@ -284,12 +284,14 @@ const Home = () => {
     const pedido = {
       nome,
       telefone,
-      endereco: `${endereco}, ${numero} ${complemento ? "- " + complemento : ""
-        }`,
+      endereco: `${endereco}, ${numero} ${
+        complemento ? "- " + complemento : ""
+      }`,
       produtos: cart
         .map(
           (item) =>
-            `${item.name} x${item.quantity}${item.observations ? ` (Obs: ${item.observations})` : ""
+            `${item.name} x${item.quantity}${
+              item.observations ? ` (Obs: ${item.observations})` : ""
             }`
         )
         .join(" | "),
@@ -746,7 +748,6 @@ const Home = () => {
 
                       <button
                         onClick={sendWhatsAppOrder}
-                  
                         className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md mt-4"
                       >
                         <Phone className="w-5 h-5" />
