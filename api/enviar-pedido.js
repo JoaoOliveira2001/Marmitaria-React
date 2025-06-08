@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
-  const appsScriptUrl = 'https://script.google.com/macros/s/SEU_ID/exec';
+  const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbyaWHyQ3drRMRSa60oUBw8KcbAE11fWkw54hjanPbPrBn2s9OyE_bjZzB8NNgaU9IS2/exec';
   try {
     const result = await fetch(appsScriptUrl, {
       method: 'POST',
