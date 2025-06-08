@@ -2,7 +2,14 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { google } = require("googleapis");
-const keys = JSON.parse(process.env.CREDENTIALS_JSON);
+const fs = require("fs");
+
+let keys;
+if (process.env.CREDENTIALS_JSON) {
+  keys = JSON.parse(process.env.CREDENTIALS_JSON);
+} else {
+  keys = JSON.parse(fs.readFileSync("credentials.json", "utf8"));
+}
 
 const app = express();
 
@@ -17,7 +24,6 @@ app.use(cors({
 
 app.options("/enviar-pedido", cors());
 
-app.options("*", cors());
 
 app.use(bodyParser.json());
 
