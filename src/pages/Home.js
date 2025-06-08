@@ -275,61 +275,57 @@ const Home = () => {
     );
   };
 
+    // em src/pages/Home.js
   const enviarPedido = async () => {
     if (cart.length === 0) {
       alert("Seu carrinho está vazio!");
-      return;
+      return false;
     }
 
+    // montar o objeto completo do pedido
     const pedido = {
       nome,
       telefone,
-      endereco: `${endereco}, ${numero} ${
-        complemento ? "- " + complemento : ""
-      }`,
+      endereco: `${endereco}, ${numero}${complemento ? ` - ${complemento}` : ""}`,
       produtos: cart
-        .map(
-          (item) =>
-            `${item.name} x${item.quantity}${
-              item.observations ? ` (Obs: ${item.observations})` : ""
-            }`
+        .map(item =>
+          `${item.name} x${item.quantity}${item.observations ? ` (Obs: ${item.observations})` : ""}`
         )
         .join(" | "),
-      quantidade: cart.reduce((total, item) => total + item.quantity, 0),
-      total: getTotalPrice(),
-      pagamento:
-        pagamento === "Dinheiro" && troco
-          ? `Dinheiro (Troco para R$ ${troco})`
-          : pagamento,
+      quantidade: cart.reduce((tot, item) => tot + item.quantity, 0),
+      total: getTotalPrice(),                              // usa a função que retorna o total
+      pagamento: pagamento === "Dinheiro" && troco
+        ? `Dinheiro (Troco para R$ ${troco})`
+        : pagamento,
       status: "Pendente",
-      observacoes,
+      observacoes
     };
 
     try {
+      // envia todo o objeto pedido para o Apps Script ou endpoint
       const response = await fetch(
-        "https://marmitaria-backend.up.railway.app/enviar-pedido",
+        "https://script.google.com/macros/s/…/exec",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(pedido),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(pedido)                      // aqui enviamos o pedido completo
         }
       );
 
       if (response.ok) {
-        // alert("Pedido enviado com sucesso!");
+        // você pode exibir um toast ou alerta de sucesso
         return true;
       } else {
-        //alert("Erro ao enviar pedido.");
+        // lidar com erro de resposta
+        console.error("Erro ao enviar pedido:", await response.text());
         return false;
       }
     } catch (error) {
-      console.error("Erro:", error);
-      //alert("Erro ao enviar pedido.");
+      console.error("Erro na requisição:", error);
       return false;
     }
   };
+;
 
   const finalizarPedido = async () => {
     const enviado = await enviarPedido();
@@ -747,12 +743,16 @@ const Home = () => {
                       </div>
 
                       <button
-                        onClick={finalizarPedido}
+                        onClick={() => {
+                          finalizarPedido();
+                          sendWhatsAppOrder();
+                        }}
                         className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md mt-4"
                       >
                         <Phone className="w-5 h-5" />
                         Finalizar Pedido
                       </button>
+
                     </div>
                   </div>
                 </>
