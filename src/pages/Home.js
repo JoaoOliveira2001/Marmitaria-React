@@ -275,14 +275,15 @@ const Home = () => {
     );
   };
 
-    // em src/pages/Home.js
+  // em src/pages/Home.js
   const enviarPedido = async () => {
+    // 1. valida carrinho não vazio
     if (cart.length === 0) {
       alert("Seu carrinho está vazio!");
       return false;
     }
 
-    // montar o objeto completo do pedido
+    // 2. monta o objeto completo do pedido
     const pedido = {
       nome,
       telefone,
@@ -293,39 +294,42 @@ const Home = () => {
         )
         .join(" | "),
       quantidade: cart.reduce((tot, item) => tot + item.quantity, 0),
-      total: getTotalPrice(),                              // usa a função que retorna o total
-      pagamento: pagamento === "Dinheiro" && troco
-        ? `Dinheiro (Troco para R$ ${troco})`
-        : pagamento,
+      total: getTotalPrice(),
+      pagamento:
+        pagamento === "Dinheiro" && troco
+          ? `Dinheiro (Troco para R$ ${troco})`
+          : pagamento,
       status: "Pendente",
-      observacoes
+      observacoes,
     };
 
     try {
-      // envia todo o objeto pedido para o Apps Script ou endpoint
-      const response = await fetch(
-        "https://script.google.com/macros/s/…/exec",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(pedido)                      // aqui enviamos o pedido completo
-        }
-      );
+      // 3. chama o endpoint proxy na Vercel em vez do Apps Script direto
+      const response = await fetch("/api/enviar-pedido", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pedido),
+      });
 
-      if (response.ok) {
-        // você pode exibir um toast ou alerta de sucesso
-        return true;
-      } else {
-        // lidar com erro de resposta
-        console.error("Erro ao enviar pedido:", await response.text());
+      if (!response.ok) {
+        // log de erro mais detalhado
+        const text = await response.text();
+        console.error("Erro ao enviar pedido:", text);
+        alert("Ocorreu um erro ao enviar o pedido.");
         return false;
       }
+
+      // 4. se chegou aqui, foi sucesso
+      alert("Pedido enviado com sucesso!");
+      return true;
     } catch (error) {
       console.error("Erro na requisição:", error);
+      alert("Não foi possível enviar o pedido. Tente novamente.");
       return false;
     }
   };
-;
+
+  ;
 
   const finalizarPedido = async () => {
     const enviado = await enviarPedido();
