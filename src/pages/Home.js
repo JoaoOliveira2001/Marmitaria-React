@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Cardapio1 from '../components/Cardapio1';
+import Cardapio2 from '../components/Cardapio2';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -31,6 +33,46 @@ const Home = () => {
   const [observacoes, setObservacoes] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [senha, setSenha] = useState("");
+  const [now, setNow] = useState(new Date());
+  const [cardapio1, setCardapio1] = useState([]);
+
+
+  useEffect(() => {
+    // Endpoint do seu Web App do Apps Script
+    const url = 'https://script.google.com/macros/s/AKfycbyYDPV06sKgZMVDEnGlih52_SNiLtQaXocYBzF37fu3rvZmdO5SVzLIo3Az9HotBE4N/exec';
+
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error(`Erro ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        // data é um array de objetos { id, name, description, price, image, time, type }
+        setCardapio1(data);
+      })
+      .catch(err => {
+        console.error('Falha ao carregar cardápio1:', err);
+        // você pode setar um fallback vazio ou exibir mensagem de erro
+        setCardapio1([]);
+      });
+  }, []); // roda só uma vez, ao montar o componente
+
+  const addToCart = (item) => {
+    const existing = cart.find(ci => ci.id === item.id);
+    if (existing) {
+      setCart(cart.map(ci =>
+        ci.id === item.id
+          ? { ...ci, quantity: ci.quantity + 1 }
+          : ci
+      ));
+    } else {
+      setCart([...cart, { ...item, quantity: 1, observations: '' }]);
+    }
+    toast.success(`${item.name} adicionado ao carrinho!`, {
+      position: 'bottom-right',
+      autoClose: 2000,
+    });
+  };
 
   const verificarSenha = () => {
     if (senha === "marmita123") {
@@ -41,72 +83,62 @@ const Home = () => {
     }
   };
 
-  const marmitas = [
-    {
-      id: 1,
-      name: "Marmita Executiva",
-      description: "Arroz, feijão, bife grelhado, batata frita e salada",
-      price: 18.9,
-      image: "https://i.imgur.com/irH6zDT.png",
-      rating: 4.8,
-      time: "25-35 min",
-      type: "marmita",
-    },
-    {
-      id: 2,
-      name: "Marmita Frango",
-      description: "Arroz, feijão, frango grelhado, farofa e legumes",
-      price: 16.9,
-      image: "https://i.imgur.com/fNkPi7U.png",
-      rating: 4.9,
-      time: "20-30 min",
-      type: "marmita",
-    },
-    {
-      id: 3,
-      name: "Marmita Peixe",
-      description: "Arroz, feijão, peixe grelhado, purê e salada verde",
-      price: 19.9,
-      image:
-        "https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=300&h=300&fit=crop&crop=center",
-      rating: 4.7,
-      time: "30-40 min",
-      type: "marmita",
-    },
-    {
-      id: 4,
-      name: "Marmita Vegetariana",
-      description:
-        "Arroz integral, feijão, proteína de soja, legumes refogados",
-      price: 15.9,
-      image:
-        "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&h=300&fit=crop&crop=center",
-      rating: 4.6,
-      time: "20-30 min",
-      type: "marmita",
-    },
-    {
-      id: 5,
-      name: "Marmita Premium",
-      description: "Arroz, feijão tropeiro, picanha, mandioca e vinagrete",
-      price: 24.9,
-      image:
-        "https://images.unsplash.com/photo-1558030006-450675393462?w=300&h=300&fit=crop&crop=center",
-      rating: 5.0,
-      time: "35-45 min",
-      type: "marmita",
-    },
+  // atualiza hora a cada minuto
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const day = now.getDay();     // 0=Dom,1=Seg,2=Ter…
+  const hour = now.getHours();   // 0–23
+
+
+
+  const cardapio2 = [
     {
       id: 6,
-      name: "Marmita Fitness",
-      description:
-        "Arroz integral, feijão, peito de frango, batata doce e brócolis",
-      price: 17.9,
-      image:
-        "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=300&h=300&fit=crop&crop=center",
-      rating: 4.8,
-      time: "25-35 min",
-      type: "marmita",
+      name: "Porção de Batata Frita",
+      description: "Batata palito crocante, servida com ketchup",
+      price: 12.5,
+      image: "https://via.placeholder.com/300x300?text=Porcao+Batata+Frita",
+      time: "10-15 min",
+      type: "porcao",
+    },
+    {
+      id: 7,
+      name: "Refrigerante Cola",
+      description: "Garrafa PET 600ml de refrigerante sabor cola",
+      price: 6.0,
+      image: "https://via.placeholder.com/300x300?text=Refrigerante+Cola",
+      time: "5-10 min",
+      type: "bebida",
+    },
+    {
+      id: 8,
+      name: "Suco Natural de Laranja",
+      description: "Suco espremido na hora, sem adição de açúcar",
+      price: 8.0,
+      image: "https://via.placeholder.com/300x300?text=Suco+Laranja",
+      time: "5-10 min",
+      type: "bebida",
+    },
+    {
+      id: 9,
+      name: "Porção de Frango a Passarinho",
+      description: "Cortinhas de frango temperadas e fritas até ficar crocante",
+      price: 18.0,
+      image: "https://via.placeholder.com/300x300?text=Frango+Passarinho",
+      time: "15-20 min",
+      type: "porcao",
+    },
+    {
+      id: 10,
+      name: "Água Mineral 500ml",
+      description: "Garrafa de água mineral sem gás",
+      price: 4.0,
+      image: "https://via.placeholder.com/300x300?text=Agua+Mineral",
+      time: "3-5 min",
+      type: "bebida",
     },
   ];
 
@@ -165,27 +197,6 @@ const Home = () => {
       icon: "🍟",
     },
   ];
-
-  const addToCart = (item) => {
-    const existingItem = cart.find((cartItem) => cartItem.id === item.id);
-    if (existingItem) {
-      setCart(
-        cart.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        )
-      );
-    } else {
-      setCart([...cart, { ...item, quantity: 1, observations: "" }]);
-    }
-
-    // Exibe o toast de confirmação
-    toast.success(`${item.name} adicionado ao carrinho!`, {
-      position: "bottom-right",
-      autoClose: 2000,
-    });
-  };
 
   const removeFromCart = (id) => {
     const existingItem = cart.find((item) => item.id === id);
@@ -338,6 +349,91 @@ const Home = () => {
     }
   };
 
+  let menuSection;
+  if (day === 1) {
+    menuSection = (
+      <p className="text-center font-bold text-red-500">
+        ❌ Fechado às segundas-feiras
+      </p>
+    );
+
+  } else if (hour >= 10 && hour < 24) {
+    menuSection = (
+      <div className="grid md:grid-cols-2 gap-6">
+        {cardapio1.map((m) => (
+          <div key={m.id} className="bg-white rounded-2xl shadow-lg p-6">
+            <div className="text-center mb-4">
+              <img
+                src={m.image}
+                alt={m.name}
+                className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
+              />
+              <h3 className="text-xl font-bold">{m.name}</h3>
+            </div>
+            <p className="text-gray-600 mb-4">{m.description}</p>
+            <div className="flex justify-between items-center mb-4">
+              <span>⏰ {m.time}</span>
+              <span className="text-2xl font-bold text-orange-600">
+                R$ {Number(m.price).toFixed(2)}
+              </span>
+            </div>
+            <button
+              onClick={() => addToCart(m)}
+              className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2 rounded-full"
+            >
+              Adicionar
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+
+  } else if (hour >= 15 && hour < 24) {
+    // 3) Renderiza cardápio 2 inline
+    menuSection = (
+      <div className="grid md:grid-cols-2 gap-6">
+        {cardapio2.map((m) => (
+          <div key={m.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+            {/* réplica do layout acima, trocando somente as props */}
+            <div className="p-6 text-center mb-4">
+              <img
+                src={m.image}
+                alt={m.name}
+                className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
+                onError={(e) => { e.target.src = "https://via.placeholder.com/150"; }}
+              />
+              <h3 className="text-xl font-bold text-gray-800">{m.name}</h3>
+            </div>
+            <p className="text-gray-600 text-center mb-4">{m.description}</p>
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center text-yellow-500">
+              </div>
+              <div className="flex items-center text-gray-500">
+                <Clock size={16} /><span className="ml-1 text-sm">{m.time}</span>
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-2xl font-bold text-orange-600">R$ {m.price.toFixed(2)}</span>
+              <button
+                onClick={() => addToCart(m)}
+                className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2 rounded-full hover:scale-105 shadow-lg"
+              >
+                <Plus size={16} className="inline mr-1" /> Adicionar
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+
+  } else {
+    menuSection = (
+      <p className="text-center font-bold text-gray-600">
+        🚫 Fora do horário de funcionamento
+      </p>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
       {/* Header */}
@@ -377,6 +473,7 @@ const Home = () => {
               4.8 de avaliação
             </div>
           </div>
+
         </div>
       </section>
 
@@ -388,63 +485,13 @@ const Home = () => {
             <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
               🍱 Nosso Cardápio
             </h2>
-            <div className="grid md:grid-cols-2 gap-6 mb-12">
-              {marmitas.map((marmita) => (
-                <div
-                  key={marmita.id}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-                >
-                  <div className="p-6">
-                    <div className="text-center mb-4">
-                      <div className="mb-2">
-                        <img
-                          src={marmita.image}
-                          alt={marmita.name}
-                          className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
-                          onError={(e) => {
-                            e.target.src =
-                              "https://via.placeholder.com/150x150/f97316/ffffff?text=Marmita";
-                          }}
-                        />
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-800">
-                        {marmita.name}
-                      </h3>
-                    </div>
 
-                    <p className="text-gray-600 text-center mb-4">
-                      {marmita.description}
-                    </p>
+            <section className="mb-12">
+              {menuSection}
 
-                    <div className="flex justify-between items-center mb-4">
-                      <div className="flex items-center text-yellow-500">
-                        <Star size={16} fill="currentColor" />
-                        <span className="ml-1 text-sm text-gray-600">
-                          {marmita.rating}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-gray-500">
-                        <Clock size={16} />
-                        <span className="ml-1 text-sm">{marmita.time}</span>
-                      </div>
-                    </div>
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-orange-600">
-                        R$ {marmita.price.toFixed(2)}
-                      </span>
-                      <button
-                        onClick={() => addToCart(marmita)}
-                        className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2 rounded-full hover:from-orange-600 hover:to-amber-600 transition-all transform hover:scale-105 shadow-lg"
-                      >
-                        <Plus size={16} className="inline mr-1" />
-                        Adicionar
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+
+            </section>
 
             {/* Bebidas Section */}
             <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
@@ -796,13 +843,13 @@ const Home = () => {
             </div>
 
             <div>
-              <h4 className="text-lg font-semibold mb-4">
-                Horário de Funcionamento
-              </h4>
+              <h4 className="text-lg font-semibold mb-4"></h4>
+              <h1>🕒 Horário de Funcionamento</h1>
               <div className="text-gray-400 space-y-1">
-                <p>Segunda à Sexta: 11h às 15h</p>
-                <p>Sábado: 11h às 14h</p>
-                <p>Domingo: Fechado</p>
+                <p>Terça a Domingo</p>
+                <p>⏰ 10h às 14h – Marmitas (cardápio 1)</p>
+                <p>⏰ 15h às 22h – Porções, bebidas, etc. (cardápio 2)</p>
+                <p>❌ Fechado às segundas-feiras</p>
               </div>
             </div>
           </div>
