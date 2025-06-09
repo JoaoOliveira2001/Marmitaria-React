@@ -352,7 +352,7 @@ const Home = () => {
   const FORCE_CARDAPIO1 = true;
 
   let menuSection;
-  if (day === 1) {
+  if (day === 2) {
     menuSection = (
       <p className="text-center font-bold text-red-500">
         ❌ Fechado às segundas-feiras
