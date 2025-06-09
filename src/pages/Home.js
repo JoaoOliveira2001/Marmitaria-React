@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Cardapio1 from '../components/Cardapio1';
-import Cardapio2 from '../components/Cardapio2';
+import Cardapio1 from "../components/Cardapio1";
+import Cardapio2 from "../components/Cardapio2";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -36,40 +36,40 @@ const Home = () => {
   const [now, setNow] = useState(new Date());
   const [cardapio1, setCardapio1] = useState([]);
 
-
   useEffect(() => {
     // Endpoint do seu Web App do Apps Script
-    const url = 'https://script.google.com/macros/s/AKfycbyYDPV06sKgZMVDEnGlih52_SNiLtQaXocYBzF37fu3rvZmdO5SVzLIo3Az9HotBE4N/exec';
+    const url =
+      "https://script.google.com/macros/s/AKfycbyYDPV06sKgZMVDEnGlih52_SNiLtQaXocYBzF37fu3rvZmdO5SVzLIo3Az9HotBE4N/exec";
 
     fetch(url)
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         return res.json();
       })
-      .then(data => {
+      .then((data) => {
         // data é um array de objetos { id, name, description, price, image, time, type }
         setCardapio1(data);
       })
-      .catch(err => {
-        console.error('Falha ao carregar cardápio1:', err);
+      .catch((err) => {
+        console.error("Falha ao carregar cardápio1:", err);
         // você pode setar um fallback vazio ou exibir mensagem de erro
         setCardapio1([]);
       });
   }, []); // roda só uma vez, ao montar o componente
 
   const addToCart = (item) => {
-    const existing = cart.find(ci => ci.id === item.id);
+    const existing = cart.find((ci) => ci.id === item.id);
     if (existing) {
-      setCart(cart.map(ci =>
-        ci.id === item.id
-          ? { ...ci, quantity: ci.quantity + 1 }
-          : ci
-      ));
+      setCart(
+        cart.map((ci) =>
+          ci.id === item.id ? { ...ci, quantity: ci.quantity + 1 } : ci
+        )
+      );
     } else {
-      setCart([...cart, { ...item, quantity: 1, observations: '' }]);
+      setCart([...cart, { ...item, quantity: 1, observations: "" }]);
     }
     toast.success(`${item.name} adicionado ao carrinho!`, {
-      position: 'bottom-right',
+      position: "bottom-right",
       autoClose: 2000,
     });
   };
@@ -89,10 +89,8 @@ const Home = () => {
     return () => clearInterval(id);
   }, []);
 
-  const day = now.getDay();     // 0=Dom,1=Seg,2=Ter…
-  const hour = now.getHours();   // 0–23
-
-
+  const day = now.getDay(); // 0=Dom,1=Seg,2=Ter…
+  const hour = now.getHours(); // 0–23
 
   const cardapio2 = [
     {
@@ -298,10 +296,15 @@ const Home = () => {
     const pedido = {
       nome,
       telefone,
-      endereco: `${endereco}, ${numero}${complemento ? ` - ${complemento}` : ""}`,
+      endereco: `${endereco}, ${numero}${
+        complemento ? ` - ${complemento}` : ""
+      }`,
       produtos: cart
-        .map(item =>
-          `${item.name} x${item.quantity}${item.observations ? ` (Obs: ${item.observations})` : ""}`
+        .map(
+          (item) =>
+            `${item.name} x${item.quantity}${
+              item.observations ? ` (Obs: ${item.observations})` : ""
+            }`
         )
         .join(" | "),
       quantidade: cart.reduce((tot, item) => tot + item.quantity, 0),
@@ -340,8 +343,6 @@ const Home = () => {
     }
   };
 
-  ;
-
   const finalizarPedido = async () => {
     const enviado = await enviarPedido();
     if (enviado) {
@@ -350,7 +351,7 @@ const Home = () => {
   };
 
   const FORCE_CARDAPIO1 = true;
-// 1 seunga 2 terça e assim
+  // 1 seunga 2 terça e assim
   let menuSection;
   if (day === 2) {
     menuSection = (
@@ -382,7 +383,7 @@ const Home = () => {
             </div>
             <button
               onClick={() => addToCart(m)}
-              className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2 rounded-full"
+              className="bg-gradient-to-r bg-[#5d3d29] text-white px-6 py-2 rounded-full"
             >
               Adicionar
             </button>
@@ -390,33 +391,39 @@ const Home = () => {
         ))}
       </div>
     );
-
   } else if (hour >= 15 && hour < 23) {
     // 3) Renderiza cardápio 2 inline
     menuSection = (
       <div className="grid md:grid-cols-2 gap-6">
         {cardapio2.map((m) => (
-          <div key={m.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <div
+            key={m.id}
+            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+          >
             {/* réplica do layout acima, trocando somente as props */}
             <div className="p-6 text-center mb-4">
               <img
                 src={m.image}
                 alt={m.name}
                 className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
-                onError={(e) => { e.target.src = "https://via.placeholder.com/150"; }}
+                onError={(e) => {
+                  e.target.src = "https://via.placeholder.com/150";
+                }}
               />
               <h3 className="text-xl font-bold text-gray-800">{m.name}</h3>
             </div>
             <p className="text-gray-600 text-center mb-4">{m.description}</p>
             <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center text-yellow-500">
-              </div>
+              <div className="flex items-center text-yellow-500"></div>
               <div className="flex items-center text-gray-500">
-                <Clock size={16} /><span className="ml-1 text-sm">{m.time}</span>
+                <Clock size={16} />
+                <span className="ml-1 text-sm">{m.time}</span>
               </div>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-2xl font-bold text-orange-600">R$ {m.price.toFixed(2)}</span>
+              <span className="text-2xl font-bold text-orange-600">
+                R$ {m.price.toFixed(2)}
+              </span>
               <button
                 onClick={() => addToCart(m)}
                 className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2 rounded-full hover:scale-105 shadow-lg"
@@ -428,7 +435,6 @@ const Home = () => {
         ))}
       </div>
     );
-
   } else {
     menuSection = (
       <p className="text-center font-bold text-gray-600">
@@ -438,15 +444,22 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
+    <div className="min-h-screen bg-[#fff4e4]">
       {/* Header */}
-      <header className="bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg">
+      <header className="bg-[#5d3d29]">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="text-4xl">🦉</div>
+              <img
+                src="https://i.imgur.com/wYccCFb.jpeg"
+                alt="Logo Orçamenthus"
+                className="w-32 h-32 object-contain rounded-full"
+              />
+
               <div>
-                <h1 className="text-3xl font-bold">Corujão Marmitas</h1>
+                <h3 className="text-3xl font-bold text-[#fff4e4]">
+                  Orçamenthus
+                </h3>
                 <p className="text-orange-100">Sabor que conquista!</p>
               </div>
             </div>
@@ -456,7 +469,7 @@ const Home = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-orange-600 to-amber-600 text-white py-16">
+      <section className="bg-[#5d3d29] text-white shadow-lg">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-5xl font-bold mb-4">Marmitas Deliciosas</h2>
           <p className="text-xl mb-8 text-orange-100">
@@ -476,7 +489,6 @@ const Home = () => {
               4.8 de avaliação
             </div>
           </div>
-
         </div>
       </section>
 
@@ -489,15 +501,7 @@ const Home = () => {
               🍱 Nosso Cardápio
             </h2>
 
-            <section className="mb-12">
-              {menuSection}
-
-
-
-            </section>
-
-           
-            
+            <section className="mb-12">{menuSection}</section>
           </div>
 
           {/* Cart Sidebar */}
@@ -508,10 +512,16 @@ const Home = () => {
               </h3>
 
               {cart.length === 0 ? (
-                <div className="text-center text-gray-500 py-8">
-                  <div className="text-4xl mb-4">🦉</div>
-                  <p>Seu carrinho está vazio</p>
-                  <p className="text-sm">
+                <div className="flex flex-col items-center justify-center text-gray-500 py-8">
+                  <img
+                    src="https://i.imgur.com/wYccCFb.jpeg"
+                    alt="Logo Orçamenthus"
+                    className="w-14 h-14 object-contain rounded-full mb-4"
+                  />
+                  <p className="text-center font-semibold">
+                    Seu carrinho está vazio
+                  </p>
+                  <p className="text-sm text-center">
                     Adicione algumas marmitas deliciosas!
                   </p>
                 </div>
@@ -701,7 +711,6 @@ const Home = () => {
                         <Phone className="w-5 h-5" />
                         Finalizar Pedido
                       </button>
-
                     </div>
                   </div>
                 </>
@@ -717,8 +726,12 @@ const Home = () => {
           <div className="grid md:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="text-3xl">🦉</div>
-                <h3 className="text-2xl font-bold">Corujão Marmitas</h3>
+                <img
+                  src="https://i.imgur.com/wYccCFb.jpeg"
+                  alt="Logo Orçamenthus"
+                  className="w-32 h-32 object-contain rounded-full"
+                />
+                <h3 className="text-2xl font-bold">Orçamenthus</h3>
               </div>
               <p className="text-gray-400">
                 Marmitas saborosas e nutritivas, preparadas com ingredientes
