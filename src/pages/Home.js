@@ -349,6 +349,8 @@ const Home = () => {
     }
   };
 
+  const FORCE_CARDAPIO1 = true;
+
   let menuSection;
   if (day === 1) {
     menuSection = (
@@ -357,7 +359,8 @@ const Home = () => {
       </p>
     );
 
-  } else if (hour >= 10 && hour < 2) {
+    //hour >= 10 && hour < 14
+  } else if (FORCE_CARDAPIO1) {
     menuSection = (
       <div className="grid md:grid-cols-2 gap-6">
         {cardapio1.map((m) => (
