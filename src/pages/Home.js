@@ -357,7 +357,7 @@ const Home = () => {
       </p>
     );
 
-  } else if (hour >= 10 && hour < 24) {
+  } else if (hour >= 10 && hour < 2) {
     menuSection = (
       <div className="grid md:grid-cols-2 gap-6">
         {cardapio1.map((m) => (
@@ -388,7 +388,7 @@ const Home = () => {
       </div>
     );
 
-  } else if (hour >= 15 && hour < 24) {
+  } else if (hour >= 15 && hour < 23) {
     // 3) Renderiza cardápio 2 inline
     menuSection = (
       <div className="grid md:grid-cols-2 gap-6">
