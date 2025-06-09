@@ -350,7 +350,7 @@ const Home = () => {
   };
 
   const FORCE_CARDAPIO1 = true;
-
+// 1 seunga 2 terça e assim
   let menuSection;
   if (day === 2) {
     menuSection = (
@@ -496,113 +496,8 @@ const Home = () => {
 
             </section>
 
-            {/* Bebidas Section */}
-            <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-              🥤 Bebidas
-            </h2>
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
-              {bebidas.map((bebida) => (
-                <div
-                  key={bebida.id}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-                >
-                  <div className="p-6">
-                    <div className="text-center mb-4">
-                      <div className="mb-2">
-                        <div className="text-4xl mb-2">{bebida.icon}</div>
-                        <img
-                          src={bebida.image}
-                          alt={bebida.name}
-                          className="w-20 h-20 object-cover rounded-full mx-auto shadow-lg"
-                          onError={(e) => {
-                            e.target.src =
-                              "https://via.placeholder.com/150x150/3b82f6/ffffff?text=" +
-                              bebida.icon;
-                          }}
-                        />
-                      </div>
-                      <h3 className="text-lg font-bold text-gray-800">
-                        {bebida.name}
-                      </h3>
-                    </div>
-
-                    <p className="text-gray-600 text-center mb-4 text-sm">
-                      {bebida.description}
-                    </p>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-xl font-bold text-blue-600">
-                        R$ {bebida.price.toFixed(2)}
-                      </span>
-                      <button
-                        onClick={() => addToCart(bebida)}
-                        className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-full hover:from-blue-600 hover:to-indigo-600 transition-all transform hover:scale-105 shadow-lg"
-                      >
-                        <Plus size={14} className="inline mr-1" />
-                        Comprar
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Adicionais Section */}
-            {adicionais.length > 0 && (
-              <>
-                <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-                  🍟 Adicionais
-                </h2>
-                <div className="grid md:grid-cols-3 gap-6">
-                  {adicionais.map((adicional) => (
-                    <div
-                      key={adicional.id}
-                      className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-                    >
-                      <div className="p-6">
-                        <div className="text-center mb-4">
-                          <div className="mb-2">
-                            <div className="text-4xl mb-2">
-                              {adicional.icon}
-                            </div>
-                            <img
-                              src={adicional.image}
-                              alt={adicional.name}
-                              className="w-20 h-20 object-cover rounded-full mx-auto shadow-lg"
-                              onError={(e) => {
-                                e.target.src =
-                                  "https://via.placeholder.com/150x150/f97316/ffffff?text=" +
-                                  adicional.icon;
-                              }}
-                            />
-                          </div>
-                          <h3 className="text-lg font-bold text-gray-800">
-                            {adicional.name}
-                          </h3>
-                        </div>
-
-                        <p className="text-gray-600 text-center mb-4 text-sm">
-                          {adicional.description}
-                        </p>
-
-                        <div className="flex justify-between items-center">
-                          <span className="text-xl font-bold text-orange-600">
-                            R$ {adicional.price.toFixed(2)}
-                          </span>
-                          <button
-                            onClick={() => addToCart(adicional)}
-                            className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-2 rounded-full hover:from-orange-600 hover:to-amber-600 transition-all transform hover:scale-105 shadow-lg"
-                          >
-                            <Plus size={14} className="inline mr-1" />
-                            Comprar
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+           
+            
           </div>
 
           {/* Cart Sidebar */}
