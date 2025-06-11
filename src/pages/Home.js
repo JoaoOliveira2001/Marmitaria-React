@@ -35,6 +35,12 @@ const Home = () => {
   const [senha, setSenha] = useState("");
   const [now, setNow] = useState(new Date());
   const [cardapio1, setCardapio1] = useState([]);
+  const [tipoEntrega, setTipoEntrega] = useState("retirada");
+  const [localEntrega, setLocalEntrega] = useState("");
+  const [frete, setFrete] = useState(0);
+  const [mostrarMarmitas, setMostrarMarmitas] = useState(true);
+  const [mostrarBebidas, setMostrarBebidas] = useState(false);
+  const [mostrarPorcoes, setMostrarPorcoes] = useState(false);
 
   useEffect(() => {
     // Endpoint do seu Web App do Apps Script
@@ -274,7 +280,10 @@ const Home = () => {
       message += `\n*Observações Gerais:*\n${observacoes}`;
     }
 
-    message += `\n\n*Total: R$ ${getTotalPrice()}*\n Por favor, confirme meu pedido!`;
+    message += `\n\n*Frete:* R$ ${frete.toFixed(2)}\n`;
+    message += `*Total: R$ ${(parseFloat(getTotalPrice()) + frete).toFixed(
+      2
+    )}*\n Por favor, confirme meu pedido!`;
 
     const phoneNumber = "11936186513";
     const encodedMessage = encodeURIComponent(message);
@@ -353,7 +362,7 @@ const Home = () => {
   const FORCE_CARDAPIO1 = true;
   // 1 seunga 2 terça e assim
   let menuSection;
-  if (day === 2) {
+  if (day === 1) {
     menuSection = (
       <p className="text-center font-bold text-red-500">
         ❌ Fechado às segundas-feiras
@@ -594,7 +603,7 @@ const Home = () => {
                     <div className="flex justify-between items-center mb-4">
                       <span className="text-xl font-bold">Total:</span>
                       <span className="text-2xl font-bold text-orange-600">
-                        R$ {getTotalPrice()}
+                        R$ {(parseFloat(getTotalPrice()) + frete).toFixed(2)}
                       </span>
                     </div>
                     <div className="bg-white rounded-2xl shadow-lg p-6 mt-8 space-y-4">
@@ -661,6 +670,56 @@ const Home = () => {
                           onChange={(e) => setReferencia(e.target.value)}
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
+
+                        {/* Tipo de entrega: retirada ou entrega */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Entrega ou Retirada?
+                          </label>
+                          <select
+                            value={tipoEntrega}
+                            onChange={(e) => {
+                              const tipo = e.target.value;
+                              setTipoEntrega(tipo);
+                              if (tipo === "retirada") {
+                                setFrete(0);
+                                setLocalEntrega("");
+                              }
+                            }}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          >
+                            <option value="retirada">Retirada</option>
+                            <option value="entrega">Entrega</option>
+                          </select>
+                        </div>
+
+                        {/* Local de entrega */}
+                        {tipoEntrega === "entrega" && (
+                          <div className="mt-4">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Local de Entrega
+                            </label>
+                            <select
+                              value={localEntrega}
+                              onChange={(e) => {
+                                const local = e.target.value;
+                                setLocalEntrega(local);
+                                if (local === "pinhal") setFrete(5);
+                                else if (local === "jacare") setFrete(4);
+                                else if (local === "cabreuva") setFrete(13);
+                                else setFrete(0);
+                              }}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            >
+                              <option value="">Selecione</option>
+                              <option value="pinhal">Pinhal - R$ 5,00</option>
+                              <option value="jacare">Jacaré - R$ 4,00</option>
+                              <option value="cabreuva">
+                                Cabreúva - R$ 13,00
+                              </option>
+                            </select>
+                          </div>
+                        )}
                       </div>
 
                       <div>
