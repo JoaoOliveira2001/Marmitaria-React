@@ -237,9 +237,13 @@ const Home = () => {
 
     message += ` *Cliente:* ${nome || "Não informado"}\n`;
     message += ` *Telefone:* ${telefone || "Não informado"}\n`;
-    message += ` *Endereço:* ${endereco}, ${numero} - ${bairro}, ${cidade}\n`;
-    if (complemento) message += ` *Complemento:* ${complemento}\n`;
-    if (referencia) message += ` *Referência:* ${referencia}\n`;
+    if (tipoEntrega === "entrega") {
+      message += ` *Endereço:* ${endereco}, ${numero} - ${bairro}, ${cidade}\n`;
+      if (complemento) message += ` *Complemento:* ${complemento}\n`;
+      if (referencia) message += ` *Referência:* ${referencia}\n`;
+    } else {
+      message += ` *Retirada no local*\n`;
+    }
     message += `\n`;
 
     const marmitasInCart = cart.filter((item) => item.type === "marmita");
@@ -306,9 +310,10 @@ const Home = () => {
     const pedido = {
       nome,
       telefone,
-      endereco: `${endereco}, ${numero}${
-        complemento ? ` - ${complemento}` : ""
-      }`,
+      endereco:
+        tipoEntrega === "entrega"
+          ? `${endereco}, ${numero}${complemento ? ` - ${complemento}` : ""}`
+          : "Retirada",
       produtos: cart
         .map(
           (item) =>
@@ -628,48 +633,6 @@ const Home = () => {
                           onChange={(e) => setTelefone(e.target.value)}
                           className="p-3 border border-gray-300 rounded-lg w-full"
                         />
-                        <input
-                          type="text"
-                          placeholder="Endereço"
-                          value={endereco}
-                          onChange={(e) => setEndereco(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Número"
-                          value={numero}
-                          onChange={(e) => setNumero(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Complemento"
-                          value={complemento}
-                          onChange={(e) => setComplemento(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Bairro"
-                          value={bairro}
-                          onChange={(e) => setBairro(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Cidade"
-                          value={cidade}
-                          onChange={(e) => setCidade(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Referência (opcional)"
-                          value={referencia}
-                          onChange={(e) => setReferencia(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
 
                         {/* Tipo de entrega: retirada ou entrega */}
                         <div>
@@ -693,32 +656,76 @@ const Home = () => {
                           </select>
                         </div>
 
-                        {/* Local de entrega */}
+                        {/* Campos de endereço */}
                         {tipoEntrega === "entrega" && (
-                          <div className="mt-4">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              Local de Entrega
-                            </label>
-                            <select
-                              value={localEntrega}
-                              onChange={(e) => {
-                                const local = e.target.value;
-                                setLocalEntrega(local);
-                                if (local === "pinhal") setFrete(5);
-                                else if (local === "jacare") setFrete(4);
-                                else if (local === "cabreuva") setFrete(13);
-                                else setFrete(0);
-                              }}
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                            >
-                              <option value="">Selecione</option>
-                              <option value="pinhal">Pinhal - R$ 5,00</option>
-                              <option value="jacare">Jacaré - R$ 4,00</option>
-                              <option value="cabreuva">
-                                Cabreúva - R$ 13,00
-                              </option>
-                            </select>
-                          </div>
+                          <>
+                            <input
+                              type="text"
+                              placeholder="Endereço"
+                              value={endereco}
+                              onChange={(e) => setEndereco(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Número"
+                              value={numero}
+                              onChange={(e) => setNumero(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Complemento"
+                              value={complemento}
+                              onChange={(e) => setComplemento(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Bairro"
+                              value={bairro}
+                              onChange={(e) => setBairro(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Cidade"
+                              value={cidade}
+                              onChange={(e) => setCidade(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Referência (opcional)"
+                              value={referencia}
+                              onChange={(e) => setReferencia(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+
+                            {/* Local de entrega */}
+                            <div className="mt-4">
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Local de Entrega
+                              </label>
+                              <select
+                                value={localEntrega}
+                                onChange={(e) => {
+                                  const local = e.target.value;
+                                  setLocalEntrega(local);
+                                  if (local === "pinhal") setFrete(5);
+                                  else if (local === "jacare") setFrete(4);
+                                  else if (local === "cabreuva") setFrete(13);
+                                  else setFrete(0);
+                                }}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                              >
+                                <option value="">Selecione</option>
+                                <option value="pinhal">Pinhal - R$ 5,00</option>
+                                <option value="jacare">Jacaré - R$ 4,00</option>
+                                <option value="cabreuva">Cabreúva - R$ 13,00</option>
+                              </select>
+                            </div>
+                          </>
                         )}
                       </div>
 
