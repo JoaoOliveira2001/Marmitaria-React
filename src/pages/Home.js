@@ -39,9 +39,8 @@ const Home = () => {
   const [tipoEntrega, setTipoEntrega] = useState("retirada");
   const [localEntrega, setLocalEntrega] = useState("");
   const [frete, setFrete] = useState(0);
-  const [mostrarMarmitas, setMostrarMarmitas] = useState(true);
-  const [mostrarBebidas, setMostrarBebidas] = useState(false);
-  const [mostrarPorcoes, setMostrarPorcoes] = useState(false);
+  // tab currently selected in the menu
+  const [activeType, setActiveType] = useState("marmita");
   const cartRef = React.useRef(null);
 
   useEffect(() => {
@@ -366,8 +365,6 @@ const Home = () => {
     }
   };
 
-  const FORCE_CARDAPIO1 = true;
-  // 1 seunga 2 terça e assim
   let menuSection;
   if (day === 1) {
     menuSection = (
@@ -375,86 +372,53 @@ const Home = () => {
         ❌ Fechado às segundas-feiras
       </p>
     );
-
-    //hour >= 10 && hour < 14
-  } else if (FORCE_CARDAPIO1) {
-    menuSection = (
-      <div className="grid md:grid-cols-2 gap-6">
-        {cardapio1.map((m) => (
-          <div key={m.id} className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="text-center mb-4">
-              <img
-                src={m.image}
-                alt={m.name}
-                className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
-              />
-              <h3 className="text-xl font-bold">{m.name}</h3>
-            </div>
-            <p className="text-gray-600 mb-4">{m.description}</p>
-            <div className="flex justify-between items-center mb-4">
-              <span>⏰ {m.time}</span>
-              <span className="text-2xl font-bold text-orange-600">
-                {(() => {
-                  const p = parsePrices(m.price, m);
-                  if (p.length === 0) return "R$ 0.00";
-                  return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
-                })()}
-              </span>
-            </div>
-            <PriceButtons price={m.price} item={m} onAdd={addToCart} />
-          </div>
-        ))}
-      </div>
-    );
-  } else if (hour >= 15 && hour < 23) {
-    // 3) Renderiza cardápio 2 inline
-    menuSection = (
-      <div className="grid md:grid-cols-2 gap-6">
-        {cardapio2.map((m) => (
-          <div
-            key={m.id}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-          >
-            {/* réplica do layout acima, trocando somente as props */}
-            <div className="p-6 text-center mb-4">
-              <img
-                src={m.image}
-                alt={m.name}
-                className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
-                onError={(e) => {
-                  e.target.src = "https://via.placeholder.com/150";
-                }}
-              />
-              <h3 className="text-xl font-bold text-gray-800">{m.name}</h3>
-            </div>
-            <p className="text-gray-600 text-center mb-4">{m.description}</p>
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center text-yellow-500"></div>
-              <div className="flex items-center text-gray-500">
-                <Clock size={16} />
-                <span className="ml-1 text-sm">{m.time}</span>
-              </div>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-2xl font-bold text-orange-600">
-                R$ {m.price.toFixed(2)}
-              </span>
-              <button
-                onClick={() => addToCart(m)}
-                className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2 rounded-full hover:scale-105 shadow-lg"
-              >
-                <Plus size={16} className="inline mr-1" /> Adicionar
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
   } else {
+    const tabs = [
+      { key: "marmita", label: "Marmitas" },
+      { key: "bebida", label: "Bebidas" },
+      { key: "porcao", label: "Porções" },
+    ];
+    const filtered = cardapio1.filter((item) => item.type === activeType);
     menuSection = (
-      <p className="text-center font-bold text-gray-600">
-        🚫 Fora do horário de funcionamento
-      </p>
+      <>
+        <div className="flex justify-center mb-6 space-x-4">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setActiveType(t.key)}
+              className={`px-4 py-2 rounded-full font-semibold ${activeType === t.key ? "bg-orange-500 text-white" : "bg-gray-200 text-gray-700"}`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          {filtered.map((m) => (
+            <div key={m.id} className="bg-white rounded-2xl shadow-lg p-6">
+              <div className="text-center mb-4">
+                <img
+                  src={m.image}
+                  alt={m.name}
+                  className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
+                />
+                <h3 className="text-xl font-bold">{m.name}</h3>
+              </div>
+              <p className="text-gray-600 mb-4">{m.description}</p>
+              <div className="flex justify-between items-center mb-4">
+                {m.time && <span>⏰ {m.time}</span>}
+                <span className="text-2xl font-bold text-orange-600">
+                  {(() => {
+                    const p = parsePrices(m.price, m);
+                    if (p.length === 0) return "R$ 0.00";
+                    return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
+                  })()}
+                </span>
+              </div>
+              <PriceButtons price={m.price} item={m} onAdd={addToCart} />
+            </div>
+          ))}
+        </div>
+      </>
     );
   }
 
