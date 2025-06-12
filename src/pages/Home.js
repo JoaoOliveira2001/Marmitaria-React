@@ -15,6 +15,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cardapio1 from "../components/Cardapio1";
 import Cardapio2 from "../components/Cardapio2";
+import PriceButtons, { parsePrices } from "../components/PriceButtons";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -387,15 +388,14 @@ const Home = () => {
             <div className="flex justify-between items-center mb-4">
               <span>⏰ {m.time}</span>
               <span className="text-2xl font-bold text-orange-600">
-                R$ {Number(m.price).toFixed(2)}
+                {(() => {
+                  const p = parsePrices(m.price, m);
+                  if (p.length === 0) return "R$ 0.00";
+                  return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
+                })()}
               </span>
             </div>
-            <button
-              onClick={() => addToCart(m)}
-              className="bg-gradient-to-r bg-[#5d3d29] text-white px-6 py-2 rounded-full"
-            >
-              Adicionar
-            </button>
+            <PriceButtons price={m.price} item={m} onAdd={addToCart} />
           </div>
         ))}
       </div>
