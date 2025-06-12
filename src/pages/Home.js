@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
@@ -42,6 +42,7 @@ const Home = () => {
   const [mostrarMarmitas, setMostrarMarmitas] = useState(true);
   const [mostrarBebidas, setMostrarBebidas] = useState(false);
   const [mostrarPorcoes, setMostrarPorcoes] = useState(false);
+  const cartRef = React.useRef(null);
 
   useEffect(() => {
     // Endpoint do seu Web App do Apps Script
@@ -237,9 +238,13 @@ const Home = () => {
 
     message += ` *Cliente:* ${nome || "Não informado"}\n`;
     message += ` *Telefone:* ${telefone || "Não informado"}\n`;
-    message += ` *Endereço:* ${endereco}, ${numero} - ${bairro}, ${cidade}\n`;
-    if (complemento) message += ` *Complemento:* ${complemento}\n`;
-    if (referencia) message += ` *Referência:* ${referencia}\n`;
+    if (tipoEntrega === "entrega") {
+      message += ` *Endereço:* ${endereco}, ${numero} - ${bairro}, ${cidade}\n`;
+      if (complemento) message += ` *Complemento:* ${complemento}\n`;
+      if (referencia) message += ` *Referência:* ${referencia}\n`;
+    } else {
+      message += ` *Retirada no local*\n`;
+    }
     message += `\n`;
 
     const marmitasInCart = cart.filter((item) => item.type === "marmita");
@@ -306,9 +311,10 @@ const Home = () => {
     const pedido = {
       nome,
       telefone,
-      endereco: `${endereco}, ${numero}${
-        complemento ? ` - ${complemento}` : ""
-      }`,
+      endereco:
+        tipoEntrega === "entrega"
+          ? `${endereco}, ${numero}${complemento ? ` - ${complemento}` : ""}`
+          : "Retirada",
       produtos: cart
         .map(
           (item) =>
@@ -514,7 +520,7 @@ const Home = () => {
           </div>
 
           {/* Cart Sidebar */}
-          <div className="lg:w-1/3">
+          <div className="lg:w-1/3" id="cart" ref={cartRef}>
             <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-4">
               <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
                 🛒 Seu Pedido
@@ -628,48 +634,6 @@ const Home = () => {
                           onChange={(e) => setTelefone(e.target.value)}
                           className="p-3 border border-gray-300 rounded-lg w-full"
                         />
-                        <input
-                          type="text"
-                          placeholder="Endereço"
-                          value={endereco}
-                          onChange={(e) => setEndereco(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Número"
-                          value={numero}
-                          onChange={(e) => setNumero(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Complemento"
-                          value={complemento}
-                          onChange={(e) => setComplemento(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Bairro"
-                          value={bairro}
-                          onChange={(e) => setBairro(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Cidade"
-                          value={cidade}
-                          onChange={(e) => setCidade(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Referência (opcional)"
-                          value={referencia}
-                          onChange={(e) => setReferencia(e.target.value)}
-                          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
 
                         {/* Tipo de entrega: retirada ou entrega */}
                         <div>
@@ -693,32 +657,76 @@ const Home = () => {
                           </select>
                         </div>
 
-                        {/* Local de entrega */}
+                        {/* Campos de endereço */}
                         {tipoEntrega === "entrega" && (
-                          <div className="mt-4">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              Local de Entrega
-                            </label>
-                            <select
-                              value={localEntrega}
-                              onChange={(e) => {
-                                const local = e.target.value;
-                                setLocalEntrega(local);
-                                if (local === "pinhal") setFrete(5);
-                                else if (local === "jacare") setFrete(4);
-                                else if (local === "cabreuva") setFrete(13);
-                                else setFrete(0);
-                              }}
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                            >
-                              <option value="">Selecione</option>
-                              <option value="pinhal">Pinhal - R$ 5,00</option>
-                              <option value="jacare">Jacaré - R$ 4,00</option>
-                              <option value="cabreuva">
-                                Cabreúva - R$ 13,00
-                              </option>
-                            </select>
-                          </div>
+                          <>
+                            <input
+                              type="text"
+                              placeholder="Endereço"
+                              value={endereco}
+                              onChange={(e) => setEndereco(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Número"
+                              value={numero}
+                              onChange={(e) => setNumero(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Complemento"
+                              value={complemento}
+                              onChange={(e) => setComplemento(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Bairro"
+                              value={bairro}
+                              onChange={(e) => setBairro(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Cidade"
+                              value={cidade}
+                              onChange={(e) => setCidade(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Referência (opcional)"
+                              value={referencia}
+                              onChange={(e) => setReferencia(e.target.value)}
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+
+                            {/* Local de entrega */}
+                            <div className="mt-4">
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Local de Entrega
+                              </label>
+                              <select
+                                value={localEntrega}
+                                onChange={(e) => {
+                                  const local = e.target.value;
+                                  setLocalEntrega(local);
+                                  if (local === "pinhal") setFrete(5);
+                                  else if (local === "jacare") setFrete(4);
+                                  else if (local === "cabreuva") setFrete(13);
+                                  else setFrete(0);
+                                }}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                              >
+                                <option value="">Selecione</option>
+                                <option value="pinhal">Pinhal - R$ 5,00</option>
+                                <option value="jacare">Jacaré - R$ 4,00</option>
+                                <option value="cabreuva">Cabreúva - R$ 13,00</option>
+                              </select>
+                            </div>
+                          </>
                         )}
                       </div>
 
@@ -829,6 +837,16 @@ const Home = () => {
           </div>
         </div>
       </footer>
+
+      {cart.length > 0 && (
+        <button
+          onClick={() => cartRef.current?.scrollIntoView({ behavior: "smooth" })}
+          className="md:hidden fixed bottom-4 right-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-full flex items-center gap-2 shadow-lg z-50"
+        >
+          <ShoppingCart className="w-5 h-5" />
+          View Cart
+        </button>
+      )}
       <ToastContainer />
 
       {!mostrarSenha ? (
