@@ -15,6 +15,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cardapio1 from "../components/Cardapio1";
 import Cardapio2 from "../components/Cardapio2";
+import PriceButtons, { parsePrices } from "../components/PriceButtons";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -68,8 +69,8 @@ const Home = () => {
     if (existing) {
       setCart(
         cart.map((ci) =>
-          ci.id === item.id ? { ...ci, quantity: ci.quantity + 1 } : ci
-        )
+          ci.id === item.id ? { ...ci, quantity: ci.quantity + 1 } : ci,
+        ),
       );
     } else {
       setCart([...cart, { ...item, quantity: 1, observations: "" }]);
@@ -209,15 +210,15 @@ const Home = () => {
     } else {
       setCart(
         cart.map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-        )
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
+        ),
       );
     }
   };
 
   const updateObservations = (id, observations) => {
     setCart(
-      cart.map((item) => (item.id === id ? { ...item, observations } : item))
+      cart.map((item) => (item.id === id ? { ...item, observations } : item)),
     );
   };
 
@@ -243,7 +244,7 @@ const Home = () => {
 
     const marmitasInCart = cart.filter((item) => item.type === "marmita");
     const adicionaisInCart = cart.filter(
-      (item) => item.type === "bebida" || item.type === "adicional"
+      (item) => item.type === "bebida" || item.type === "adicional",
     );
 
     if (marmitasInCart.length > 0) {
@@ -282,14 +283,14 @@ const Home = () => {
 
     message += `\n\n*Frete:* R$ ${frete.toFixed(2)}\n`;
     message += `*Total: R$ ${(parseFloat(getTotalPrice()) + frete).toFixed(
-      2
+      2,
     )}*\n Por favor, confirme meu pedido!`;
 
     const phoneNumber = "11936186513";
     const encodedMessage = encodeURIComponent(message);
     window.open(
       `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
-      "_blank"
+      "_blank",
     );
   };
 
@@ -313,7 +314,7 @@ const Home = () => {
           (item) =>
             `${item.name} x${item.quantity}${
               item.observations ? ` (Obs: ${item.observations})` : ""
-            }`
+            }`,
         )
         .join(" | "),
       quantidade: cart.reduce((tot, item) => tot + item.quantity, 0),
@@ -387,15 +388,14 @@ const Home = () => {
             <div className="flex justify-between items-center mb-4">
               <span>⏰ {m.time}</span>
               <span className="text-2xl font-bold text-orange-600">
-                R$ {Number(m.price).toFixed(2)}
+                {(() => {
+                  const p = parsePrices(m.price, m);
+                  if (p.length === 0) return "R$ 0.00";
+                  return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
+                })()}
               </span>
             </div>
-            <button
-              onClick={() => addToCart(m)}
-              className="bg-gradient-to-r bg-[#5d3d29] text-white px-6 py-2 rounded-full"
-            >
-              Adicionar
-            </button>
+            <PriceButtons price={m.price} item={m} onAdd={addToCart} />
           </div>
         ))}
       </div>
@@ -456,17 +456,17 @@ const Home = () => {
     <div className="min-h-screen bg-[#fff4e4]">
       {/* Header */}
       <header className="bg-[#5d3d29]">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto max-w-screen-lg px-4 py-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
               <img
                 src="https://i.imgur.com/wYccCFb.jpeg"
                 alt="Logo Orçamenthus"
-                className="w-32 h-32 object-contain rounded-full"
+                className="w-24 h-24 sm:w-32 sm:h-32 object-contain rounded-full"
               />
 
-              <div>
-                <h3 className="text-3xl font-bold text-[#fff4e4]">
+              <div className="text-center sm:text-left">
+                <h3 className="text-2xl sm:text-3xl font-bold text-[#fff4e4]">
                   Orçamenthus
                 </h3>
                 <p className="text-orange-100">Sabor que conquista!</p>
@@ -479,21 +479,23 @@ const Home = () => {
 
       {/* Hero Section */}
       <section className="bg-[#5d3d29] text-white shadow-lg">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-5xl font-bold mb-4">Marmitas Deliciosas</h2>
-          <p className="text-xl mb-8 text-orange-100">
+        <div className="container mx-auto max-w-screen-md px-4 py-8 md:py-12 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            Marmitas Deliciosas
+          </h2>
+          <p className="text-lg md:text-xl mb-8 text-orange-100">
             Feitas com carinho, entregues com rapidez
           </p>
-          <div className="flex justify-center space-x-8 text-sm">
-            <div className="flex items-center">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 text-sm">
+            <div className="flex items-center justify-center">
               <Clock className="mr-2" size={16} />
               Entrega rápida
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center justify-center">
               <Users className="mr-2" size={16} />
               +1000 clientes satisfeitos
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center justify-center">
               <Star className="mr-2" size={16} />
               4.8 de avaliação
             </div>
@@ -501,7 +503,7 @@ const Home = () => {
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto max-w-screen-lg px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Menu */}
           <div className="lg:w-2/3">
@@ -781,7 +783,7 @@ const Home = () => {
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-12">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto max-w-screen-lg px-4">
           <div className="grid md:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
