@@ -15,7 +15,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cardapio1 from "../components/Cardapio1";
 import Cardapio2 from "../components/Cardapio2";
-import PriceButtons from "../components/PriceButtons";
+import PriceButtons, { parsePrices } from "../components/PriceButtons";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -389,11 +389,9 @@ const Home = () => {
               <span>⏰ {m.time}</span>
               <span className="text-2xl font-bold text-orange-600">
                 {(() => {
-                  const p = String(m.price)
-                    .split(',')
-                    .map((x) => parseFloat(x.trim()))
-                    .filter((x) => !Number.isNaN(x));
-                  return `R$ ${p[0]?.toFixed(2)}` + (p.length > 1 ? '+' : '');
+                  const p = parsePrices(m.price, m);
+                  if (p.length === 0) return "R$ 0.00";
+                  return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
                 })()}
               </span>
             </div>

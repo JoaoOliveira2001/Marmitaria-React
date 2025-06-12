@@ -1,17 +1,44 @@
 import React from "react";
 
-// Renders size buttons based on a price string
-export default function PriceButtons({ price, item, onAdd }) {
-  if (!price) return null;
-  const prices = String(price)
-    .split(',')
-    .map((p) => parseFloat(p.trim()))
-    .filter((p) => !Number.isNaN(p));
+/**
+ * Parse the price field or size properties (Pequeno, Medio, Grande)
+ * and return an array of numeric prices.
+ */
+export function parsePrices(price, item = {}) {
+  let values = [];
 
-  const sizeLabels = ['P', 'M', 'G'];
+  if (price !== undefined && price !== null && price !== "") {
+    if (typeof price === "number") {
+      values = [Number(price)];
+    } else {
+      values = String(price)
+        .split(',')
+        .map((p) => parseFloat(p.trim()))
+        .filter((n) => !Number.isNaN(n));
+    }
+  }
 
-  if (prices.length <= 1) {
-    const value = prices[0] ?? 0;
+  if (!values.length) {
+    const keys = ["Pequeno", "Medio", "Grande"];
+    values = keys
+      .map((k) => item[k])
+      .filter((v) => v !== undefined && v !== null)
+      .map((v) => parseFloat(v))
+      .filter((n) => !Number.isNaN(n));
+  }
+
+  return values;
+}
+
+// Renders size buttons based on available prices
+export default function PriceButtons({ price, item = {}, onAdd = () => {} }) {
+  const prices = parsePrices(price, item);
+  const sizeLabels = ["P", "M", "G"];
+
+  if (!prices.length) return null;
+
+  if (prices.length === 1) {
+    const value = prices[0];
     return (
       <button
         onClick={() => onAdd({ ...item, price: value })}
@@ -27,7 +54,9 @@ export default function PriceButtons({ price, item, onAdd }) {
       {prices.map((val, idx) => (
         <button
           key={idx}
-          onClick={() => onAdd({ ...item, price: val, size: sizeLabels[idx] })}
+          onClick={() =>
+            onAdd({ ...item, price: val, size: sizeLabels[idx] })
+          }
           className="bg-gradient-to-r bg-[#5d3d29] text-white px-4 py-2 rounded-full"
         >
           {sizeLabels[idx]} - R$ {val.toFixed(2)}
