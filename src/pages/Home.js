@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
@@ -42,6 +42,7 @@ const Home = () => {
   const [mostrarMarmitas, setMostrarMarmitas] = useState(true);
   const [mostrarBebidas, setMostrarBebidas] = useState(false);
   const [mostrarPorcoes, setMostrarPorcoes] = useState(false);
+  const cartRef = React.useRef(null);
 
   useEffect(() => {
     // Endpoint do seu Web App do Apps Script
@@ -519,7 +520,7 @@ const Home = () => {
           </div>
 
           {/* Cart Sidebar */}
-          <div className="lg:w-1/3">
+          <div className="lg:w-1/3" id="cart" ref={cartRef}>
             <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-4">
               <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
                 🛒 Seu Pedido
@@ -836,6 +837,16 @@ const Home = () => {
           </div>
         </div>
       </footer>
+
+      {cart.length > 0 && (
+        <button
+          onClick={() => cartRef.current?.scrollIntoView({ behavior: "smooth" })}
+          className="md:hidden fixed bottom-4 right-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-full flex items-center gap-2 shadow-lg z-50"
+        >
+          <ShoppingCart className="w-5 h-5" />
+          View Cart
+        </button>
+      )}
       <ToastContainer />
 
       {!mostrarSenha ? (
