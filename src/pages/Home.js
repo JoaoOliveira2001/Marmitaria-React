@@ -378,29 +378,28 @@ const Home = () => {
     //hour >= 10 && hour < 14
   } else if (FORCE_CARDAPIO1) {
     menuSection = (
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="space-y-4">
         {cardapio1.map((m) => (
-          <div key={m.id} className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="text-center mb-4">
-              <img
-                src={m.image}
-                alt={m.name}
-                className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
-              />
-              <h3 className="text-xl font-bold">{m.name}</h3>
+          <div key={m.id} className="bg-white rounded-lg shadow flex p-4 items-start">
+            <img
+              src={m.image}
+              alt={m.name}
+              className="w-20 h-20 rounded-full object-cover mr-4"
+            />
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-[#5d3d29]">{m.name}</h3>
+              <p className="text-sm text-gray-500">{m.description}</p>
+              <div className="mt-2 flex items-center justify-between">
+                <span className="font-bold text-orange-600">
+                  {(() => {
+                    const p = parsePrices(m.price, m);
+                    if (p.length === 0) return "R$ 0.00";
+                    return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
+                  })()}
+                </span>
+                <PriceButtons price={m.price} item={m} onAdd={addToCart} />
+              </div>
             </div>
-            <p className="text-gray-600 mb-4">{m.description}</p>
-            <div className="flex justify-between items-center mb-4">
-              <span>⏰ {m.time}</span>
-              <span className="text-2xl font-bold text-orange-600">
-                {(() => {
-                  const p = parsePrices(m.price, m);
-                  if (p.length === 0) return "R$ 0.00";
-                  return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
-                })()}
-              </span>
-            </div>
-            <PriceButtons price={m.price} item={m} onAdd={addToCart} />
           </div>
         ))}
       </div>
@@ -408,42 +407,29 @@ const Home = () => {
   } else if (hour >= 15 && hour < 23) {
     // 3) Renderiza cardápio 2 inline
     menuSection = (
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="space-y-4">
         {cardapio2.map((m) => (
-          <div
-            key={m.id}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-          >
-            {/* réplica do layout acima, trocando somente as props */}
-            <div className="p-6 text-center mb-4">
-              <img
-                src={m.image}
-                alt={m.name}
-                className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
-                onError={(e) => {
-                  e.target.src = "https://via.placeholder.com/150";
-                }}
-              />
-              <h3 className="text-xl font-bold text-gray-800">{m.name}</h3>
-            </div>
-            <p className="text-gray-600 text-center mb-4">{m.description}</p>
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center text-yellow-500"></div>
-              <div className="flex items-center text-gray-500">
-                <Clock size={16} />
-                <span className="ml-1 text-sm">{m.time}</span>
+          <div key={m.id} className="bg-white rounded-lg shadow flex p-4 items-start">
+            <img
+              src={m.image}
+              alt={m.name}
+              className="w-20 h-20 rounded-full object-cover mr-4"
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/150";
+              }}
+            />
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-[#5d3d29]">{m.name}</h3>
+              <p className="text-sm text-gray-500">{m.description}</p>
+              <div className="mt-2 flex items-center justify-between">
+                <span className="font-bold text-orange-600">R$ {m.price.toFixed(2)}</span>
+                <button
+                  onClick={() => addToCart(m)}
+                  className="bg-[#5d3d29] text-white px-4 py-2 rounded-full text-sm"
+                >
+                  <Plus size={16} className="inline mr-1" /> Adicionar
+                </button>
               </div>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-2xl font-bold text-orange-600">
-                R$ {m.price.toFixed(2)}
-              </span>
-              <button
-                onClick={() => addToCart(m)}
-                className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2 rounded-full hover:scale-105 shadow-lg"
-              >
-                <Plus size={16} className="inline mr-1" /> Adicionar
-              </button>
             </div>
           </div>
         ))}
