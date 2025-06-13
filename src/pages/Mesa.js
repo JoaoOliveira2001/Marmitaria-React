@@ -11,6 +11,7 @@ const Mesa = () => {
   const [cardapio, setCardapio] = useState([]);
   const [activeType, setActiveType] = useState("marmita");
   const [cart, setCart] = useState([]);
+  const [notes, setNotes] = useState({});
   const [pedidosMesa, setPedidosMesa] = useState(() => {
     const stored = localStorage.getItem("pedidosMesa");
     return stored ? JSON.parse(stored) : [];
@@ -45,11 +46,13 @@ const Mesa = () => {
   }, []);
 
   const addToCart = (item) => {
-    const existing = cart.find((ci) => ci.id === item.id && ci.price === item.price);
+    const existing = cart.find(
+      (ci) => ci.id === item.id && ci.price === item.price && ci.note === item.note
+    );
     if (existing) {
       setCart(
         cart.map((ci) =>
-          ci.id === item.id && ci.price === item.price
+          ci.id === item.id && ci.price === item.price && ci.note === item.note
             ? { ...ci, quantity: ci.quantity + 1 }
             : ci
         )
@@ -60,15 +63,19 @@ const Mesa = () => {
     toast.success(`${item.name} adicionado!`, { position: "bottom-right", autoClose: 1500 });
   };
 
-  const removeFromCart = (id, price) => {
-    const existing = cart.find((item) => item.id === id && item.price === price);
+  const removeFromCart = (id, price, note) => {
+    const existing = cart.find(
+      (item) => item.id === id && item.price === price && item.note === note
+    );
     if (!existing) return;
     if (existing.quantity === 1) {
-      setCart(cart.filter((item) => !(item.id === id && item.price === price)));
+      setCart(
+        cart.filter((item) => !(item.id === id && item.price === price && item.note === note))
+      );
     } else {
       setCart(
         cart.map((item) =>
-          item.id === id && item.price === price
+          item.id === id && item.price === price && item.note === note
             ? { ...item, quantity: item.quantity - 1 }
             : item
         )
@@ -100,6 +107,7 @@ const Mesa = () => {
     setPedidosMesa(updated);
     localStorage.setItem("pedidosMesa", JSON.stringify(updated));
     setCart([]);
+    setNotes({});
     toast.success("Pedido adicionado!", { position: "bottom-right", autoClose: 1500 });
   };
 
@@ -113,18 +121,17 @@ const Mesa = () => {
       return;
     }
 
-    const produtosMap = new Map();
+    const produtos = [];
     pedidosMesa.forEach((p) => {
       p.items.forEach((it) => {
-        const key = `${it.name}|${it.price}`;
-        if (produtosMap.has(key)) {
-          produtosMap.get(key).quantity += it.quantity;
-        } else {
-          produtosMap.set(key, { name: it.name, price: it.price, quantity: it.quantity });
-        }
+        produtos.push({
+          name: it.name,
+          price: it.price,
+          quantity: it.quantity,
+          note: it.note,
+        });
       });
     });
-    const produtos = Array.from(produtosMap.values());
     const total = pedidosMesa.reduce((sum, p) => sum + p.total, 0);
     const payload = {
       mesa,
@@ -150,6 +157,7 @@ const Mesa = () => {
       setMesa(null);
       localStorage.removeItem("pedidosMesa");
       localStorage.removeItem("mesaAtual");
+      setNotes({});
       setShowOrders(false);
     } catch (err) {
       console.error("Erro na requisição:", err);
@@ -214,12 +222,30 @@ const Mesa = () => {
                   })()}
                 </span>
               </div>
-              <PriceButtons price={m.price} item={m} onAdd={addToCart} />
+              <PriceButtons
+                price={m.price}
+                item={m}
+                onAdd={(itm) =>
+                  addToCart({ ...itm, note: notes[m.id] ? notes[m.id] : "" })
+                }
+              />
+              <input
+                type="text"
+                placeholder="Observação (opcional)"
+                value={notes[m.id] || ""}
+                onChange={(e) =>
+                  setNotes({ ...notes, [m.id]: e.target.value })
+                }
+                className="mt-2 w-full border border-gray-300 rounded p-1 text-sm"
+              />
             </div>
           ))}
         </div>
         <div className="bg-white rounded-2xl shadow-lg p-6" id="cart">
-
+                    {item.note && (
+                      <p className="text-xs text-gray-500">{item.note}</p>
+                    )}
+                      onClick={() => removeFromCart(item.id, item.price, item.note)}
           {cart.length === 0 ? (
             <p className="text-gray-500 text-center">Nenhum item adicionado</p>
           ) : (
