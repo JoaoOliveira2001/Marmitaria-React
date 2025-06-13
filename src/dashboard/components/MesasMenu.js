@@ -9,7 +9,7 @@ export default function MesasMenu() {
       {tables.map((t) => (
         <a
           key={t}
-          href={`/mesa?mesa=${t}`}
+          href={`/#/mesa?mesa=${t}`}
           target="_blank"
           rel="noopener noreferrer"
           className="block bg-[#fff4e4] text-[#5d3d29] rounded px-2 py-1 text-center"
