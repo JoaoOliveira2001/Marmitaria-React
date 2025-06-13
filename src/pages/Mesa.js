@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ShoppingCart, Plus, Minus } from "lucide-react";
+import { ShoppingCart, Plus, Minus, ChevronDown, ChevronUp } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PriceButtons, { parsePrices } from "../components/PriceButtons";
@@ -16,6 +16,7 @@ const Mesa = () => {
     return stored ? JSON.parse(stored) : [];
   });
   const [showOrders, setShowOrders] = useState(false);
+  const [expandedOrder, setExpandedOrder] = useState(null);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -175,6 +176,13 @@ const Mesa = () => {
         alert("Erro ao fechar conta");
         return;
       }
+
+      await fetch("/api/limpaMesa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({mesa:`${mesa}`}),
+      });
+
       toast.success("Conta encerrada!", { position: "bottom-right", autoClose: 2000 });
       setPedidosMesa([]);
       setMesa(null);
@@ -198,12 +206,17 @@ const Mesa = () => {
   return (
     <div className="min-h-screen bg-[#fff4e4]">
       <header className="bg-[#5d3d29]">
-        <div className="container mx-auto px-4 py-4 flex justify-center">
+        <div className="container mx-auto px-4 py-4 flex flex-col items-center">
           <img
             src="https://i.imgur.com/wYccCFb.jpeg"
             alt="Logo"
             className="w-20 h-20 object-contain rounded-full"
           />
+          {mesa && (
+            <span className="mt-2 text-white font-semibold text-lg">
+              Mesa {mesa}
+            </span>
+          )}
         </div>
       </header>
 
@@ -288,7 +301,7 @@ const Mesa = () => {
             onClick={adicionarPedido}
             className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2"
           >
-            <PhoneIcon /> Adicionar Pedido
+            <PhoneIcon /> Enviar pedido para cozinha
           </button>
         </div>
       </main>
@@ -302,17 +315,46 @@ const Mesa = () => {
       {showOrders && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-xl font-bold mb-4">Meus Pedidos</h3>
+            <h3 className="text-xl font-bold mb-4">
+              Meus Pedidos{mesa ? ` – Mesa ${mesa}` : ""}
+            </h3>
             {pedidosMesa.length === 0 ? (
               <p className="text-center text-gray-500">Nenhum pedido salvo</p>
             ) : (
               <div className="space-y-4 max-h-60 overflow-y-auto mb-4">
                 {pedidosMesa.map((p, idx) => (
-                  <div key={idx} className="border-b pb-2">
-                    <p className="font-semibold">Pedido {idx + 1}</p>
-                    <p className="text-sm text-gray-600">
-                      {p.quantidade} itens - R$ {p.total.toFixed(2)}
-                    </p>
+                  <div
+                    key={idx}
+                    className="border-b pb-2 cursor-pointer"
+                    onClick={() =>
+                      setExpandedOrder(expandedOrder === idx ? null : idx)
+                    }
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-semibold">Pedido {idx + 1}</p>
+                        <p className="text-sm text-gray-600">
+                          {p.quantidade} itens - R$ {p.total.toFixed(2)}
+                        </p>
+                      </div>
+                      {expandedOrder === idx ? <ChevronUp /> : <ChevronDown />}
+                    </div>
+                    {expandedOrder === idx && (
+                      <ul className="mt-2 text-sm text-gray-700 space-y-1">
+                        {p.items.map((it, i) => (
+                          <li key={i} className="flex justify-between">
+                            <span>
+                              {it.name} x{it.quantity}
+                            </span>
+                            <span>R$ {(it.price * it.quantity).toFixed(2)}</span>
+                          </li>
+                        ))}
+                        <li className="font-semibold flex justify-between pt-2">
+                          <span>Total</span>
+                          <span>R$ {p.total.toFixed(2)}</span>
+                        </li>
+                      </ul>
+                    )}
                   </div>
                 ))}
               </div>
