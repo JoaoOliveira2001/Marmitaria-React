@@ -180,7 +180,7 @@ const Mesa = () => {
       await fetch("/api/limpaMesa", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({mesa:`${mesa}`}),
+        body: JSON.stringify({ mesa: String(mesa).trim() }),
       });
 
       toast.success("Conta encerrada!", { position: "bottom-right", autoClose: 2000 });
