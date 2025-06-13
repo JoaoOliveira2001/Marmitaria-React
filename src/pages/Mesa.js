@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ShoppingCart, Plus, Minus } from "lucide-react";
+import { ShoppingCart, Plus, Minus, ChevronDown, ChevronUp } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PriceButtons, { parsePrices } from "../components/PriceButtons";
@@ -16,6 +16,7 @@ const Mesa = () => {
     return stored ? JSON.parse(stored) : [];
   });
   const [showOrders, setShowOrders] = useState(false);
+  const [expandedOrder, setExpandedOrder] = useState(null);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -198,12 +199,17 @@ const Mesa = () => {
   return (
     <div className="min-h-screen bg-[#fff4e4]">
       <header className="bg-[#5d3d29]">
-        <div className="container mx-auto px-4 py-4 flex justify-center">
+        <div className="container mx-auto px-4 py-4 flex flex-col items-center">
           <img
             src="https://i.imgur.com/wYccCFb.jpeg"
             alt="Logo"
             className="w-20 h-20 object-contain rounded-full"
           />
+          {mesa && (
+            <span className="mt-2 text-white font-semibold text-lg">
+              Mesa {mesa}
+            </span>
+          )}
         </div>
       </header>
 
@@ -308,11 +314,38 @@ const Mesa = () => {
             ) : (
               <div className="space-y-4 max-h-60 overflow-y-auto mb-4">
                 {pedidosMesa.map((p, idx) => (
-                  <div key={idx} className="border-b pb-2">
-                    <p className="font-semibold">Pedido {idx + 1}</p>
-                    <p className="text-sm text-gray-600">
-                      {p.quantidade} itens - R$ {p.total.toFixed(2)}
-                    </p>
+                  <div
+                    key={idx}
+                    className="border-b pb-2 cursor-pointer"
+                    onClick={() =>
+                      setExpandedOrder(expandedOrder === idx ? null : idx)
+                    }
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-semibold">Pedido {idx + 1}</p>
+                        <p className="text-sm text-gray-600">
+                          {p.quantidade} itens - R$ {p.total.toFixed(2)}
+                        </p>
+                      </div>
+                      {expandedOrder === idx ? <ChevronUp /> : <ChevronDown />}
+                    </div>
+                    {expandedOrder === idx && (
+                      <ul className="mt-2 text-sm text-gray-700 space-y-1">
+                        {p.items.map((it, i) => (
+                          <li key={i} className="flex justify-between">
+                            <span>
+                              {it.name} x{it.quantity}
+                            </span>
+                            <span>R$ {(it.price * it.quantity).toFixed(2)}</span>
+                          </li>
+                        ))}
+                        <li className="font-semibold flex justify-between pt-2">
+                          <span>Total</span>
+                          <span>R$ {p.total.toFixed(2)}</span>
+                        </li>
+                      </ul>
+                    )}
                   </div>
                 ))}
               </div>
