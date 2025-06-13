@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginPedidos from "../components/LoginPedidos";
+import TableSidebar from "../components/TableSidebar";
 import { Bar } from "react-chartjs-2";
 import {
   Chart,
@@ -161,7 +162,9 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 flex">
+        <TableSidebar orders={orders} />
+        <div className="flex-1">
         <div className="flex justify-center mb-6 space-x-2">
           {[
             ["today", "Hoje"],
@@ -218,6 +221,7 @@ const Dashboard = () => {
           <div className="bg-white p-6 rounded shadow">
             <Bar data={barData} options={barOptions} />
           </div>
+        </div>
         </div>
       </div>
     </div>
