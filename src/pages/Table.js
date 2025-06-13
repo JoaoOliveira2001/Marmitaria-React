@@ -5,7 +5,7 @@ import PriceButtons from "../components/PriceButtons";
 
 export default function Table() {
   const [searchParams] = useSearchParams();
-  const mesa = searchParams.get("mesa");
+  const [mesa, setMesa] = useState(null);
   const tableKey = mesa ? `mesa_${mesa}_cart` : null;
 
   const [cardapio1, setCardapio1] = useState([]);
@@ -19,6 +19,18 @@ export default function Table() {
       .then((data) => setCardapio1(data))
       .catch(() => setCardapio1([]));
   }, []);
+
+  // Persist mesa parameter to handle page reloads without query string
+  useEffect(() => {
+    const paramMesa = searchParams.get("mesa");
+    if (paramMesa) {
+      localStorage.setItem("mesa_atual", paramMesa);
+      setMesa(paramMesa);
+    } else {
+      const stored = localStorage.getItem("mesa_atual");
+      if (stored) setMesa(stored);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!tableKey) return;
@@ -92,6 +104,10 @@ export default function Table() {
       alert("Erro ao enviar pedido");
     }
   };
+
+  if (mesa === null) {
+    return <div className="p-4">Carregando...</div>;
+  }
 
   if (!mesa) {
     return <div className="p-4">Mesa não informada.</div>;

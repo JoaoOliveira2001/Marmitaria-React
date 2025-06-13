@@ -152,12 +152,26 @@ const Dashboard = () => {
       <header className="bg-[#5d3d29] text-[#fff4e4] py-6">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <button
-            onClick={() => navigate("/")}
-            className="bg-[#fff4e4] text-[#5d3d29] px-4 py-2 rounded"
-          >
-            Home
-          </button>
+          <div className="space-x-2">
+            <button
+              onClick={() => navigate("/cozinha")}
+              className="bg-[#fff4e4] text-[#5d3d29] px-3 py-1 rounded"
+            >
+              Go to Kitchen View
+            </button>
+            <button
+              onClick={() => navigate("/mesa?mesa=7")}
+              className="bg-[#fff4e4] text-[#5d3d29] px-3 py-1 rounded"
+            >
+              Test Table View
+            </button>
+            <button
+              onClick={() => navigate("/")}
+              className="bg-[#fff4e4] text-[#5d3d29] px-3 py-1 rounded"
+            >
+              Home
+            </button>
+          </div>
         </div>
       </header>
 

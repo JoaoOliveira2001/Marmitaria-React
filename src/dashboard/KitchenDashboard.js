@@ -15,13 +15,12 @@ export default function KitchenDashboard() {
     return () => window.removeEventListener("storage", handler);
   }, []);
 
-  const closeOrder = (index) => {
-    const updated = [...orders];
-    const [removed] = updated.splice(index, 1);
+  const closeTable = (mesa) => {
+    const updated = orders.filter((o) => o.mesa !== mesa);
     setOrders(updated);
     localStorage.setItem("dashboard_orders", JSON.stringify(updated));
     const occ = JSON.parse(localStorage.getItem("occupied_tables") || "[]");
-    const idx = occ.indexOf(removed.mesa);
+    const idx = occ.indexOf(mesa);
     if (idx >= 0) {
       occ.splice(idx, 1);
       localStorage.setItem("occupied_tables", JSON.stringify(occ));
@@ -32,19 +31,25 @@ export default function KitchenDashboard() {
     <div className="min-h-screen bg-[#fff4e4] p-4">
       <h2 className="text-2xl font-bold mb-4">Cozinha - Novos Pedidos</h2>
       {orders.length === 0 && <p>Nenhum pedido.</p>}
-      {orders.map((order, idx) => (
-        <div key={idx} className="bg-white p-4 rounded shadow mb-4">
-          <div className="font-semibold">
-            Mesa {order.mesa} - {new Date(order.hora).toLocaleTimeString()}
-          </div>
-          <div className="text-sm mb-2">{order.itens}</div>
-          <div className="mb-2">Total R$ {order.total}</div>
-          <div className="font-bold mb-2">Status: {order.status}</div>
+      {Object.entries(
+        orders.reduce((acc, o) => {
+          acc[o.mesa] = acc[o.mesa] ? [...acc[o.mesa], o] : [o];
+          return acc;
+        }, {})
+      ).map(([mesa, list]) => (
+        <div key={mesa} className="bg-white p-4 rounded shadow mb-4">
+          <div className="font-semibold mb-2">Mesa {mesa}</div>
+          {list.map((order, idx) => (
+            <div key={idx} className="text-sm mb-1">
+              {new Date(order.hora).toLocaleTimeString()} - {order.itens} (R$
+              {order.total})
+            </div>
+          ))}
           <button
-            onClick={() => closeOrder(idx)}
-            className="bg-[#5d3d29] text-white px-3 py-1 rounded"
+            onClick={() => closeTable(mesa)}
+            className="mt-2 bg-[#5d3d29] text-white px-3 py-1 rounded"
           >
-            Fechar Pedido
+            Fechar Mesa
           </button>
         </div>
       ))}
