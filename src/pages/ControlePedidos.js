@@ -81,7 +81,7 @@ const [pedidos, setPedidos] = useState([
       className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${
         pedido.status === "concluido"
           ? "border-green-500 opacity-75"
-          : "border-orange-500"
+          : "border-[#5d3d29]"
       }`}
     >
       <div className="flex justify-between items-start mb-4">
@@ -165,7 +165,7 @@ const [pedidos, setPedidos] = useState([
       {pedido.status === "pendente" ? (
         <button
           onClick={() => marcarComoConcluido(pedido.id)}
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+          className="w-full bg-[#5d3d29] hover:bg-[#5d3d29] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
         >
           <Package className="w-5 h-5" />
           Marcar como Concluído
@@ -182,22 +182,21 @@ const [pedidos, setPedidos] = useState([
   return (
     <div>
       {/* Cabeçalho */}
-      <div className="bg-gradient-to-r from-orange-600 to-amber-600 text-white py-16">
+      <div className="bg-gradient-to-r from-[#5d3d29] to-[#5d3d29] text-white py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center">🦉</div>
-              <h1 className="text-2xl font-bold">Corujão Marmitas</h1>
+              <h1 className="text-2xl font-bold">Orçamenthus</h1>
             </div>
             <button
               onClick={() => navigate("/")}
-              className="bg-white text-orange-600 font-semibold px-4 py-2 rounded shadow hover:bg-orange-100 transition"
+              className="bg-white text-[#5d3d29] font-semibold px-4 py-2 rounded shadow hover:bg-[#5d3d29] transition"
             >
               ⬅ Voltar para Home
             </button>
           </div>
           <h2 className="text-xl font-semibold">Controle de Pedidos</h2>
-          <p className="text-orange-100">Gerencie os pedidos da cozinha</p>
+          <p className="text-[#5d3d29]">Gerencie os pedidos da cozinha</p>
         </div>
       </div>
 
@@ -206,7 +205,7 @@ const [pedidos, setPedidos] = useState([
         {/* Status Cards */}
         <div className="grid md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <div className="text-3xl font-bold text-orange-500">
+            <div className="text-3xl font-bold text-[#5d3d29]">
               {pedidos.length}
             </div>
             <div className="text-gray-600">Total de Pedidos</div>
@@ -229,7 +228,7 @@ const [pedidos, setPedidos] = useState([
         {pedidosPendentes.length > 0 && (
           <div className="mb-8">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Clock className="w-6 h-6 text-orange-500" />
+              <Clock className="w-6 h-6 text-[#5d3d29]" />
               Pedidos Pendentes ({pedidosPendentes.length})
             </h3>
             <div className="space-y-4">
