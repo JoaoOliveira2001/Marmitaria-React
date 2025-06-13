@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginPedidos from "../components/LoginPedidos";
+import TableSidebar from "../components/TableSidebar";
 import { Bar } from "react-chartjs-2";
 import {
   Chart,
@@ -60,6 +61,23 @@ const Dashboard = () => {
   };
 
   const filtered = orders.filter(filterOrder);
+
+  const tables = Array.from({ length: 15 }, (_, i) => i + 1);
+  const getTableNumber = (order) => {
+    const t = order.Mesa || order.table || order.Table;
+    if (!t) return null;
+    const m = String(t).match(/\d+/);
+    return m ? parseInt(m[0], 10) : null;
+  };
+  const tableStatus = {};
+  tables.forEach((n) => {
+    const occupied = orders.some((o) => {
+      const tableNum = getTableNumber(o);
+      const active = !String(o.Status).toLowerCase().includes("concl");
+      return tableNum === n && active;
+    });
+    tableStatus[n] = occupied ? "occupied" : "available";
+  });
 
   const sumBy = (list, key) =>
     list.reduce((sum, o) => sum + parseFloat(o[key] || 0), 0);
@@ -148,20 +166,22 @@ const Dashboard = () => {
     filter === "today" ? "Hoje" : filter === "week" ? "Semana" : "Mês";
 
   return (
-    <div className="min-h-screen bg-[#fff4e4]">
-      <header className="bg-[#5d3d29] text-[#fff4e4] py-6">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <button
-            onClick={() => navigate("/")}
-            className="bg-[#fff4e4] text-[#5d3d29] px-4 py-2 rounded"
+    <div className="min-h-screen bg-[#fff4e4] flex">
+      <TableSidebar tableStatus={tableStatus} />
+      <div className="flex-1 ml-48">
+        <header className="bg-[#5d3d29] text-[#fff4e4] py-6">
+          <div className="container mx-auto px-4 flex justify-between items-center">
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <button
+              onClick={() => navigate("/")}
+              className="bg-[#fff4e4] text-[#5d3d29] px-4 py-2 rounded"
           >
             Home
           </button>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center mb-6 space-x-2">
           {[
             ["today", "Hoje"],
@@ -219,6 +239,7 @@ const Dashboard = () => {
             <Bar data={barData} options={barOptions} />
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
