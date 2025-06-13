@@ -11,6 +11,11 @@ const Mesa = () => {
   const [cardapio, setCardapio] = useState([]);
   const [activeType, setActiveType] = useState("marmita");
   const [cart, setCart] = useState([]);
+  const [pedidosMesa, setPedidosMesa] = useState(() => {
+    const stored = localStorage.getItem("pedidosMesa");
+    return stored ? JSON.parse(stored) : [];
+  });
+  const [showOrders, setShowOrders] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -75,7 +80,7 @@ const Mesa = () => {
     return cart.reduce((tot, item) => tot + item.price * item.quantity, 0).toFixed(2);
   };
 
-  const finalizarPedido = async () => {
+  const adicionarPedido = () => {
     if (!mesa) {
       alert("Mesa não identificada");
       return;
@@ -84,30 +89,71 @@ const Mesa = () => {
       alert("Seu pedido está vazio");
       return;
     }
+
     const pedido = {
-      mesa,
-      produtos: cart.map((item) => `${item.name} x${item.quantity}`).join(" | "),
+      items: cart,
       quantidade: cart.reduce((t, i) => t + i.quantity, 0),
-      total: getTotalPrice(),
-      status: "Pendente",
+      total: parseFloat(getTotalPrice()),
     };
+
+    const updated = [...pedidosMesa, pedido];
+    setPedidosMesa(updated);
+    localStorage.setItem("pedidosMesa", JSON.stringify(updated));
+    setCart([]);
+    toast.success("Pedido adicionado!", { position: "bottom-right", autoClose: 1500 });
+  };
+
+  const fecharConta = async () => {
+    if (!mesa) {
+      alert("Mesa não identificada");
+      return;
+    }
+    if (pedidosMesa.length === 0) {
+      alert("Nenhum pedido salvo");
+      return;
+    }
+
+    const produtosMap = new Map();
+    pedidosMesa.forEach((p) => {
+      p.items.forEach((it) => {
+        const key = `${it.name}|${it.price}`;
+        if (produtosMap.has(key)) {
+          produtosMap.get(key).quantity += it.quantity;
+        } else {
+          produtosMap.set(key, { name: it.name, price: it.price, quantity: it.quantity });
+        }
+      });
+    });
+    const produtos = Array.from(produtosMap.values());
+    const total = pedidosMesa.reduce((sum, p) => sum + p.total, 0);
+    const payload = {
+      mesa,
+      produtos,
+      total: total.toFixed(2),
+      status: "Finalized",
+    };
+
     try {
       const response = await fetch("/api/enviar-pedido", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(pedido),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) {
         const text = await response.text();
         console.error("Erro ao enviar pedido:", text);
-        alert("Erro ao enviar pedido");
+        alert("Erro ao fechar conta");
         return;
       }
-      alert("Pedido enviado!");
-      setCart([]);
+      toast.success("Conta encerrada!", { position: "bottom-right", autoClose: 2000 });
+      setPedidosMesa([]);
+      setMesa(null);
+      localStorage.removeItem("pedidosMesa");
+      localStorage.removeItem("mesaAtual");
+      setShowOrders(false);
     } catch (err) {
       console.error("Erro na requisição:", err);
-      alert("Erro ao enviar pedido");
+      alert("Erro ao fechar conta");
     }
   };
 
@@ -172,7 +218,6 @@ const Mesa = () => {
             </div>
           ))}
         </div>
-
         <div className="bg-white rounded-2xl shadow-lg p-6" id="cart">
           <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" /> Seu Pedido
@@ -212,13 +257,63 @@ const Mesa = () => {
             <span className="text-[#5d3d29]">R$ {getTotalPrice()}</span>
           </div>
           <button
-            onClick={finalizarPedido}
+            onClick={adicionarPedido}
             className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2"
           >
-            <PhoneIcon /> Finalizar Pedido
+            <PhoneIcon /> Adicionar Pedido
           </button>
         </div>
       </main>
+      <button
+        onClick={() => setShowOrders(true)}
+        className="fixed bottom-4 right-4 bg-[#5d3d29] text-white px-4 py-2 rounded-full shadow-lg"
+      >
+        Ver meus pedidos
+      </button>
+
+      {showOrders && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-xl font-bold mb-4">Meus Pedidos</h3>
+            {pedidosMesa.length === 0 ? (
+              <p className="text-center text-gray-500">Nenhum pedido salvo</p>
+            ) : (
+              <div className="space-y-4 max-h-60 overflow-y-auto mb-4">
+                {pedidosMesa.map((p, idx) => (
+                  <div key={idx} className="border-b pb-2">
+                    <p className="font-semibold">Pedido {idx + 1}</p>
+                    <p className="text-sm text-gray-600">
+                      {p.quantidade} itens - R$ {p.total.toFixed(2)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+            {pedidosMesa.length > 0 && (
+              <div className="text-right font-bold mb-4">
+                Total:&nbsp;
+                R$ {pedidosMesa.reduce((s, p) => s + p.total, 0).toFixed(2)}
+              </div>
+            )}
+            <div className="flex justify-between">
+              <button
+                onClick={() => setShowOrders(false)}
+                className="bg-gray-300 px-4 py-2 rounded"
+              >
+                Voltar
+              </button>
+              {pedidosMesa.length > 0 && (
+                <button
+                  onClick={fecharConta}
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                >
+                  Fechar Conta
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <ToastContainer />
     </div>
   );
