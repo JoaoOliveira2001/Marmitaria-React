@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginPedidos from "../components/LoginPedidos";
 import { Bar } from "react-chartjs-2";
+import { CheckCircle, XCircle } from "lucide-react";
 import {
   Chart,
   ArcElement,
@@ -144,6 +145,17 @@ const Dashboard = () => {
     plugins: { legend: { display: false } },
   };
 
+  const tables = Array.from({ length: 15 }, (_, i) => i + 1);
+  const activeOrders = orders.filter(
+    (o) => !String(o.Status).toLowerCase().includes("concl")
+  );
+  const getTableNumber = (o) => o.Mesa ?? o.Table ?? o.table ?? o.mesa ?? "";
+  const isTableOccupied = (n) =>
+    activeOrders.some((o) => {
+      const t = String(getTableNumber(o)).replace(/mesa\s*/i, "").trim();
+      return t === String(n);
+    });
+
   const filterLabel =
     filter === "today" ? "Hoje" : filter === "week" ? "Semana" : "Mês";
 
@@ -161,12 +173,28 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center mb-6 space-x-2">
-          {[
-            ["today", "Hoje"],
-            ["week", "Semana"],
-            ["month", "Mês"],
+      <div className="flex">
+        <aside className="w-48 bg-white border-r p-4">
+          <h2 className="font-bold mb-4">Mesas</h2>
+          <ul className="space-y-2">
+            {tables.map((n) => (
+              <li key={n} className="flex items-center justify-between">
+                <span>Mesa {n}</span>
+                {isTableOccupied(n) ? (
+                  <XCircle className="w-4 h-4 text-red-500" />
+                ) : (
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                )}
+              </li>
+            ))}
+          </ul>
+        </aside>
+        <div className="flex-1 container mx-auto px-4 py-8">
+          <div className="flex justify-center mb-6 space-x-2">
+            {[
+              ["today", "Hoje"],
+              ["week", "Semana"],
+              ["month", "Mês"],
           ].map(([val, label]) => (
             <button
               key={val}
@@ -218,6 +246,7 @@ const Dashboard = () => {
           <div className="bg-white p-6 rounded shadow">
             <Bar data={barData} options={barOptions} />
           </div>
+        </div>
         </div>
       </div>
     </div>
