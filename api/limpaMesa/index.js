@@ -1,0 +1,28 @@
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
+  try {
+    const payload = req.body;
+
+    const url = "https://script.google.com/macros/s/AKfycbx1--VijG4Sa9yIdl5S1lgA9l7m382GZUjhYfUO0kDi1EL8P4sZytPwyunELqOpVXqM/exec";
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const text = await response.text();
+
+    if (!response.ok) {
+      return res.status(response.status).send(text);
+    }
+
+    res.status(200).send(text);
+  } catch (error) {
+    console.error("Erro ao limpar mesa:", error);
+    res.status(500).json({ error: "Erro interno ao limpar mesa", details: error.message });
+  }
+}

@@ -176,6 +176,13 @@ const Mesa = () => {
         alert("Erro ao fechar conta");
         return;
       }
+
+      await fetch("/api/limpaMesa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mesa: `Mesa ${mesa}` }),
+      });
+
       toast.success("Conta encerrada!", { position: "bottom-right", autoClose: 2000 });
       setPedidosMesa([]);
       setMesa(null);
