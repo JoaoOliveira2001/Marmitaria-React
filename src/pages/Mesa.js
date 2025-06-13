@@ -80,7 +80,7 @@ const Mesa = () => {
     return cart.reduce((tot, item) => tot + item.price * item.quantity, 0).toFixed(2);
   };
 
-  const adicionarPedido = () => {
+  const adicionarPedido = async () => {
     if (!mesa) {
       alert("Mesa não identificada");
       return;
@@ -90,17 +90,47 @@ const Mesa = () => {
       return;
     }
 
-    const pedido = {
-      items: cart,
+    const produtos = cart
+      .map((item) => `${item.name} x${item.quantity}`)
+      .join(" | ");
+
+    const payload = {
+      mesa,
+      produtos,
       quantidade: cart.reduce((t, i) => t + i.quantity, 0),
-      total: parseFloat(getTotalPrice()),
+      total: getTotalPrice(),
+      status: "Pendente",
     };
 
-    const updated = [...pedidosMesa, pedido];
-    setPedidosMesa(updated);
-    localStorage.setItem("pedidosMesa", JSON.stringify(updated));
-    setCart([]);
-    toast.success("Pedido adicionado!", { position: "bottom-right", autoClose: 1500 });
+    try {
+      const response = await fetch("/api/cria", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Erro ao registrar pedido:", text);
+        alert("Erro ao registrar pedido");
+        return;
+      }
+
+      const pedido = {
+        items: cart,
+        quantidade: payload.quantidade,
+        total: parseFloat(payload.total),
+      };
+
+      const updated = [...pedidosMesa, pedido];
+      setPedidosMesa(updated);
+      localStorage.setItem("pedidosMesa", JSON.stringify(updated));
+      setCart([]);
+      toast.success("Pedido adicionado!", { position: "bottom-right", autoClose: 1500 });
+    } catch (err) {
+      console.error("Erro na requisição:", err);
+      alert("Erro ao registrar pedido");
+    }
   };
 
   const fecharConta = async () => {
