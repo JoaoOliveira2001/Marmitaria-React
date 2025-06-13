@@ -146,6 +146,7 @@ const Dashboard = () => {
   };
 
   const tables = Array.from({ length: 15 }, (_, i) => i + 1);
+  const [selectedTable, setSelectedTable] = useState(null);
   const activeOrders = orders.filter(
     (o) => !String(o.Status).toLowerCase().includes("concl")
   );
@@ -155,6 +156,25 @@ const Dashboard = () => {
       const t = String(getTableNumber(o)).replace(/mesa\s*/i, "").trim();
       return t === String(n);
     });
+  const tableOrders = selectedTable
+    ? orders.filter((o) => {
+        const t = String(getTableNumber(o)).replace(/mesa\s*/i, "").trim();
+        return t === String(selectedTable);
+      })
+    : [];
+  const closeOrder = (order) => {
+    setOrders(
+      orders.map((o) => (o === order ? { ...o, Status: "Concluído" } : o))
+    );
+  };
+  const editOrder = (order) => {
+    const newStatus = prompt("Novo status:", order.Status);
+    if (newStatus !== null) {
+      setOrders(
+        orders.map((o) => (o === order ? { ...o, Status: newStatus } : o))
+      );
+    }
+  };
 
   const filterLabel =
     filter === "today" ? "Hoje" : filter === "week" ? "Semana" : "Mês";
@@ -178,7 +198,13 @@ const Dashboard = () => {
           <h2 className="font-bold mb-4">Mesas</h2>
           <ul className="space-y-2">
             {tables.map((n) => (
-              <li key={n} className="flex items-center justify-between">
+              <li
+                key={n}
+                onClick={() => setSelectedTable(n)}
+                className={`flex items-center justify-between p-1 rounded cursor-pointer ${
+                  selectedTable === n ? "bg-yellow-100" : ""
+                }`}
+              >
                 <span>Mesa {n}</span>
                 {isTableOccupied(n) ? (
                   <XCircle className="w-4 h-4 text-red-500" />
@@ -190,11 +216,11 @@ const Dashboard = () => {
           </ul>
         </aside>
         <div className="flex-1 container mx-auto px-4 py-8">
-          <div className="flex justify-center mb-6 space-x-2">
-            {[
-              ["today", "Hoje"],
-              ["week", "Semana"],
-              ["month", "Mês"],
+        <div className="flex justify-center mb-6 space-x-2">
+          {[
+            ["today", "Hoje"],
+            ["week", "Semana"],
+            ["month", "Mês"],
           ].map(([val, label]) => (
             <button
               key={val}
@@ -209,6 +235,56 @@ const Dashboard = () => {
             </button>
           ))}
         </div>
+
+        {selectedTable && (
+          <div className="mb-6">
+            <h2 className="font-bold text-[#5d3d29] mb-2">
+              Pedidos Mesa {selectedTable}
+            </h2>
+            {tableOrders.length ? (
+              <ul className="space-y-2">
+                {tableOrders.map((order, idx) => (
+                  <li
+                    key={order.id || idx}
+                    className="bg-white p-3 rounded shadow flex justify-between"
+                  >
+                    <div>
+                      <p className="font-semibold">
+                        {order.Nome || order.Cliente || "Cliente"}
+                      </p>
+                      <p className="text-sm">
+                        {order["Produto(s)"] || order.Produtos}
+                      </p>
+                      <p className="text-sm">Status: {order.Status}</p>
+                    </div>
+                    <div className="flex gap-2 items-start">
+                      <button
+                        onClick={() => editOrder(order)}
+                        className="text-xs px-2 py-1 bg-yellow-100 rounded"
+                      >
+                        Editar
+                      </button>
+                      {String(order.Status).toLowerCase().includes("concl") ? (
+                        <span className="text-xs text-green-600 px-2 py-1">
+                          Concluído
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => closeOrder(order)}
+                          className="text-xs px-2 py-1 bg-green-600 text-white rounded"
+                        >
+                          Fechar
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-600">Nenhum pedido para esta mesa</p>
+            )}
+          </div>
+        )}
 
         <div className="grid md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white p-4 rounded shadow text-center">
