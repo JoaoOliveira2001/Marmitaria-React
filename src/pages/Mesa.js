@@ -219,9 +219,7 @@ const Mesa = () => {
           ))}
         </div>
         <div className="bg-white rounded-2xl shadow-lg p-6" id="cart">
-          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5" /> Seu Pedido
-          </h3>
+
           {cart.length === 0 ? (
             <p className="text-gray-500 text-center">Nenhum item adicionado</p>
           ) : (
