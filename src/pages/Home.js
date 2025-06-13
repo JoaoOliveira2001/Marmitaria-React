@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ShoppingCart,
   Plus,
@@ -19,6 +19,9 @@ import PriceButtons, { parsePrices } from "../components/PriceButtons";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const mesaParam = searchParams.get("mesa");
+  const mesa = mesaParam ? parseInt(mesaParam, 10) : null;
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
   const [nome, setNome] = useState("");
@@ -42,6 +45,30 @@ const Home = () => {
   // tab currently selected in the menu
   const [activeType, setActiveType] = useState("marmita");
   const cartRef = React.useRef(null);
+
+  // Carrega o carrinho salvo para a mesa atual
+  useEffect(() => {
+    if (mesa) {
+      const stored = localStorage.getItem(`mesa_${mesa}`);
+      if (stored) {
+        try {
+          setCart(JSON.parse(stored));
+        } catch (e) {
+          console.error("Erro ao ler carrinho da mesa", mesa, e);
+          setCart([]);
+        }
+      } else {
+        setCart([]);
+      }
+    }
+  }, [mesa]);
+
+  // Salva o carrinho sempre que ele muda
+  useEffect(() => {
+    if (mesa) {
+      localStorage.setItem(`mesa_${mesa}`, JSON.stringify(cart));
+    }
+  }, [cart, mesa]);
 
   useEffect(() => {
     // Endpoint do seu Web App do Apps Script
@@ -362,6 +389,43 @@ const Home = () => {
     const enviado = await enviarPedido();
     if (enviado) {
       sendWhatsAppOrder();
+    }
+  };
+
+  const closeBill = async () => {
+    if (!mesa) {
+      alert("Mesa inválida");
+      return;
+    }
+    const stored = localStorage.getItem(`mesa_${mesa}`);
+    const items = stored ? JSON.parse(stored) : [];
+    if (items.length === 0) {
+      alert("Carrinho vazio!");
+      return;
+    }
+    const total = items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    const payload = {
+      mesa,
+      produtos: items,
+      total,
+      data: new Date().toISOString(),
+    };
+    try {
+      const response = await fetch("/api/enviar-pedido", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error("Erro ao enviar pedido");
+      localStorage.removeItem(`mesa_${mesa}`);
+      setCart([]);
+      alert("Conta encerrada com sucesso!");
+    } catch (err) {
+      console.error(err);
+      alert("Falha ao fechar conta");
     }
   };
 
@@ -742,6 +806,14 @@ const Home = () => {
                         <Phone className="w-5 h-5" />
                         Finalizar Pedido
                       </button>
+                      {mesa && (
+                        <button
+                          onClick={closeBill}
+                          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md mt-2"
+                        >
+                          Fechar Conta
+                        </button>
+                      )}
                     </div>
                   </div>
                 </>
