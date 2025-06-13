@@ -80,7 +80,7 @@ const Mesa = () => {
     return cart.reduce((tot, item) => tot + item.price * item.quantity, 0).toFixed(2);
   };
 
-  const adicionarPedido = () => {
+  const adicionarPedido = async () => {
     if (!mesa) {
       alert("Mesa não identificada");
       return;
@@ -90,17 +90,53 @@ const Mesa = () => {
       return;
     }
 
-    const pedido = {
-      items: cart,
-      quantidade: cart.reduce((t, i) => t + i.quantity, 0),
-      total: parseFloat(getTotalPrice()),
+    const produtos = cart
+      .map((item) => `${item.name} x${item.quantity}`)
+      .join(" | ");
+    const quantidade = cart.reduce((t, i) => t + i.quantity, 0);
+    const total = getTotalPrice();
+
+    const observacoes = prompt("Alguma observação?") || "";
+
+    const body = {
+      mesa: `Mesa ${mesa}`,
+      produtos,
+      quantidade,
+      total,
+      status: "Pendente",
+      observacoes,
     };
 
-    const updated = [...pedidosMesa, pedido];
-    setPedidosMesa(updated);
-    localStorage.setItem("pedidosMesa", JSON.stringify(updated));
-    setCart([]);
-    toast.success("Pedido adicionado!", { position: "bottom-right", autoClose: 1500 });
+    try {
+      const res = await fetch(
+        "https://script.google.com/macros/s/AKfycbzF9SaWpbP1Bh_m93nei2I-3XP3ajiP-w5pgmKud1pCcDU2so9L98z49FpHvh0sqgrn/exec",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }
+      );
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Erro ao adicionar pedido:", text);
+        alert("Erro ao adicionar pedido");
+        return;
+      }
+
+      const pedido = {
+        items: cart,
+        quantidade,
+        total: parseFloat(total),
+      };
+      const updated = [...pedidosMesa, pedido];
+      setPedidosMesa(updated);
+      localStorage.setItem("pedidosMesa", JSON.stringify(updated));
+      setCart([]);
+      toast.success("Pedido adicionado!", { position: "bottom-right", autoClose: 1500 });
+    } catch (err) {
+      console.error("Erro na requisição:", err);
+      alert("Erro ao adicionar pedido");
+    }
   };
 
   const fecharConta = async () => {
@@ -125,12 +161,16 @@ const Mesa = () => {
       });
     });
     const produtos = Array.from(produtosMap.values());
+    const produtosStr = produtos.map((p) => `${p.name} x${p.quantity}`).join(" | ");
+    const quantidade = produtos.reduce((s, p) => s + p.quantity, 0);
     const total = pedidosMesa.reduce((sum, p) => sum + p.total, 0);
+
     const payload = {
-      mesa,
-      produtos,
+      mesa: `Mesa ${mesa}`,
+      produtos: produtosStr,
+      quantidade,
       total: total.toFixed(2),
-      status: "Finalized",
+      status: "Pendente",
     };
 
     try {
@@ -145,11 +185,28 @@ const Mesa = () => {
         alert("Erro ao fechar conta");
         return;
       }
-      toast.success("Conta encerrada!", { position: "bottom-right", autoClose: 2000 });
+
+      const delRes = await fetch(
+        "https://script.google.com/macros/s/AKfycbxKfMBCFlLzQ2JTvIhF7DV2DCsxQdlFwTcsSvh-O2iZpI-WstfCPKDyiMHd976dIQRt/exec",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ acao: "excluirMesa", mesa: `Mesa ${mesa}` }),
+        }
+      );
+      if (!delRes.ok) {
+        const text = await delRes.text();
+        console.error("Erro ao excluir mesa:", text);
+        alert("Erro ao fechar conta");
+        return;
+      }
+
+      toast.success("Bill successfully closed!", { position: "bottom-right", autoClose: 2000 });
       setPedidosMesa([]);
       setMesa(null);
       localStorage.removeItem("pedidosMesa");
       localStorage.removeItem("mesaAtual");
+      setCart([]);
       setShowOrders(false);
     } catch (err) {
       console.error("Erro na requisição:", err);
