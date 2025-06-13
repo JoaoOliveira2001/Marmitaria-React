@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   try {
     const payload = req.body;
 
-    const url = "https://script.google.com/macros/s/AKfycbx1--VijG4Sa9yIdl5S1lgA9l7m382GZUjhYfUO0kDi1EL8P4sZytPwyunELqOpVXqM/exec";
+    const url = "https://script.google.com/macros/s/AKfycbxtHy6Vk6CDa3i6HKT6pYpaaVWovvtB8KZt6vdx8um3xLwzTiicHYB2BxdIMhgdt08l/exec";
 
     const response = await fetch(url, {
       method: "POST",
