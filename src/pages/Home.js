@@ -233,7 +233,7 @@ const Home = () => {
   };
 
   const sendWhatsAppOrder = () => {
-    let message = " *Pedido Corujão Marmitas*\n\n";
+    let message = " *Pedido Orçamenthus*\n\n";
 
     message += ` *Cliente:* ${nome || "Não informado"}\n`;
     message += ` *Telefone:* ${telefone || "Não informado"}\n`;
@@ -386,7 +386,7 @@ const Home = () => {
             <button
               key={t.key}
               onClick={() => setActiveType(t.key)}
-              className={`px-4 py-2 rounded-full font-semibold ${activeType === t.key ? "bg-orange-500 text-white" : "bg-gray-200 text-gray-700"}`}
+              className={`px-4 py-2 rounded-full font-semibold ${activeType === t.key ? "bg-[#5d3d29] text-white" : "bg-gray-200 text-gray-700"}`}
             >
               {t.label}
             </button>
@@ -406,7 +406,7 @@ const Home = () => {
               <p className="text-gray-600 mb-4">{m.description}</p>
               <div className="flex justify-between items-center mb-4">
                 {m.time && <span>⏰ {m.time}</span>}
-                <span className="text-2xl font-bold text-orange-600">
+                <span className="text-2xl font-bold text-[#5d3d29]">
                   {(() => {
                     const p = parsePrices(m.price, m);
                     if (p.length === 0) return "R$ 0.00";
@@ -439,7 +439,7 @@ const Home = () => {
                 <h3 className="text-3xl font-bold text-[#fff4e4]">
                   Orçamenthus
                 </h3>
-                <p className="text-orange-100">Sabor que conquista!</p>
+                <p className="text-[#5d3d29]">Sabor que conquista!</p>
               </div>
             </div>
             <div className="flex items-center space-x-4"></div>
@@ -451,7 +451,7 @@ const Home = () => {
       <section className="bg-[#5d3d29] text-white shadow-lg">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-5xl font-bold mb-4">Marmitas Deliciosas</h2>
-          <p className="text-xl mb-8 text-orange-100">
+          <p className="text-xl mb-8 text-[#5d3d29]">
             Feitas com carinho, entregues com rapidez
           </p>
           <div className="flex justify-center space-x-8 text-sm">
@@ -520,7 +520,7 @@ const Home = () => {
                               )}
                               <h4 className="font-semibold">{item.name}</h4>
                             </div>
-                            <p className="text-orange-600 font-bold">
+                            <p className="text-[#5d3d29] font-bold">
                               R$ {item.price.toFixed(2)}
                             </p>
                           </div>
@@ -560,7 +560,7 @@ const Home = () => {
                                 updateObservations(item.id, e.target.value)
                               }
                               placeholder="Ex: sem cebola, caprichar no tempero..."
-                              className="w-full p-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                              className="w-full p-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#5d3d29] focus:border-transparent"
                               rows="2"
                             />
                           </div>
@@ -572,13 +572,13 @@ const Home = () => {
                   <div className="border-t pt-4">
                     <div className="flex justify-between items-center mb-4">
                       <span className="text-xl font-bold">Total:</span>
-                      <span className="text-2xl font-bold text-orange-600">
+                      <span className="text-2xl font-bold text-[#5d3d29]">
                         R$ {(parseFloat(getTotalPrice()) + frete).toFixed(2)}
                       </span>
                     </div>
                     <div className="bg-white rounded-2xl shadow-lg p-6 mt-8 space-y-4">
                       <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-orange-500" />
+                        <MapPin className="w-5 h-5 text-[#5d3d29]" />
                         Informações para Entrega
                       </h3>
 
@@ -614,7 +614,7 @@ const Home = () => {
                                 setLocalEntrega("");
                               }
                             }}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                           >
                             <option value="retirada">Retirada</option>
                             <option value="entrega">Entrega</option>
@@ -629,42 +629,42 @@ const Home = () => {
                               placeholder="Endereço"
                               value={endereco}
                               onChange={(e) => setEndereco(e.target.value)}
-                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                             />
                             <input
                               type="text"
                               placeholder="Número"
                               value={numero}
                               onChange={(e) => setNumero(e.target.value)}
-                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                             />
                             <input
                               type="text"
                               placeholder="Complemento"
                               value={complemento}
                               onChange={(e) => setComplemento(e.target.value)}
-                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                             />
                             <input
                               type="text"
                               placeholder="Bairro"
                               value={bairro}
                               onChange={(e) => setBairro(e.target.value)}
-                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                             />
                             <input
                               type="text"
                               placeholder="Cidade"
                               value={cidade}
                               onChange={(e) => setCidade(e.target.value)}
-                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                             />
                             <input
                               type="text"
                               placeholder="Referência (opcional)"
                               value={referencia}
                               onChange={(e) => setReferencia(e.target.value)}
-                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                             />
 
                             {/* Local de entrega */}
@@ -682,7 +682,7 @@ const Home = () => {
                                   else if (local === "cabreuva") setFrete(13);
                                   else setFrete(0);
                                 }}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                               >
                                 <option value="">Selecione</option>
                                 <option value="pinhal">Pinhal - R$ 5,00</option>
@@ -701,7 +701,7 @@ const Home = () => {
                         <select
                           value={pagamento}
                           onChange={(e) => setPagamento(e.target.value)}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                         >
                           <option value="Pix">Pix</option>
                           <option value="Dinheiro">Dinheiro</option>
@@ -715,7 +715,7 @@ const Home = () => {
                           placeholder="Troco para quanto?"
                           value={troco}
                           onChange={(e) => setTroco(e.target.value)}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                         />
                       )}
 
@@ -728,7 +728,7 @@ const Home = () => {
                           value={observacoes}
                           onChange={(e) => setObservacoes(e.target.value)}
                           rows="3"
-                          className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                         />
                       </div>
 
@@ -781,6 +781,14 @@ const Home = () => {
                   <MapPin size={16} className="mr-2" />
                   Cabreúva, SP
                 </div>
+                <a
+                  href="https://wa.me/5511998836070"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-[#5d3d29] rounded text-white"
+                >
+                  <MessageSquare className="w-4 h-4" /> Chat with us on WhatsApp
+                </a>
               </div>
             </div>
 
@@ -797,7 +805,7 @@ const Home = () => {
           </div>
 
           <div className="border-t border-gray-700 pt-8 mt-8 text-center text-gray-400">
-            <p>&copy; 2025 Corujão Marmitas. Todos os direitos reservados.</p>
+            <p>&copy; 2025 Orçamenthus. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>
@@ -805,7 +813,7 @@ const Home = () => {
       {cart.length > 0 && (
         <button
           onClick={() => cartRef.current?.scrollIntoView({ behavior: "smooth" })}
-          className="md:hidden fixed bottom-4 right-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-full flex items-center gap-2 shadow-lg z-50"
+          className="md:hidden fixed bottom-4 right-4 bg-[#5d3d29] hover:bg-[#5d3d29] text-white font-semibold py-3 px-4 rounded-full flex items-center gap-2 shadow-lg z-50"
         >
           <ShoppingCart className="w-5 h-5" />
           View Cart
@@ -831,7 +839,7 @@ const Home = () => {
           />
           <button
             onClick={verificarSenha}
-            className="bg-orange-500 text-black px-4 py-2 rounded"
+            className="bg-[#5d3d29] text-black px-4 py-2 rounded"
           >
             Entrar
           </button>

@@ -69,12 +69,12 @@ export default function Cardapio1({ addToCart }) {
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-2xl font-bold text-orange-600">
+              <span className="text-2xl font-bold text-[#5d3d29]">
                 R$ {m.price.toFixed(2)}
               </span>
               <button
                 onClick={() => addToCart(m)}      // precisa receber addToCart via props
-                className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-2 rounded-full hover:from-orange-600 hover:to-amber-600 transition-all transform hover:scale-105 shadow-lg"
+                className="bg-gradient-to-r from-[#5d3d29] to-[#5d3d29] text-white px-6 py-2 rounded-full hover:from-[#5d3d29] hover:to-[#5d3d29] transition-all transform hover:scale-105 shadow-lg"
               >
                 {/* ícone de "+" */}
                 Adicionar

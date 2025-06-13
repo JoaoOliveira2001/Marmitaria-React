@@ -27,7 +27,7 @@ const LoginPedidos = ({ onLogin }) => {
         />
         <button
           type="submit"
-          className="bg-orange-500 text-white py-2 px-4 rounded w-full hover:bg-orange-600"
+          className="bg-[#5d3d29] text-white py-2 px-4 rounded w-full hover:bg-[#5d3d29]"
         >
           Entrar
         </button>
