@@ -301,7 +301,7 @@ const Mesa = () => {
             onClick={adicionarPedido}
             className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2"
           >
-            <PhoneIcon /> Adicionar Pedido
+            <PhoneIcon /> Enviar pedido para cozinha
           </button>
         </div>
       </main>
