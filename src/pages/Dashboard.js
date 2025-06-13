@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [autorizado, setAutorizado] = useState(false);
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("today");
+  const [selectedTable, setSelectedTable] = useState(null);
 
   useEffect(() => {
     fetch(API_URL)
@@ -60,6 +61,28 @@ const Dashboard = () => {
   };
 
   const filtered = orders.filter(filterOrder);
+
+  const tableNumbers = Array.from({ length: 15 }, (_, i) => i + 1);
+  const ordersByTable = orders.reduce((acc, o) => {
+    const mesa = o.Mesa || o.table || o.mesa;
+    if (!mesa) return acc;
+    if (!acc[mesa]) acc[mesa] = [];
+    acc[mesa].push(o);
+    return acc;
+  }, {});
+
+  const isOccupied = (table) =>
+    orders.some(
+      (o) =>
+        (o.Mesa || o.table || o.mesa) == table &&
+        !String(o.Status).toLowerCase().includes("concl")
+    );
+
+  const closeOrder = (order) => {
+    setOrders((prev) =>
+      prev.map((o) => (o === order ? { ...o, Status: "concluido" } : o))
+    );
+  };
 
   const sumBy = (list, key) =>
     list.reduce((sum, o) => sum + parseFloat(o[key] || 0), 0);
@@ -161,64 +184,118 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center mb-6 space-x-2">
-          {[
-            ["today", "Hoje"],
-            ["week", "Semana"],
-            ["month", "Mês"],
-          ].map(([val, label]) => (
-            <button
-              key={val}
-              onClick={() => setFilter(val)}
-              className={`border px-3 py-1 rounded-full ${
-                filter === val
-                  ? "bg-[#5d3d29] text-[#fff4e4]"
-                  : "bg-white text-[#5d3d29]"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      <div className="flex">
+        <aside className="w-48 bg-[#f9e9d7] p-4">
+          {tableNumbers.map((num) => {
+            const occupied = isOccupied(num);
+            const active = selectedTable === num;
+            return (
+              <button
+                key={num}
+                onClick={() => setSelectedTable(num)}
+                className={`flex items-center justify-between w-full mb-2 p-2 rounded text-sm ${
+                  active ? "bg-[#5d3d29] text-[#fff4e4]" : "bg-white text-[#5d3d29]"
+                }`}
+              >
+                <span>Mesa {num}</span>
+                <span>{occupied ? "❌" : "✅"}</span>
+              </button>
+            );
+          })}
+        </aside>
 
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white p-4 rounded shadow text-center">
-            <div className="text-xl font-bold text-[#5d3d29]">
-              R$ {revenueToday.toFixed(2)}
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-center mb-6 space-x-2">
+              {[
+                ["today", "Hoje"],
+                ["week", "Semana"],
+                ["month", "Mês"],
+              ].map(([val, label]) => (
+                <button
+                  key={val}
+                  onClick={() => setFilter(val)}
+                  className={`border px-3 py-1 rounded-full ${
+                    filter === val
+                      ? "bg-[#5d3d29] text-[#fff4e4]"
+                      : "bg-white text-[#5d3d29]"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
-            <div className="text-sm text-gray-500">Faturamento Hoje</div>
-          </div>
-          <div className="bg-white p-4 rounded shadow text-center">
-            <div className="text-xl font-bold text-[#5d3d29]">
-              R$ {revenueWeek.toFixed(2)}
-            </div>
-            <div className="text-sm text-gray-500">Últimos 7 dias</div>
-          </div>
-          <div className="bg-white p-4 rounded shadow text-center">
-            <div className="text-xl font-bold text-[#5d3d29]">
-              R$ {revenueMonth.toFixed(2)}
-            </div>
-            <div className="text-sm text-gray-500">Últimos 30 dias</div>
-          </div>
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-6 items-start">
-          <div className="bg-white p-6 rounded shadow space-y-2">
-            <h2 className="font-bold text-[#5d3d29] text-lg mb-2">
-              Resumo ({filterLabel})
-            </h2>
-            <p>Total de pedidos: {totalOrders}</p>
-            <p>Faturamento: R$ {totalRevenue.toFixed(2)}</p>
-            <p>Marmita mais vendida: {mostSold}</p>
-            <p>Quantidade média: {avgQuantity.toFixed(2)}</p>
-            <p>Pagamento mais usado: {mostPayment}</p>
-            <p>Cliente com mais pedidos: {topCustomer}</p>
+            <div className="grid md:grid-cols-3 gap-4 mb-8">
+              <div className="bg-white p-4 rounded shadow text-center">
+                <div className="text-xl font-bold text-[#5d3d29]">
+                  R$ {revenueToday.toFixed(2)}
+                </div>
+                <div className="text-sm text-gray-500">Faturamento Hoje</div>
+              </div>
+              <div className="bg-white p-4 rounded shadow text-center">
+                <div className="text-xl font-bold text-[#5d3d29]">
+                  R$ {revenueWeek.toFixed(2)}
+                </div>
+                <div className="text-sm text-gray-500">Últimos 7 dias</div>
+              </div>
+              <div className="bg-white p-4 rounded shadow text-center">
+                <div className="text-xl font-bold text-[#5d3d29]">
+                  R$ {revenueMonth.toFixed(2)}
+                </div>
+                <div className="text-sm text-gray-500">Últimos 30 dias</div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 items-start">
+              <div className="bg-white p-6 rounded shadow space-y-2">
+                <h2 className="font-bold text-[#5d3d29] text-lg mb-2">
+                  Resumo ({filterLabel})
+                </h2>
+                <p>Total de pedidos: {totalOrders}</p>
+                <p>Faturamento: R$ {totalRevenue.toFixed(2)}</p>
+                <p>Marmita mais vendida: {mostSold}</p>
+                <p>Quantidade média: {avgQuantity.toFixed(2)}</p>
+                <p>Pagamento mais usado: {mostPayment}</p>
+                <p>Cliente com mais pedidos: {topCustomer}</p>
+              </div>
+              <div className="bg-white p-6 rounded shadow">
+                <Bar data={barData} options={barOptions} />
+              </div>
+            </div>
+
+            {selectedTable && (
+              <div className="mt-8">
+                <h2 className="font-bold text-[#5d3d29] text-lg mb-4">
+                  Pedidos Mesa {selectedTable}
+                </h2>
+                {ordersByTable[selectedTable]?.length ? (
+                  <div className="space-y-4">
+                    {ordersByTable[selectedTable].map((o, idx) => (
+                      <div key={idx} className="bg-white p-4 rounded shadow">
+                        <p className="font-semibold">{o.Nome}</p>
+                        <p className="text-sm">{o["Produto(s)"]}</p>
+                        <p className="text-sm">Status: {o.Status}</p>
+                        {!String(o.Status)
+                          .toLowerCase()
+                          .includes("concl") && (
+                          <button
+                            onClick={() => closeOrder(o)}
+                            className="mt-2 bg-[#5d3d29] text-[#fff4e4] px-4 py-1 rounded"
+                          >
+                            Fechar Pedido
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-600">Nenhum pedido para esta mesa.</p>
+                )}
+              </div>
+            )}
           </div>
-          <div className="bg-white p-6 rounded shadow">
-            <Bar data={barData} options={barOptions} />
-          </div>
-        </div>
+        </main>
       </div>
     </div>
   );
