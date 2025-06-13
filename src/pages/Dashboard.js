@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginPedidos from "../components/LoginPedidos";
+import TableSidebar from "../components/TableSidebar";
 import { Bar } from "react-chartjs-2";
 import {
   Chart,
@@ -149,6 +150,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#fff4e4]">
+      <TableSidebar />
+      <div className="ml-40">
       <header className="bg-[#5d3d29] text-[#fff4e4] py-6">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -220,6 +223,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
