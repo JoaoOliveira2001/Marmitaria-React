@@ -174,11 +174,14 @@ const Mesa = () => {
     };
 
     try {
-      const response = await fetch("/api/enviar-pedido", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        "https://script.google.com/macros/s/AKfycbyVHR5d-yjht3C6tW9h0qzO5W6MgdKpkm9sChEEv-ebfOuEx9IxFS_oUxbDoeNsrvuS/exec",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
       if (!response.ok) {
         const text = await response.text();
         console.error("Erro ao enviar pedido:", text);
