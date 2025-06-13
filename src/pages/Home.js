@@ -84,7 +84,7 @@ const Home = () => {
   const verificarSenha = () => {
     if (senha === "marmita123") {
       localStorage.setItem("autorizado", "true");
-      navigate("/controle-pedidos");
+      navigate("/dashboard");
     } else {
       alert("Senha incorreta");
     }
