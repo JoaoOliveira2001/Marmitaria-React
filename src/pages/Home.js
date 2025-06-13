@@ -787,7 +787,7 @@ const Home = () => {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-[#5d3d29] rounded text-white"
                 >
-                  <MessageSquare className="w-4 h-4" /> Chat with us on WhatsApp
+                  <MessageSquare className="w-4 h-4" /> Gostou do site ? Chama ai !
                 </a>
               </div>
             </div>
@@ -816,7 +816,7 @@ const Home = () => {
           className="md:hidden fixed bottom-4 right-4 bg-[#5d3d29] hover:bg-[#5d3d29] text-white font-semibold py-3 px-4 rounded-full flex items-center gap-2 shadow-lg z-50"
         >
           <ShoppingCart className="w-5 h-5" />
-          View Cart
+          Ver Carrinho
         </button>
       )}
       <ToastContainer />
