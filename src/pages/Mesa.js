@@ -205,6 +205,11 @@ const Mesa = () => {
 
   return (
     <div className="min-h-screen bg-[#fff4e4]">
+      {mesa && (
+        <div className="w-full bg-yellow-200 text-[#5d3d29] font-semibold text-center py-2">
+          Mesa {mesa}
+        </div>
+      )}
       <header className="bg-[#5d3d29]">
         <div className="container mx-auto px-4 py-4 flex flex-col items-center">
           <img
@@ -325,7 +330,9 @@ const Mesa = () => {
                 {pedidosMesa.map((p, idx) => (
                   <div
                     key={idx}
-                    className="border-b pb-2 cursor-pointer"
+                    className={`border p-3 rounded-lg shadow mb-2 cursor-pointer transition-colors ${
+                      expandedOrder === idx ? "bg-gray-50" : "bg-white"
+                    }`}
                     onClick={() =>
                       setExpandedOrder(expandedOrder === idx ? null : idx)
                     }
