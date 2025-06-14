@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginPedidos from "../components/LoginPedidos";
 import MesasMenu from "../dashboard/components/MesasMenu";
+import OrdersList from "../dashboard/Orders";
 import { Bar } from "react-chartjs-2";
 import {
   Chart,
@@ -222,6 +223,7 @@ const Dashboard = () => {
             <Bar data={barData} options={barOptions} />
           </div>
         </div>
+        <OrdersList />
       </div>
     </div>
     </div>
