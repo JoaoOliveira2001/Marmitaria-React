@@ -9,6 +9,7 @@ const Mesa = () => {
   const location = useLocation();
   const [mesa, setMesa] = useState(null);
   const [cardapio, setCardapio] = useState([]);
+  const [now, setNow] = useState(new Date());
   const [activeType, setActiveType] = useState("marmita");
   const [cart, setCart] = useState([]);
   const [pedidosMesa, setPedidosMesa] = useState(() => {
@@ -38,11 +39,22 @@ const Mesa = () => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         return res.json();
       })
-      .then((data) => setCardapio(data))
+      .then((data) => {
+        const normalized = data.map((it) => ({
+          ...it,
+          cardapio: String(it.cardapio ?? it.Cardapio ?? ""),
+        }));
+        setCardapio(normalized);
+      })
       .catch((err) => {
         console.error("Falha ao carregar cardápio:", err);
         setCardapio([]);
       });
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
   }, []);
 
   const addToCart = (item) => {
@@ -195,13 +207,70 @@ const Mesa = () => {
     }
   };
 
+  // Check current day and hour to determine available menu
+  const day = now.getDay();
+  const hour = now.getHours();
+
+  let allowedCardapio;
+  if (hour >= 10 && hour < 15) {
+    allowedCardapio = "1";
+  } else if (hour >= 15 && hour <= 22) {
+    allowedCardapio = "2";
+  }
+
   const tabs = [
     { key: "marmita", label: "Marmitas" },
     { key: "bebida", label: "Bebidas" },
     { key: "porcao", label: "Porções" },
   ];
 
-  const filtered = cardapio.filter((item) => item.type === activeType);
+  const filtered = cardapio.filter(
+    (item) =>
+      item.type === activeType &&
+      String(item.cardapio).trim() === allowedCardapio,
+  );
+
+  // Build menu or show closed message
+  let menuSection;
+  if (day === 1 || !allowedCardapio) {
+    menuSection = (
+      <p className="text-center font-bold text-red-500">
+        Estamos fechados neste horário
+      </p>
+    );
+  } else {
+    menuSection = (
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        {filtered.map((m) => (
+          <div
+            key={m.id}
+            className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-transform hover:-translate-y-1"
+          >
+            <div className="mb-4 text-center">
+              <img
+                src={m.image}
+                alt={m.name}
+                className="w-full h-40 object-cover rounded-lg"
+              />
+              <h3 className="text-xl font-bold mt-2">{m.name}</h3>
+            </div>
+            <p className="text-gray-600 mb-4 text-center">{m.description}</p>
+            <div className="flex justify-between items-center mb-4">
+              {m.time && <span>⏰ {m.time}</span>}
+              <span className="text-2xl font-bold text-[#5d3d29]">
+                {(() => {
+                  const p = parsePrices(m.price, m);
+                  if (p.length === 0) return "R$ 0.00";
+                  return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
+                })()}
+              </span>
+            </div>
+            <PriceButtons price={m.price} item={m} onAdd={addToCart} />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#fff4e4]">
@@ -211,16 +280,15 @@ const Mesa = () => {
         </div>
       )}
       <header className="bg-[#5d3d29]">
-        <div className="container mx-auto px-4 py-4 flex flex-col items-center">
+        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <img
             src="https://i.imgur.com/wYccCFb.jpeg"
-            alt="Logo"
+            alt="Logo Orçamenthus"
             className="w-20 h-20 object-contain rounded-full"
           />
+          <h1 className="text-2xl font-bold text-[#fff4e4]">Orçamenthus</h1>
           {mesa && (
-            <span className="mt-2 text-white font-semibold text-lg">
-              Mesa {mesa}
-            </span>
+            <span className="ml-auto text-white font-semibold">Mesa {mesa}</span>
           )}
         </div>
       </header>
@@ -240,32 +308,7 @@ const Mesa = () => {
           ))}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {filtered.map((m) => (
-            <div key={m.id} className="bg-white rounded-2xl shadow-lg p-6">
-              <div className="mb-4 text-center">
-                <img
-                  src={m.image}
-                  alt={m.name}
-                  className="w-full h-40 object-cover rounded-lg"
-                />
-                <h3 className="text-xl font-bold mt-2">{m.name}</h3>
-              </div>
-              <p className="text-gray-600 mb-4 text-center">{m.description}</p>
-              <div className="flex justify-between items-center mb-4">
-                {m.time && <span>⏰ {m.time}</span>}
-                <span className="text-2xl font-bold text-[#5d3d29]">
-                  {(() => {
-                    const p = parsePrices(m.price, m);
-                    if (p.length === 0) return "R$ 0.00";
-                    return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
-                  })()}
-                </span>
-              </div>
-              <PriceButtons price={m.price} item={m} onAdd={addToCart} />
-            </div>
-          ))}
-        </div>
+        {menuSection}
         <div className="bg-white rounded-2xl shadow-lg p-6" id="cart">
 
           {cart.length === 0 ? (
