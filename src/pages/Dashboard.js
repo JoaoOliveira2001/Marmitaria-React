@@ -164,12 +164,12 @@ const Dashboard = () => {
       <div className="ml-40">
       <header className="bg-[#5d3d29] text-[#fff4e4] py-6">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <h1 className="text-2xl font-bold">Painel</h1>
           <button
             onClick={() => navigate("/")}
             className="bg-[#fff4e4] text-[#5d3d29] px-4 py-2 rounded"
           >
-            Home
+            Início
           </button>
         </div>
       </header>
@@ -225,7 +225,7 @@ const Dashboard = () => {
             <p>Total de pedidos: {totalOrders}</p>
             <p>Faturamento: R$ {formatCurrency(totalRevenue)}</p>
             <div>
-              Top Sellers {filterLabel === "Hoje" ? "Today" : filterLabel}:
+              Mais Vendidos:
               {topProductEntries.length > 0 ? (
                 <ul className="list-disc ml-5">
                   {topProductEntries.map(([name, qty]) => (
@@ -233,7 +233,7 @@ const Dashboard = () => {
                   ))}
                 </ul>
               ) : (
-                <p>No sales today</p>
+                <p>Sem vendas hoje</p>
               )}
             </div>
             <p>Quantidade média: {avgQuantity.toFixed(2)}</p>

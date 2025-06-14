@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-const ORDERS_API = "https://script.google.com/macros/s/AKfycbx99ZMXtaHbwS_hq_PxrLK4gBRxhDfa_YsHLU0FujJkv52rKkGyXU6jeRJhP9LioL2Y/exec";
+const ORDERS_API =
+  "https://script.google.com/macros/s/AKfycbx99ZMXtaHbwS_hq_PxrLK4gBRxhDfa_YsHLU0FujJkv52rKkGyXU6jeRJhP9LioL2Y/exec";
 
 function parseItems(order) {
   if (Array.isArray(order.itensFormatados)) {
@@ -26,7 +27,15 @@ function formatTime(dateStr) {
 
 export default function OrdersList() {
   const [orders, setOrders] = useState([]);
-  const [printedOrders, setPrintedOrders] = useState([]);
+  const [printedOrders, setPrintedOrders] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("printedOrders") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
+  const orderKey = (o) => `${o.Mesa}_${o.Data}_${o.Total}`;
 
   const fetchOrders = () => {
     fetch(ORDERS_API)
@@ -35,7 +44,15 @@ export default function OrdersList() {
         const pedidos = data.pedidos || data;
         const valid = pedidos.filter((p) => p.Data);
         valid.sort((a, b) => new Date(b.Data) - new Date(a.Data));
-        setOrders(valid);
+        let stored = [];
+        try {
+          stored = JSON.parse(localStorage.getItem("printedOrders") || "[]");
+        } catch {
+          stored = [];
+        }
+        const printed = new Set(stored.map((p) => orderKey(p)));
+        const filtered = valid.filter((o) => !printed.has(orderKey(o)));
+        setOrders(filtered);
       })
       .catch((err) => {
         console.error("Erro ao buscar pedidos", err);
@@ -56,6 +73,7 @@ export default function OrdersList() {
       if (stored !== today) {
         setPrintedOrders([]);
         localStorage.setItem("printedDate", today);
+        localStorage.setItem("printedOrders", "[]");
       }
     };
     checkReset();
@@ -69,7 +87,7 @@ export default function OrdersList() {
     const html = `<!DOCTYPE html>
 <html>
 <head>
-<title>RECEIPT - Mesa ${order.Mesa}</title>
+<title>COMANDA - Mesa ${order.Mesa}</title>
 <style>
   body { font-family: sans-serif; padding: 20px; }
   h1 { text-align: center; font-size: 20px; }
@@ -79,7 +97,7 @@ export default function OrdersList() {
 </style>
 </head>
 <body>
-<h1>RECEIPT - Mesa ${order.Mesa}</h1>
+<h1>COMANDA - Mesa ${order.Mesa}</h1>
 <p>${formatTime(order.Data)}</p>
 <ul>
 ${items.map((it) => `<li>${it.nome} x${it.qtd}</li>`).join("")}
@@ -90,8 +108,12 @@ ${items.map((it) => `<li>${it.nome} x${it.qtd}</li>`).join("")}
 </html>`;
     win.document.write(html);
     win.document.close();
-    setPrintedOrders((prev) => [...prev, order]);
-    setOrders((prev) => prev.filter((o) => o !== order));
+    setPrintedOrders((prev) => {
+      const updated = [...prev, order];
+      localStorage.setItem("printedOrders", JSON.stringify(updated));
+      return updated;
+    });
+    setOrders((prev) => prev.filter((o) => orderKey(o) !== orderKey(order)));
   };
 
   const hasOrders = orders.length > 0;
@@ -121,15 +143,15 @@ ${items.map((it) => `<li>${it.nome} x${it.qtd}</li>`).join("")}
               onClick={() => printOrder(o)}
               className="mt-2 bg-[#5d3d29] text-[#fff4e4] px-2 py-1 rounded"
             >
-              Print Receipt
+              Imprimir Comanda
             </button>
           </div>
         );
-      }) : <p className="text-center">No orders yet</p>}
+      }) : <p className="text-center">Nenhum pedido</p>}
 
       {printedOrders.length > 0 && (
         <div className="mt-8">
-          <h3 className="font-bold mb-2">Printed Orders</h3>
+          <h3 className="font-bold mb-2">Pedidos Impressos</h3>
           <div className="space-y-4">
             {printedOrders.map((o, idx) => {
               const items = parseItems(o);
