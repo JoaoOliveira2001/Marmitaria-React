@@ -26,6 +26,7 @@ function formatTime(dateStr) {
 
 export default function OrdersList() {
   const [orders, setOrders] = useState([]);
+  const [printedOrders, setPrintedOrders] = useState([]);
 
   const fetchOrders = () => {
     fetch(ORDERS_API)
@@ -45,6 +46,20 @@ export default function OrdersList() {
   useEffect(() => {
     fetchOrders();
     const id = setInterval(fetchOrders, 60000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const checkReset = () => {
+      const today = new Date().toDateString();
+      const stored = localStorage.getItem("printedDate");
+      if (stored !== today) {
+        setPrintedOrders([]);
+        localStorage.setItem("printedDate", today);
+      }
+    };
+    checkReset();
+    const id = setInterval(checkReset, 60000);
     return () => clearInterval(id);
   }, []);
 
@@ -75,15 +90,15 @@ ${items.map((it) => `<li>${it.nome} x${it.qtd}</li>`).join("")}
 </html>`;
     win.document.write(html);
     win.document.close();
+    setPrintedOrders((prev) => [...prev, order]);
+    setOrders((prev) => prev.filter((o) => o !== order));
   };
 
-  if (orders.length === 0) {
-    return <p className="text-center mt-4">No orders yet</p>;
-  }
+  const hasOrders = orders.length > 0;
 
   return (
     <div className="space-y-4">
-      {orders.map((o, idx) => {
+      {hasOrders ? orders.map((o, idx) => {
         const items = parseItems(o);
         return (
           <div key={idx} className="bg-white p-4 rounded shadow">
@@ -110,7 +125,37 @@ ${items.map((it) => `<li>${it.nome} x${it.qtd}</li>`).join("")}
             </button>
           </div>
         );
-      })}
+      }) : <p className="text-center">No orders yet</p>}
+
+      {printedOrders.length > 0 && (
+        <div className="mt-8">
+          <h3 className="font-bold mb-2">Printed Orders</h3>
+          <div className="space-y-4">
+            {printedOrders.map((o, idx) => {
+              const items = parseItems(o);
+              return (
+                <div key={idx} className="bg-gray-100 p-4 rounded shadow">
+                  <div className="flex justify-between">
+                    <div>
+                      <div className="font-bold">Mesa {o.Mesa}</div>
+                      <div className="text-sm text-gray-500">{formatTime(o.Data)}</div>
+                    </div>
+                    <div className="font-bold">R$ {parseFloat(o.Total).toFixed(2)}</div>
+                  </div>
+                  <ul className="mt-2">
+                    {items.map((it, i) => (
+                      <li key={i} className="flex justify-between">
+                        <span>{it.nome}</span>
+                        <span>x{it.qtd}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
