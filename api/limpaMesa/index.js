@@ -4,7 +4,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const payload = req.body;
+    const mesa = String(req.body?.mesa || "").trim();
+    const payload = { mesa };
 
     const url = "https://script.google.com/macros/s/AKfycbxtHy6Vk6CDa3i6HKT6pYpaaVWovvtB8KZt6vdx8um3xLwzTiicHYB2BxdIMhgdt08l/exec";
 
