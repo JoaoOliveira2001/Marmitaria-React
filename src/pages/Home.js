@@ -54,12 +54,16 @@ const Home = () => {
         return res.json();
       })
       .then((data) => {
-        // data é um array de objetos { id, name, description, price, image, time, type, cardapio }
-        setCardapio1(data);
+        // data é um array de objetos { id, name, description, price, image, time, type, Cardapio }
+        const normalized = data.map((it) => ({
+          ...it,
+          cardapio: String(it.cardapio ?? it.Cardapio ?? ""),
+        }));
+        setCardapio1(normalized);
+        console.log("Itens carregados:", normalized.length);
       })
       .catch((err) => {
         console.error("Falha ao carregar cardápio1:", err);
-        // você pode setar um fallback vazio ou exibir mensagem de erro
         setCardapio1([]);
       });
   }, []); // roda só uma vez, ao montar o componente
@@ -69,8 +73,8 @@ const Home = () => {
     if (existing) {
       setCart(
         cart.map((ci) =>
-          ci.id === item.id ? { ...ci, quantity: ci.quantity + 1 } : ci
-        )
+          ci.id === item.id ? { ...ci, quantity: ci.quantity + 1 } : ci,
+        ),
       );
     } else {
       setCart([...cart, { ...item, quantity: 1, observations: "" }]);
@@ -210,15 +214,15 @@ const Home = () => {
     } else {
       setCart(
         cart.map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-        )
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
+        ),
       );
     }
   };
 
   const updateObservations = (id, observations) => {
     setCart(
-      cart.map((item) => (item.id === id ? { ...item, observations } : item))
+      cart.map((item) => (item.id === id ? { ...item, observations } : item)),
     );
   };
 
@@ -248,7 +252,7 @@ const Home = () => {
 
     const marmitasInCart = cart.filter((item) => item.type === "marmita");
     const adicionaisInCart = cart.filter(
-      (item) => item.type === "bebida" || item.type === "adicional"
+      (item) => item.type === "bebida" || item.type === "adicional",
     );
 
     if (marmitasInCart.length > 0) {
@@ -287,14 +291,14 @@ const Home = () => {
 
     message += `\n\n*Frete:* R$ ${frete.toFixed(2)}\n`;
     message += `*Total: R$ ${(parseFloat(getTotalPrice()) + frete).toFixed(
-      2
+      2,
     )}*\n Por favor, confirme meu pedido!`;
 
     const phoneNumber = "11936186513";
     const encodedMessage = encodeURIComponent(message);
     window.open(
       `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
-      "_blank"
+      "_blank",
     );
   };
 
@@ -319,7 +323,7 @@ const Home = () => {
           (item) =>
             `${item.name} x${item.quantity}${
               item.observations ? ` (Obs: ${item.observations})` : ""
-            }`
+            }`,
         )
         .join(" | "),
       quantidade: cart.reduce((tot, item) => tot + item.quantity, 0),
@@ -386,8 +390,18 @@ const Home = () => {
       { key: "porcao", label: "Porções" },
     ];
     const filtered = cardapio1.filter(
-      (item) => item.type === activeType && item.cardapio === allowedCardapio
+      (item) =>
+        item.type === activeType &&
+        String(item.cardapio).trim() === allowedCardapio,
     );
+    if (filtered.length === 0) {
+      console.warn("Lista vazia após filtragem", {
+        hora: hour,
+        activeType,
+        allowedCardapio,
+        totalItens: cardapio1.length,
+      });
+    }
     menuSection = (
       <>
         <div className="flex justify-center mb-6 space-x-4">
@@ -402,30 +416,38 @@ const Home = () => {
           ))}
         </div>
         <div className="grid md:grid-cols-2 gap-6">
-          {filtered.map((m) => (
-            <div key={m.id} className="bg-white rounded-2xl shadow-lg p-6">
-              <div className="text-center mb-4">
-                <img
-                  src={m.image}
-                  alt={m.name}
-                  className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
-                />
-                <h3 className="text-xl font-bold">{m.name}</h3>
+          {filtered.length === 0 ? (
+            <p className="col-span-2 text-center text-red-500 font-semibold">
+              Nenhum item disponível
+            </p>
+          ) : (
+            filtered.map((m) => (
+              <div key={m.id} className="bg-white rounded-2xl shadow-lg p-6">
+                <div className="text-center mb-4">
+                  <img
+                    src={m.image}
+                    alt={m.name}
+                    className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
+                  />
+                  <h3 className="text-xl font-bold">{m.name}</h3>
+                </div>
+                <p className="text-gray-600 mb-4">{m.description}</p>
+                <div className="flex justify-between items-center mb-4">
+                  {m.time && <span>⏰ {m.time}</span>}
+                  <span className="text-2xl font-bold text-[#5d3d29]">
+                    {(() => {
+                      const p = parsePrices(m.price, m);
+                      if (p.length === 0) return "R$ 0.00";
+                      return (
+                        `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "")
+                      );
+                    })()}
+                  </span>
+                </div>
+                <PriceButtons price={m.price} item={m} onAdd={addToCart} />
               </div>
-              <p className="text-gray-600 mb-4">{m.description}</p>
-              <div className="flex justify-between items-center mb-4">
-                {m.time && <span>⏰ {m.time}</span>}
-                <span className="text-2xl font-bold text-[#5d3d29]">
-                  {(() => {
-                    const p = parsePrices(m.price, m);
-                    if (p.length === 0) return "R$ 0.00";
-                    return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
-                  })()}
-                </span>
-              </div>
-              <PriceButtons price={m.price} item={m} onAdd={addToCart} />
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </>
     );
@@ -696,7 +718,9 @@ const Home = () => {
                                 <option value="">Selecione</option>
                                 <option value="pinhal">Pinhal - R$ 5,00</option>
                                 <option value="jacare">Jacaré - R$ 4,00</option>
-                                <option value="cabreuva">Cabreúva - R$ 13,00</option>
+                                <option value="cabreuva">
+                                  Cabreúva - R$ 13,00
+                                </option>
                               </select>
                             </div>
                           </>
@@ -796,7 +820,8 @@ const Home = () => {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-[#5d3d29] rounded text-white"
                 >
-                  <MessageSquare className="w-4 h-4" /> Gostou do site ? Chama ai !
+                  <MessageSquare className="w-4 h-4" /> Gostou do site ? Chama
+                  ai !
                 </a>
               </div>
             </div>
@@ -821,7 +846,9 @@ const Home = () => {
 
       {cart.length > 0 && (
         <button
-          onClick={() => cartRef.current?.scrollIntoView({ behavior: "smooth" })}
+          onClick={() =>
+            cartRef.current?.scrollIntoView({ behavior: "smooth" })
+          }
           className="md:hidden fixed bottom-4 right-4 bg-[#5d3d29] hover:bg-[#5d3d29] text-white font-semibold py-3 px-4 rounded-full flex items-center gap-2 shadow-lg z-50"
         >
           <ShoppingCart className="w-5 h-5" />
