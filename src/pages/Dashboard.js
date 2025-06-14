@@ -73,6 +73,12 @@ const Dashboard = () => {
   const revenueWeek = sumBy(orders.filter((o) => withinDays(o.Data, 7)), "Total");
   const revenueMonth = sumBy(orders.filter((o) => withinDays(o.Data, 30)), "Total");
 
+  const formatCurrency = (v) =>
+    Number(v).toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
   const totalRevenue = sumBy(filtered, "Total");
   const totalOrders = filtered.length;
   const avgQuantity =
@@ -119,12 +125,9 @@ const Dashboard = () => {
       }
     });
   });
-  const topProductEntry = Object.entries(productCounts).sort(
+  const topProductEntries = Object.entries(productCounts).sort(
     (a, b) => b[1] - a[1]
-  )[0];
-  const mostSold = topProductEntry
-    ? `${topProductEntry[0]} (${topProductEntry[1]})`
-    : "-";
+  );
 
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
   const lineLabels = Array.from({ length: daysInMonth }, (_, i) => String(i + 1));
@@ -195,19 +198,19 @@ const Dashboard = () => {
         <div className="grid md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white p-4 rounded shadow text-center">
             <div className="text-2xl font-bold text-[#5d3d29]">
-              R$ {revenueToday.toFixed(2)}
+              R$ {formatCurrency(revenueToday)}
             </div>
             <div className="text-sm text-gray-500">Faturamento Hoje</div>
           </div>
           <div className="bg-white p-4 rounded shadow text-center">
             <div className="text-2xl font-bold text-[#5d3d29]">
-              R$ {revenueWeek.toFixed(2)}
+              R$ {formatCurrency(revenueWeek)}
             </div>
             <div className="text-sm text-gray-500">Últimos 7 dias</div>
           </div>
           <div className="bg-white p-4 rounded shadow text-center">
             <div className="text-2xl font-bold text-[#5d3d29]">
-              R$ {revenueMonth.toFixed(2)}
+              R$ {formatCurrency(revenueMonth)}
             </div>
             <div className="text-sm text-gray-500">Últimos 30 dias</div>
           </div>
@@ -220,8 +223,19 @@ const Dashboard = () => {
               Resumo ({filterLabel})
             </h2>
             <p>Total de pedidos: {totalOrders}</p>
-            <p>Faturamento: R$ {totalRevenue.toFixed(2)}</p>
-            <p>Marmita mais vendida: {mostSold}</p>
+            <p>Faturamento: R$ {formatCurrency(totalRevenue)}</p>
+            <div>
+              Top Sellers {filterLabel === "Hoje" ? "Today" : filterLabel}:
+              {topProductEntries.length > 0 ? (
+                <ul className="list-disc ml-5">
+                  {topProductEntries.map(([name, qty]) => (
+                    <li key={name}>{name} (x{qty})</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No sales today</p>
+              )}
+            </div>
             <p>Quantidade média: {avgQuantity.toFixed(2)}</p>
             <p>Pagamento mais usado: {mostPayment}</p>
             <p>Cliente com mais pedidos: {topCustomer}</p>
