@@ -423,13 +423,13 @@ const Home = () => {
           ) : (
             filtered.map((m) => (
               <div key={m.id} className="bg-white rounded-2xl shadow-lg p-6">
-                <div className="text-center mb-4">
+                <div className="mb-4 text-center">
                   <img
                     src={m.image}
                     alt={m.name}
-                    className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
+                    className="w-full h-40 object-cover rounded-lg"
                   />
-                  <h3 className="text-xl font-bold">{m.name}</h3>
+                  <h3 className="text-xl font-bold mt-2">{m.name}</h3>
                 </div>
                 <p className="text-gray-600 mb-4">{m.description}</p>
                 <div className="flex justify-between items-center mb-4">
