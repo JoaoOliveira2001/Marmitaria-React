@@ -2,18 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginPedidos from "../components/LoginPedidos";
 import MesasMenu from "../dashboard/components/MesasMenu";
-import { Bar } from "react-chartjs-2";
-import {
-  Chart,
-  ArcElement,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-Chart.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+import LatestOrders from "../dashboard/components/LatestOrders";
 
 const API_URL =
   "https://script.google.com/macros/s/AKfycbwHrRUQZIWj8edBBQA-2tBA6J-mIVTypi5w5BFfBULIb5G1vpposGqQ2I3l-b3tjTO_/exec";
@@ -25,10 +14,15 @@ const Dashboard = () => {
   const [filter, setFilter] = useState("today");
 
   useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then((data) => setOrders(data))
-      .catch((err) => console.error("Falha ao buscar API", err));
+    const fetchOrders = () => {
+      fetch(API_URL)
+        .then((res) => res.json())
+        .then((data) => setOrders(data))
+        .catch((err) => console.error("Falha ao buscar API", err));
+    };
+    fetchOrders();
+    const id = setInterval(fetchOrders, 60000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -131,19 +125,9 @@ const Dashboard = () => {
     ? `${topProductEntry[0]} (${topProductEntry[1]})`
     : "-";
 
-  const barData = {
-    labels: ["Concluído", "Pendente"],
-    datasets: [
-      {
-        data: [completedCount, pendingCount],
-        backgroundColor: ["#5d3d29", "#facc15"],
-      },
-    ],
-  };
-  const barOptions = {
-    responsive: true,
-    plugins: { legend: { display: false } },
-  };
+  const latestOrders = [...filtered]
+    .sort((a, b) => new Date(b.Data) - new Date(a.Data))
+    .slice(0, 10);
 
   const filterLabel =
     filter === "today" ? "Hoje" : filter === "week" ? "Semana" : "Mês";
@@ -219,7 +203,8 @@ const Dashboard = () => {
             <p>Cliente com mais pedidos: {topCustomer}</p>
           </div>
           <div className="bg-white p-6 rounded shadow">
-            <Bar data={barData} options={barOptions} />
+            <h2 className="font-bold text-[#5d3d29] text-lg mb-4">Últimos Pedidos</h2>
+            <LatestOrders orders={latestOrders} />
           </div>
         </div>
       </div>
