@@ -54,7 +54,7 @@ const Home = () => {
         return res.json();
       })
       .then((data) => {
-        // data é um array de objetos { id, name, description, price, image, time, type }
+        // data é um array de objetos { id, name, description, price, image, time, type, cardapio }
         setCardapio1(data);
       })
       .catch((err) => {
@@ -365,11 +365,18 @@ const Home = () => {
     }
   };
 
+  let allowedCardapio;
+  if (hour >= 10 && hour < 15) {
+    allowedCardapio = "1";
+  } else if (hour >= 15 && hour <= 22) {
+    allowedCardapio = "2";
+  }
+
   let menuSection;
-  if (day === 1) {
+  if (day === 1 || !allowedCardapio) {
     menuSection = (
       <p className="text-center font-bold text-red-500">
-        ❌ Fechado às segundas-feiras
+        Estamos fechados neste horário
       </p>
     );
   } else {
@@ -378,7 +385,9 @@ const Home = () => {
       { key: "bebida", label: "Bebidas" },
       { key: "porcao", label: "Porções" },
     ];
-    const filtered = cardapio1.filter((item) => item.type === activeType);
+    const filtered = cardapio1.filter(
+      (item) => item.type === activeType && item.cardapio === allowedCardapio
+    );
     menuSection = (
       <>
         <div className="flex justify-center mb-6 space-x-4">
