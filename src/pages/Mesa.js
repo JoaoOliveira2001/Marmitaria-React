@@ -1,6 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
-import { ShoppingCart, Plus, Minus, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  ShoppingCart,
+  Plus,
+  Minus,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PriceButtons, { parsePrices } from "../components/PriceButtons";
@@ -24,6 +30,9 @@ const Mesa = () => {
   });
   const [showOrders, setShowOrders] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState(null);
+  const cartRef = useRef(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -53,9 +62,9 @@ const Mesa = () => {
         setCardapio(normalized);
       })
       .catch((err) => {
-      console.error("Falha ao carregar cardápio:", err);
-      setCardapio([]);
-    });
+        console.error("Falha ao carregar cardápio:", err);
+        setCardapio([]);
+      });
   }, []);
 
   // carrega horários de funcionamento dos cardápios
@@ -100,23 +109,30 @@ const Mesa = () => {
   }, [allowedCardapio]);
 
   const addToCart = (item) => {
-    const existing = cart.find((ci) => ci.id === item.id && ci.price === item.price);
+    const existing = cart.find(
+      (ci) => ci.id === item.id && ci.price === item.price,
+    );
     if (existing) {
       setCart(
         cart.map((ci) =>
           ci.id === item.id && ci.price === item.price
             ? { ...ci, quantity: ci.quantity + 1 }
-            : ci
-        )
+            : ci,
+        ),
       );
     } else {
       setCart([...cart, { ...item, quantity: 1 }]);
     }
-    toast.success(`${item.name} adicionado!`, { position: "bottom-right", autoClose: 1500 });
+    toast.success(`${item.name} adicionado!`, {
+      position: "bottom-right",
+      autoClose: 1500,
+    });
   };
 
   const removeFromCart = (id, price) => {
-    const existing = cart.find((item) => item.id === id && item.price === price);
+    const existing = cart.find(
+      (item) => item.id === id && item.price === price,
+    );
     if (!existing) return;
     if (existing.quantity === 1) {
       setCart(cart.filter((item) => !(item.id === id && item.price === price)));
@@ -125,15 +141,43 @@ const Mesa = () => {
         cart.map((item) =>
           item.id === id && item.price === price
             ? { ...item, quantity: item.quantity - 1 }
-            : item
-        )
+            : item,
+        ),
       );
     }
   };
 
   const getTotalPrice = () => {
-    return cart.reduce((tot, item) => tot + item.price * item.quantity, 0).toFixed(2);
+    return cart
+      .reduce((tot, item) => tot + item.price * item.quantity, 0)
+      .toFixed(2);
   };
+
+  const scrollToCart = () => {
+    if (cartRef.current) {
+      cartRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+  const resumoPedidos = useMemo(() => {
+    const map = new Map();
+    pedidosMesa.forEach((p) => {
+      p.items.forEach((it) => {
+        const key = `${it.name}|${it.price}`;
+        if (map.has(key)) {
+          map.get(key).quantity += it.quantity;
+        } else {
+          map.set(key, {
+            name: it.name,
+            price: it.price,
+            quantity: it.quantity,
+          });
+        }
+      });
+    });
+    const items = Array.from(map.values());
+    const total = items.reduce((s, it) => s + it.price * it.quantity, 0);
+    return { items, total };
+  }, [pedidosMesa]);
 
   const adicionarPedido = async () => {
     if (!mesa) {
@@ -181,14 +225,16 @@ const Mesa = () => {
       setPedidosMesa(updated);
       localStorage.setItem("pedidosMesa", JSON.stringify(updated));
       setCart([]);
-      toast.success("Pedido adicionado!", { position: "bottom-right", autoClose: 1500 });
+      toast.success("Pedido adicionado!", {
+        position: "bottom-right",
+        autoClose: 1500,
+      });
     } catch (err) {
       console.error("Erro na requisição:", err);
       alert("Erro ao registrar pedido");
     }
   };
-
-  const fecharConta = async () => {
+  const handleFecharConta = () => {
     if (!mesa) {
       alert("Mesa não identificada");
       return;
@@ -197,20 +243,12 @@ const Mesa = () => {
       alert("Nenhum pedido salvo");
       return;
     }
+    setShowConfirmation(true);
+  };
 
-    const produtosMap = new Map();
-    pedidosMesa.forEach((p) => {
-      p.items.forEach((it) => {
-        const key = `${it.name}|${it.price}`;
-        if (produtosMap.has(key)) {
-          produtosMap.get(key).quantity += it.quantity;
-        } else {
-          produtosMap.set(key, { name: it.name, price: it.price, quantity: it.quantity });
-        }
-      });
-    });
-    const produtos = Array.from(produtosMap.values());
-    const total = pedidosMesa.reduce((sum, p) => sum + p.total, 0);
+  const confirmarFechamento = async () => {
+    const { items: produtos, total } = resumoPedidos;
+
     const payload = {
       mesa,
       produtos,
@@ -237,12 +275,14 @@ const Mesa = () => {
         body: JSON.stringify({ mesa: String(mesa).trim() }),
       });
 
-      toast.success("Conta encerrada!", { position: "bottom-right", autoClose: 2000 });
       setPedidosMesa([]);
+      setCart([]);
       setMesa(null);
       localStorage.removeItem("pedidosMesa");
       localStorage.removeItem("mesaAtual");
       setShowOrders(false);
+      setShowConfirmation(false);
+      setShowSuccess(true);
     } catch (err) {
       console.error("Erro na requisição:", err);
       alert("Erro ao fechar conta");
@@ -327,7 +367,9 @@ const Mesa = () => {
           />
           <h1 className="text-2xl font-bold text-[#fff4e4]">Orçamenthus</h1>
           {mesa && (
-            <span className="ml-auto text-white font-semibold">Mesa {mesa}</span>
+            <span className="ml-auto text-white font-semibold">
+              Mesa {mesa}
+            </span>
           )}
         </div>
       </header>
@@ -348,7 +390,9 @@ const Mesa = () => {
               key={t.key}
               onClick={() => setActiveType(t.key)}
               className={`px-4 py-2 rounded-full font-semibold ${
-                activeType === t.key ? "bg-[#5d3d29] text-white" : "bg-gray-200 text-gray-700"
+                activeType === t.key
+                  ? "bg-[#5d3d29] text-white"
+                  : "bg-gray-200 text-gray-700"
               }`}
             >
               {t.label}
@@ -357,8 +401,11 @@ const Mesa = () => {
         </div>
 
         {menuSection}
-        <div className="bg-white rounded-2xl shadow-lg p-6" id="cart">
-
+        <div
+          className="bg-white rounded-2xl shadow-lg p-6"
+          id="cart"
+          ref={cartRef}
+        >
           {cart.length === 0 ? (
             <p className="text-gray-500 text-center">Nenhum item adicionado</p>
           ) : (
@@ -367,7 +414,9 @@ const Mesa = () => {
                 <div key={idx} className="flex justify-between items-center">
                   <div>
                     <p className="font-semibold">{item.name}</p>
-                    <p className="text-sm text-[#5d3d29]">R$ {item.price.toFixed(2)}</p>
+                    <p className="text-sm text-[#5d3d29]">
+                      R$ {item.price.toFixed(2)}
+                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -399,10 +448,16 @@ const Mesa = () => {
           >
             <PhoneIcon /> Enviar pedido para cozinha
           </button>
+          <button
+            onClick={handleFecharConta}
+            className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 mt-2"
+          >
+            Fechar Conta
+          </button>
         </div>
       </main>
       <button
-        onClick={() => setShowOrders(true)}
+        onClick={scrollToCart}
         className="fixed bottom-4 right-4 bg-[#5d3d29] text-white px-4 py-2 rounded-full shadow-lg"
       >
         Ver meus pedidos
@@ -444,7 +499,9 @@ const Mesa = () => {
                             <span>
                               {it.name} x{it.quantity}
                             </span>
-                            <span>R$ {(it.price * it.quantity).toFixed(2)}</span>
+                            <span>
+                              R$ {(it.price * it.quantity).toFixed(2)}
+                            </span>
                           </li>
                         ))}
                         <li className="font-semibold flex justify-between pt-2">
@@ -459,8 +516,8 @@ const Mesa = () => {
             )}
             {pedidosMesa.length > 0 && (
               <div className="text-right font-bold mb-4">
-                Total:&nbsp;
-                R$ {pedidosMesa.reduce((s, p) => s + p.total, 0).toFixed(2)}
+                Total:&nbsp; R${" "}
+                {pedidosMesa.reduce((s, p) => s + p.total, 0).toFixed(2)}
               </div>
             )}
             <div className="flex justify-between">
@@ -472,7 +529,7 @@ const Mesa = () => {
               </button>
               {pedidosMesa.length > 0 && (
                 <button
-                  onClick={fecharConta}
+                  onClick={handleFecharConta}
                   className="bg-green-500 text-white px-4 py-2 rounded"
                 >
                   Fechar Conta
@@ -482,11 +539,75 @@ const Mesa = () => {
           </div>
         </div>
       )}
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-xl font-bold mb-4">Confirmar Fechamento</h3>
+            <div className="max-h-60 overflow-y-auto mb-4 space-y-2">
+              {resumoPedidos.items.map((it, idx) => (
+                <div key={idx} className="flex justify-between">
+                  <span>
+                    {it.name} x{it.quantity}
+                  </span>
+                  <span>R$ {(it.price * it.quantity).toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+            <div className="font-bold text-right mb-4">
+              Total: R$ {resumoPedidos.total.toFixed(2)}
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowConfirmation(false)}
+                className="flex-1 bg-gray-300 py-2 rounded"
+              >
+                Editar Pedido
+              </button>
+              <button
+                onClick={confirmarFechamento}
+                className="flex-1 bg-green-500 text-white py-2 rounded"
+              >
+                Confirmar e Finalizar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSuccess && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 text-center space-y-4">
+            <p className="text-lg font-semibold">
+              Pedido enviado com sucesso! Um atendente irá até sua mesa em
+              breve. Obrigado!
+            </p>
+            <button
+              onClick={() => setShowSuccess(false)}
+              className="bg-[#5d3d29] text-white px-4 py-2 rounded w-full"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
       <ToastContainer />
     </div>
   );
 };
 
-const PhoneIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.27 12.27 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8 9a16 16 0 0 0 6 6l.36-.36a2 2 0 0 1 2.11-.45 12.27 12.27 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>;
+const PhoneIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-5 h-5"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.27 12.27 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8 9a16 16 0 0 0 6 6l.36-.36a2 2 0 0 1 2.11-.45 12.27 12.27 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+  </svg>
+);
 
 export default Mesa;
