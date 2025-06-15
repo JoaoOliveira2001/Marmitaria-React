@@ -318,18 +318,12 @@ const Home = () => {
       </p>
     );
   } else {
-    const tabs =
-      allowedCardapio === "1"
-        ? [{ key: "marmita", label: "Marmitas" }]
-        : [
-            { key: "porcao", label: "Porções" },
-            { key: "bebida", label: "Bebidas" },
-          ];
-    const filtered = cardapio1.filter(
-      (item) =>
-        item.type === activeType &&
-        String(item.cardapio).trim() === allowedCardapio,
-    );
+    const tabs = [
+      { key: "marmita", label: "Marmitas" },
+      { key: "porcao", label: "Porções" },
+      { key: "bebida", label: "Bebidas" },
+    ];
+    const filtered = cardapio1.filter((item) => item.type === activeType);
     if (filtered.length === 0) {
       console.warn("Lista vazia após filtragem", {
         hora: hour,
