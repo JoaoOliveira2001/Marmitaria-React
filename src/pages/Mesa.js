@@ -301,7 +301,9 @@ const Mesa = () => {
     { key: "bebida", label: "Bebidas" },
   ];
 
-  const filtered = cardapio.filter((item) => item.type === activeType);
+  const filtered = cardapio.filter(
+    (item) => item.type === activeType && item.cardapio === allowedCardapio,
+  );
 
   // Build menu or show closed message
   let menuSection;

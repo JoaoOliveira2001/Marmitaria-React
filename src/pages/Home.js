@@ -323,7 +323,9 @@ const Home = () => {
       { key: "porcao", label: "Porções" },
       { key: "bebida", label: "Bebidas" },
     ];
-    const filtered = cardapio1.filter((item) => item.type === activeType);
+    const filtered = cardapio1.filter(
+      (item) => item.type === activeType && item.cardapio === allowedCardapio,
+    );
     if (filtered.length === 0) {
       console.warn("Lista vazia após filtragem", {
         hora: hour,
