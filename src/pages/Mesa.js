@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { ShoppingCart, Plus, Minus, ChevronDown, ChevronUp } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
@@ -24,6 +24,7 @@ const Mesa = () => {
   });
   const [showOrders, setShowOrders] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState(null);
+  const cartRef = useRef(null);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -133,6 +134,12 @@ const Mesa = () => {
 
   const getTotalPrice = () => {
     return cart.reduce((tot, item) => tot + item.price * item.quantity, 0).toFixed(2);
+  };
+
+  const scrollToCart = () => {
+    if (cartRef.current) {
+      cartRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const adicionarPedido = async () => {
@@ -357,7 +364,7 @@ const Mesa = () => {
         </div>
 
         {menuSection}
-        <div className="bg-white rounded-2xl shadow-lg p-6" id="cart">
+        <div className="bg-white rounded-2xl shadow-lg p-6" id="cart" ref={cartRef}>
 
           {cart.length === 0 ? (
             <p className="text-gray-500 text-center">Nenhum item adicionado</p>
@@ -399,10 +406,16 @@ const Mesa = () => {
           >
             <PhoneIcon /> Enviar pedido para cozinha
           </button>
+          <button
+            onClick={fecharConta}
+            className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 mt-2"
+          >
+            Fechar Conta
+          </button>
         </div>
       </main>
       <button
-        onClick={() => setShowOrders(true)}
+        onClick={scrollToCart}
         className="fixed bottom-4 right-4 bg-[#5d3d29] text-white px-4 py-2 rounded-full shadow-lg"
       >
         Ver meus pedidos
