@@ -11,6 +11,11 @@ const Mesa = () => {
   const [cardapio, setCardapio] = useState([]);
   const [now, setNow] = useState(new Date());
   const [allowedCardapio, setAllowedCardapio] = useState(null);
+  const [horarios, setHorarios] = useState({
+    cardapio1: { inicio: 10, fim: 15 },
+    cardapio2: { inicio: 15, fim: 22 },
+  });
+  const [horariosError, setHorariosError] = useState(false);
   const [activeType, setActiveType] = useState("marmita");
   const [cart, setCart] = useState([]);
   const [pedidosMesa, setPedidosMesa] = useState(() => {
@@ -48,8 +53,27 @@ const Mesa = () => {
         setCardapio(normalized);
       })
       .catch((err) => {
-        console.error("Falha ao carregar cardápio:", err);
-        setCardapio([]);
+      console.error("Falha ao carregar cardápio:", err);
+      setCardapio([]);
+    });
+  }, []);
+
+  // carrega horários de funcionamento dos cardápios
+  useEffect(() => {
+    const url =
+      "https://script.google.com/macros/s/AKfycbzokXTguI-RRjMaVSmSwEStnDupPEgHXcMqIRX2Ss-f0tq2WiwTcQHxYztIgurtuN3Z/exec";
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Erro ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        setHorarios(data);
+        setHorariosError(false);
+      })
+      .catch((err) => {
+        console.error("Falha ao carregar horários:", err);
+        setHorariosError(true);
       });
   }, []);
 
@@ -61,10 +85,11 @@ const Mesa = () => {
   useEffect(() => {
     const h = now.getHours();
     let menu = null;
-    if (h >= 10 && h < 15) menu = "1";
-    else if (h >= 15 && h <= 22) menu = "2";
+    const { cardapio1, cardapio2 } = horarios;
+    if (h >= cardapio1.inicio && h < cardapio1.fim) menu = "1";
+    else if (h >= cardapio2.inicio && h < cardapio2.fim) menu = "2";
     setAllowedCardapio(menu);
-  }, [now]);
+  }, [now, horarios]);
 
   useEffect(() => {
     if (allowedCardapio === "1") {
@@ -312,6 +337,12 @@ const Mesa = () => {
           )}
         </div>
       </header>
+
+      {horariosError && (
+        <p className="text-center text-red-500 mt-4">
+          Não foi possível carregar os horários. Utilizando valores padrão.
+        </p>
+      )}
 
       <main className="container mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold text-center mb-6">

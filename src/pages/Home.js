@@ -34,6 +34,11 @@ const Home = () => {
   const [now, setNow] = useState(new Date());
   const [allowedCardapio, setAllowedCardapio] = useState(null);
   const [cardapio1, setCardapio1] = useState([]);
+  const [horarios, setHorarios] = useState({
+    cardapio1: { inicio: 10, fim: 15 },
+    cardapio2: { inicio: 15, fim: 22 },
+  });
+  const [horariosError, setHorariosError] = useState(false);
   const [tipoEntrega, setTipoEntrega] = useState("retirada");
   const [localEntrega, setLocalEntrega] = useState("");
   const [frete, setFrete] = useState(0);
@@ -61,10 +66,29 @@ const Home = () => {
         console.log("Itens carregados:", normalized.length);
       })
       .catch((err) => {
-        console.error("Falha ao carregar cardápio1:", err);
-        setCardapio1([]);
-      });
+      console.error("Falha ao carregar cardápio1:", err);
+      setCardapio1([]);
+    });
   }, []); // roda só uma vez, ao montar o componente
+
+  // carrega horários de funcionamento dos cardápios
+  useEffect(() => {
+    const url =
+      "https://script.google.com/macros/s/AKfycbzokXTguI-RRjMaVSmSwEStnDupPEgHXcMqIRX2Ss-f0tq2WiwTcQHxYztIgurtuN3Z/exec";
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Erro ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        setHorarios(data);
+        setHorariosError(false);
+      })
+      .catch((err) => {
+        console.error("Falha ao carregar horários:", err);
+        setHorariosError(true);
+      });
+  }, []);
 
   const addToCart = (item) => {
     const existing = cart.find((ci) => ci.id === item.id);
@@ -102,10 +126,11 @@ const Home = () => {
   useEffect(() => {
     const h = now.getHours();
     let menu = null;
-    if (h >= 10 && h < 15) menu = "1";
-    else if (h >= 15 && h <= 22) menu = "2";
+    const { cardapio1, cardapio2 } = horarios;
+    if (h >= cardapio1.inicio && h < cardapio1.fim) menu = "1";
+    else if (h >= cardapio2.inicio && h < cardapio2.fim) menu = "2";
     setAllowedCardapio(menu);
-  }, [now]);
+  }, [now, horarios]);
 
   // ajusta a aba ativa quando o cardápio muda
   useEffect(() => {
@@ -414,6 +439,12 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {horariosError && (
+        <p className="text-center text-red-500 mt-4">
+          Não foi possível carregar os horários. Utilizando valores padrão.
+        </p>
+      )}
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
