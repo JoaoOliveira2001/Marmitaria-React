@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 const ORDERS_API =
   "https://script.google.com/macros/s/AKfycbx99ZMXtaHbwS_hq_PxrLK4gBRxhDfa_YsHLU0FujJkv52rKkGyXU6jeRJhP9LioL2Y/exec";
@@ -34,6 +34,8 @@ export default function OrdersList() {
       return [];
     }
   });
+  const [unseenMap, setUnseenMap] = useState({});
+  const prevOrdersRef = useRef([]);
 
   const orderKey = (o) => `${o.Mesa}_${o.Data}_${o.Total}`;
 
@@ -65,6 +67,29 @@ export default function OrdersList() {
     const id = setInterval(fetchOrders, 60000);
     return () => clearInterval(id);
   }, []);
+
+  // Detect new orders and mark them as unseen
+  useEffect(() => {
+    const prev = prevOrdersRef.current;
+    const prevKeys = new Set(prev.map((o) => orderKey(o)));
+    setUnseenMap((prevMap) => {
+      const updated = { ...prevMap };
+      orders.forEach((o) => {
+        const key = orderKey(o);
+        if (!prevKeys.has(key) && !updated[key]) {
+          updated[key] = true;
+        }
+      });
+      // remove entries for orders no longer present
+      Object.keys(updated).forEach((k) => {
+        if (!orders.some((o) => orderKey(o) === k)) {
+          delete updated[k];
+        }
+      });
+      return updated;
+    });
+    prevOrdersRef.current = orders;
+  }, [orders]);
 
   useEffect(() => {
     const checkReset = () => {
@@ -108,6 +133,7 @@ ${items.map((it) => `<li>${it.nome} x${it.qtd}</li>`).join("")}
 </html>`;
     win.document.write(html);
     win.document.close();
+    markAsSeen(order);
     setPrintedOrders((prev) => {
       const updated = [...prev, order];
       localStorage.setItem("printedOrders", JSON.stringify(updated));
@@ -116,14 +142,25 @@ ${items.map((it) => `<li>${it.nome} x${it.qtd}</li>`).join("")}
     setOrders((prev) => prev.filter((o) => orderKey(o) !== orderKey(order)));
   };
 
+  const markAsSeen = (order) => {
+    const key = orderKey(order);
+    setUnseenMap((prev) => ({ ...prev, [key]: false }));
+  };
+
   const hasOrders = orders.length > 0;
 
   return (
     <div className="space-y-4">
       {hasOrders ? orders.map((o, idx) => {
         const items = parseItems(o);
+        const key = orderKey(o);
+        const highlight = unseenMap[key];
         return (
-          <div key={idx} className="bg-white p-4 rounded shadow">
+          <div
+            key={idx}
+            onClick={() => markAsSeen(o)}
+            className={`bg-white p-4 rounded shadow ${highlight ? "animate-pulse" : ""}`}
+          >
             <div className="flex justify-between">
               <div>
                 <div className="font-bold">Mesa {o.Mesa}</div>
