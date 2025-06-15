@@ -255,19 +255,13 @@ const Mesa = () => {
 
   // allowedCardapio é atualizado no efeito acima
 
-  const tabs =
-    allowedCardapio === "1"
-      ? [{ key: "marmita", label: "Marmitas" }]
-      : [
-          { key: "porcao", label: "Porções" },
-          { key: "bebida", label: "Bebidas" },
-        ];
+  const tabs = [
+    { key: "marmita", label: "Marmitas" },
+    { key: "porcao", label: "Porções" },
+    { key: "bebida", label: "Bebidas" },
+  ];
 
-  const filtered = cardapio.filter(
-    (item) =>
-      item.type === activeType &&
-      String(item.cardapio).trim() === allowedCardapio,
-  );
+  const filtered = cardapio.filter((item) => item.type === activeType);
 
   // Build menu or show closed message
   let menuSection;
