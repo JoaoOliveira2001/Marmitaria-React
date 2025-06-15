@@ -13,14 +13,11 @@ import {
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Cardapio1 from "../components/Cardapio1";
-import Cardapio2 from "../components/Cardapio2";
 import PriceButtons, { parsePrices } from "../components/PriceButtons";
 
 const Home = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
-  const [showCart, setShowCart] = useState(false);
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [endereco, setEndereco] = useState("");
@@ -35,13 +32,14 @@ const Home = () => {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [senha, setSenha] = useState("");
   const [now, setNow] = useState(new Date());
+  const [allowedCardapio, setAllowedCardapio] = useState(null);
   const [cardapio1, setCardapio1] = useState([]);
   const [tipoEntrega, setTipoEntrega] = useState("retirada");
   const [localEntrega, setLocalEntrega] = useState("");
   const [frete, setFrete] = useState(0);
   // tab currently selected in the menu
   const [activeType, setActiveType] = useState("marmita");
-  const cartRef = React.useRef(null);
+  const cartRef = useRef(null);
 
   useEffect(() => {
     // Endpoint do seu Web App do Apps Script
@@ -100,112 +98,27 @@ const Home = () => {
     return () => clearInterval(id);
   }, []);
 
+  // determina qual cardápio deve ser exibido de acordo com o horário
+  useEffect(() => {
+    const h = now.getHours();
+    let menu = null;
+    if (h >= 10 && h < 15) menu = "1";
+    else if (h >= 15 && h <= 22) menu = "2";
+    setAllowedCardapio(menu);
+  }, [now]);
+
+  // ajusta a aba ativa quando o cardápio muda
+  useEffect(() => {
+    if (allowedCardapio === "1") {
+      setActiveType("marmita");
+    } else if (allowedCardapio === "2") {
+      setActiveType("porcao");
+    }
+  }, [allowedCardapio]);
+
   const day = now.getDay(); // 0=Dom,1=Seg,2=Ter…
   const hour = now.getHours(); // 0–23
 
-  const cardapio2 = [
-    {
-      id: 6,
-      name: "Porção de Batata Frita",
-      description: "Batata palito crocante, servida com ketchup",
-      price: 12.5,
-      image: "https://via.placeholder.com/300x300?text=Porcao+Batata+Frita",
-      time: "10-15 min",
-      type: "porcao",
-    },
-    {
-      id: 7,
-      name: "Refrigerante Cola",
-      description: "Garrafa PET 600ml de refrigerante sabor cola",
-      price: 6.0,
-      image: "https://via.placeholder.com/300x300?text=Refrigerante+Cola",
-      time: "5-10 min",
-      type: "bebida",
-    },
-    {
-      id: 8,
-      name: "Suco Natural de Laranja",
-      description: "Suco espremido na hora, sem adição de açúcar",
-      price: 8.0,
-      image: "https://via.placeholder.com/300x300?text=Suco+Laranja",
-      time: "5-10 min",
-      type: "bebida",
-    },
-    {
-      id: 9,
-      name: "Porção de Frango a Passarinho",
-      description: "Cortinhas de frango temperadas e fritas até ficar crocante",
-      price: 18.0,
-      image: "https://via.placeholder.com/300x300?text=Frango+Passarinho",
-      time: "15-20 min",
-      type: "porcao",
-    },
-    {
-      id: 10,
-      name: "Água Mineral 500ml",
-      description: "Garrafa de água mineral sem gás",
-      price: 4.0,
-      image: "https://via.placeholder.com/300x300?text=Agua+Mineral",
-      time: "3-5 min",
-      type: "bebida",
-    },
-  ];
-
-  const bebidas = [
-    {
-      id: 7,
-      name: "Coca-Cola",
-      description: "Refrigerante Coca-Cola 350ml",
-      price: 10.0,
-      image: "https://i.imgur.com/ttICFKW.png",
-      type: "bebida",
-    },
-    {
-      id: 8,
-      name: "Sprite",
-      description: "Refrigerante Sprite 350ml",
-      price: 10.0,
-      image: "https://i.imgur.com/FPi7DxS.png",
-      type: "bebida",
-    },
-    {
-      id: 9,
-      name: "Água",
-      description: "Água mineral 500ml",
-      price: 10.0,
-      image: "https://i.imgur.com/O1IFuSy.png",
-      type: "bebida",
-    },
-    {
-      id: 10,
-      name: "Itubaina",
-      description: "Refrigerante Itubaina 350ml",
-      price: 10.0,
-      image: "https://i.imgur.com/b9HaJqS.png",
-      type: "bebida",
-    },
-    {
-      id: 11,
-      name: "Coca-Cola Zero",
-      description: "Refrigerante Coca-Cola Zero 350ml",
-      price: 10.0,
-      image: "https://i.imgur.com/WQJp15f.png",
-      type: "bebida",
-    },
-  ];
-
-  const adicionais = [
-    {
-      id: 12,
-      name: "Batata Frita Extra",
-      description: "Porção extra de batata frita crocante",
-      price: 10.0,
-      image:
-        "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300&h=300&fit=crop&crop=center",
-      type: "adicional",
-      icon: "🍟",
-    },
-  ];
 
   const removeFromCart = (id) => {
     const existingItem = cart.find((item) => item.id === id);
@@ -369,13 +282,9 @@ const Home = () => {
     }
   };
 
-  let allowedCardapio;
-  if (hour >= 10 && hour < 15) {
-    allowedCardapio = "1";
-  } else if (hour >= 15 && hour <= 22) {
-    allowedCardapio = "2";
-  }
+  // allowedCardapio é atualizado no efeito acima
 
+  // Build the menu section based on day/time and selected tab
   let menuSection;
   if (day === 1 || !allowedCardapio) {
     menuSection = (
@@ -384,11 +293,13 @@ const Home = () => {
       </p>
     );
   } else {
-    const tabs = [
-      { key: "marmita", label: "Marmitas" },
-      { key: "bebida", label: "Bebidas" },
-      { key: "porcao", label: "Porções" },
-    ];
+    const tabs =
+      allowedCardapio === "1"
+        ? [{ key: "marmita", label: "Marmitas" }]
+        : [
+            { key: "porcao", label: "Porções" },
+            { key: "bebida", label: "Bebidas" },
+          ];
     const filtered = cardapio1.filter(
       (item) =>
         item.type === activeType &&
@@ -422,7 +333,10 @@ const Home = () => {
             </p>
           ) : (
             filtered.map((m) => (
-              <div key={m.id} className="bg-white rounded-2xl shadow-lg p-6">
+              <div
+                key={m.id}
+                className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-transform hover:-translate-y-1"
+              >
                 <div className="mb-4 text-center">
                   <img
                     src={m.image}
@@ -458,7 +372,7 @@ const Home = () => {
       {/* Header */}
       <header className="bg-[#5d3d29]">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <div className="flex items-center space-x-3">
               <img
                 src="https://i.imgur.com/wYccCFb.jpeg"
@@ -473,7 +387,6 @@ const Home = () => {
                 <p className="text-[#5d3d29]">Sabor que conquista!</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4"></div>
           </div>
         </div>
       </header>
@@ -508,7 +421,7 @@ const Home = () => {
           <div className="lg:w-2/3">
             {/* Marmitas Section */}
             <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-              🍱 Nosso Cardápio
+              {allowedCardapio === "2" ? "🍟 Porções e Bebidas" : "🍱 Nosso Cardápio"}
             </h2>
 
             <section className="mb-12">{menuSection}</section>

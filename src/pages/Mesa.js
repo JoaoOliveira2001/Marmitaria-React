@@ -9,6 +9,8 @@ const Mesa = () => {
   const location = useLocation();
   const [mesa, setMesa] = useState(null);
   const [cardapio, setCardapio] = useState([]);
+  const [now, setNow] = useState(new Date());
+  const [allowedCardapio, setAllowedCardapio] = useState(null);
   const [activeType, setActiveType] = useState("marmita");
   const [cart, setCart] = useState([]);
   const [pedidosMesa, setPedidosMesa] = useState(() => {
@@ -38,12 +40,39 @@ const Mesa = () => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         return res.json();
       })
-      .then((data) => setCardapio(data))
+      .then((data) => {
+        const normalized = data.map((it) => ({
+          ...it,
+          cardapio: String(it.cardapio ?? it.Cardapio ?? ""),
+        }));
+        setCardapio(normalized);
+      })
       .catch((err) => {
         console.error("Falha ao carregar cardápio:", err);
         setCardapio([]);
       });
   }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const h = now.getHours();
+    let menu = null;
+    if (h >= 10 && h < 15) menu = "1";
+    else if (h >= 15 && h <= 22) menu = "2";
+    setAllowedCardapio(menu);
+  }, [now]);
+
+  useEffect(() => {
+    if (allowedCardapio === "1") {
+      setActiveType("marmita");
+    } else if (allowedCardapio === "2") {
+      setActiveType("porcao");
+    }
+  }, [allowedCardapio]);
 
   const addToCart = (item) => {
     const existing = cart.find((ci) => ci.id === item.id && ci.price === item.price);
@@ -195,54 +224,47 @@ const Mesa = () => {
     }
   };
 
-  const tabs = [
-    { key: "marmita", label: "Marmitas" },
-    { key: "bebida", label: "Bebidas" },
-    { key: "porcao", label: "Porções" },
-  ];
+  // Check current day and hour to determine available menu
+  const day = now.getDay();
+  const hour = now.getHours();
 
-  const filtered = cardapio.filter((item) => item.type === activeType);
+  // allowedCardapio é atualizado no efeito acima
 
-  return (
-    <div className="min-h-screen bg-[#fff4e4]">
-      {mesa && (
-        <div className="w-full bg-yellow-200 text-[#5d3d29] font-semibold text-center py-2">
-          Mesa {mesa}
-        </div>
-      )}
-      <header className="bg-[#5d3d29]">
-        <div className="container mx-auto px-4 py-4 flex flex-col items-center">
-          <img
-            src="https://i.imgur.com/wYccCFb.jpeg"
-            alt="Logo"
-            className="w-20 h-20 object-contain rounded-full"
-          />
-          {mesa && (
-            <span className="mt-2 text-white font-semibold text-lg">
-              Mesa {mesa}
-            </span>
-          )}
-        </div>
-      </header>
+  const tabs =
+    allowedCardapio === "1"
+      ? [{ key: "marmita", label: "Marmitas" }]
+      : [
+          { key: "porcao", label: "Porções" },
+          { key: "bebida", label: "Bebidas" },
+        ];
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex justify-center mb-6 space-x-4">
-          {tabs.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setActiveType(t.key)}
-              className={`px-4 py-2 rounded-full font-semibold ${
-                activeType === t.key ? "bg-[#5d3d29] text-white" : "bg-gray-200 text-gray-700"
-              }`}
+  const filtered = cardapio.filter(
+    (item) =>
+      item.type === activeType &&
+      String(item.cardapio).trim() === allowedCardapio,
+  );
+
+  // Build menu or show closed message
+  let menuSection;
+  if (day === 1 || !allowedCardapio) {
+    menuSection = (
+      <p className="text-center font-bold text-red-500">
+        Estamos fechados neste horário
+      </p>
+    );
+  } else {
+    menuSection = (
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        {filtered.length === 0 ? (
+          <p className="col-span-2 text-center text-red-500 font-semibold">
+            Nenhum item disponível
+          </p>
+        ) : (
+          filtered.map((m) => (
+            <div
+              key={m.id}
+              className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-transform hover:-translate-y-1"
             >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {filtered.map((m) => (
-            <div key={m.id} className="bg-white rounded-2xl shadow-lg p-6">
               <div className="mb-4 text-center">
                 <img
                   src={m.image}
@@ -264,8 +286,52 @@ const Mesa = () => {
               </div>
               <PriceButtons price={m.price} item={m} onAdd={addToCart} />
             </div>
+          ))
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#fff4e4]">
+      {mesa && (
+        <div className="w-full bg-yellow-200 text-[#5d3d29] font-semibold text-center py-2">
+          Mesa {mesa}
+        </div>
+      )}
+      <header className="bg-[#5d3d29]">
+        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+          <img
+            src="https://i.imgur.com/wYccCFb.jpeg"
+            alt="Logo Orçamenthus"
+            className="w-20 h-20 object-contain rounded-full"
+          />
+          <h1 className="text-2xl font-bold text-[#fff4e4]">Orçamenthus</h1>
+          {mesa && (
+            <span className="ml-auto text-white font-semibold">Mesa {mesa}</span>
+          )}
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-8">
+        <h2 className="text-2xl font-bold text-center mb-6">
+          {allowedCardapio === "2" ? "🍟 Porções e Bebidas" : "🍱 Marmitas"}
+        </h2>
+        <div className="flex justify-center mb-6 space-x-4">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setActiveType(t.key)}
+              className={`px-4 py-2 rounded-full font-semibold ${
+                activeType === t.key ? "bg-[#5d3d29] text-white" : "bg-gray-200 text-gray-700"
+              }`}
+            >
+              {t.label}
+            </button>
           ))}
         </div>
+
+        {menuSection}
         <div className="bg-white rounded-2xl shadow-lg p-6" id="cart">
 
           {cart.length === 0 ? (
