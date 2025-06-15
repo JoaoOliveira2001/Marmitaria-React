@@ -32,6 +32,7 @@ const Home = () => {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [senha, setSenha] = useState("");
   const [now, setNow] = useState(new Date());
+  const [allowedCardapio, setAllowedCardapio] = useState(null);
   const [cardapio1, setCardapio1] = useState([]);
   const [tipoEntrega, setTipoEntrega] = useState("retirada");
   const [localEntrega, setLocalEntrega] = useState("");
@@ -96,6 +97,24 @@ const Home = () => {
     const id = setInterval(() => setNow(new Date()), 60_000);
     return () => clearInterval(id);
   }, []);
+
+  // determina qual cardápio deve ser exibido de acordo com o horário
+  useEffect(() => {
+    const h = now.getHours();
+    let menu = null;
+    if (h >= 10 && h < 15) menu = "1";
+    else if (h >= 15 && h <= 22) menu = "2";
+    setAllowedCardapio(menu);
+  }, [now]);
+
+  // ajusta a aba ativa quando o cardápio muda
+  useEffect(() => {
+    if (allowedCardapio === "1") {
+      setActiveType("marmita");
+    } else if (allowedCardapio === "2") {
+      setActiveType("porcao");
+    }
+  }, [allowedCardapio]);
 
   const day = now.getDay(); // 0=Dom,1=Seg,2=Ter…
   const hour = now.getHours(); // 0–23
@@ -263,13 +282,7 @@ const Home = () => {
     }
   };
 
-  // Determine which menu is available based on current time
-  let allowedCardapio;
-  if (hour >= 10 && hour < 15) {
-    allowedCardapio = "1";
-  } else if (hour >= 15 && hour <= 22) {
-    allowedCardapio = "2";
-  }
+  // allowedCardapio é atualizado no efeito acima
 
   // Build the menu section based on day/time and selected tab
   let menuSection;
@@ -280,11 +293,13 @@ const Home = () => {
       </p>
     );
   } else {
-    const tabs = [
-      { key: "marmita", label: "Marmitas" },
-      { key: "bebida", label: "Bebidas" },
-      { key: "porcao", label: "Porções" },
-    ];
+    const tabs =
+      allowedCardapio === "1"
+        ? [{ key: "marmita", label: "Marmitas" }]
+        : [
+            { key: "porcao", label: "Porções" },
+            { key: "bebida", label: "Bebidas" },
+          ];
     const filtered = cardapio1.filter(
       (item) =>
         item.type === activeType &&
@@ -406,7 +421,7 @@ const Home = () => {
           <div className="lg:w-2/3">
             {/* Marmitas Section */}
             <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-              🍱 Nosso Cardápio
+              {allowedCardapio === "2" ? "🍟 Porções e Bebidas" : "🍱 Nosso Cardápio"}
             </h2>
 
             <section className="mb-12">{menuSection}</section>

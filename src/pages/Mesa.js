@@ -10,6 +10,7 @@ const Mesa = () => {
   const [mesa, setMesa] = useState(null);
   const [cardapio, setCardapio] = useState([]);
   const [now, setNow] = useState(new Date());
+  const [allowedCardapio, setAllowedCardapio] = useState(null);
   const [activeType, setActiveType] = useState("marmita");
   const [cart, setCart] = useState([]);
   const [pedidosMesa, setPedidosMesa] = useState(() => {
@@ -56,6 +57,22 @@ const Mesa = () => {
     const id = setInterval(() => setNow(new Date()), 60_000);
     return () => clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    const h = now.getHours();
+    let menu = null;
+    if (h >= 10 && h < 15) menu = "1";
+    else if (h >= 15 && h <= 22) menu = "2";
+    setAllowedCardapio(menu);
+  }, [now]);
+
+  useEffect(() => {
+    if (allowedCardapio === "1") {
+      setActiveType("marmita");
+    } else if (allowedCardapio === "2") {
+      setActiveType("porcao");
+    }
+  }, [allowedCardapio]);
 
   const addToCart = (item) => {
     const existing = cart.find((ci) => ci.id === item.id && ci.price === item.price);
@@ -211,18 +228,15 @@ const Mesa = () => {
   const day = now.getDay();
   const hour = now.getHours();
 
-  let allowedCardapio;
-  if (hour >= 10 && hour < 15) {
-    allowedCardapio = "1";
-  } else if (hour >= 15 && hour <= 22) {
-    allowedCardapio = "2";
-  }
+  // allowedCardapio é atualizado no efeito acima
 
-  const tabs = [
-    { key: "marmita", label: "Marmitas" },
-    { key: "bebida", label: "Bebidas" },
-    { key: "porcao", label: "Porções" },
-  ];
+  const tabs =
+    allowedCardapio === "1"
+      ? [{ key: "marmita", label: "Marmitas" }]
+      : [
+          { key: "porcao", label: "Porções" },
+          { key: "bebida", label: "Bebidas" },
+        ];
 
   const filtered = cardapio.filter(
     (item) =>
@@ -241,33 +255,39 @@ const Mesa = () => {
   } else {
     menuSection = (
       <div className="grid md:grid-cols-2 gap-6 mb-8">
-        {filtered.map((m) => (
-          <div
-            key={m.id}
-            className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-transform hover:-translate-y-1"
-          >
-            <div className="mb-4 text-center">
-              <img
-                src={m.image}
-                alt={m.name}
-                className="w-full h-40 object-cover rounded-lg"
-              />
-              <h3 className="text-xl font-bold mt-2">{m.name}</h3>
+        {filtered.length === 0 ? (
+          <p className="col-span-2 text-center text-red-500 font-semibold">
+            Nenhum item disponível
+          </p>
+        ) : (
+          filtered.map((m) => (
+            <div
+              key={m.id}
+              className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-transform hover:-translate-y-1"
+            >
+              <div className="mb-4 text-center">
+                <img
+                  src={m.image}
+                  alt={m.name}
+                  className="w-full h-40 object-cover rounded-lg"
+                />
+                <h3 className="text-xl font-bold mt-2">{m.name}</h3>
+              </div>
+              <p className="text-gray-600 mb-4 text-center">{m.description}</p>
+              <div className="flex justify-between items-center mb-4">
+                {m.time && <span>⏰ {m.time}</span>}
+                <span className="text-2xl font-bold text-[#5d3d29]">
+                  {(() => {
+                    const p = parsePrices(m.price, m);
+                    if (p.length === 0) return "R$ 0.00";
+                    return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
+                  })()}
+                </span>
+              </div>
+              <PriceButtons price={m.price} item={m} onAdd={addToCart} />
             </div>
-            <p className="text-gray-600 mb-4 text-center">{m.description}</p>
-            <div className="flex justify-between items-center mb-4">
-              {m.time && <span>⏰ {m.time}</span>}
-              <span className="text-2xl font-bold text-[#5d3d29]">
-                {(() => {
-                  const p = parsePrices(m.price, m);
-                  if (p.length === 0) return "R$ 0.00";
-                  return `R$ ${p[0].toFixed(2)}` + (p.length > 1 ? "+" : "");
-                })()}
-              </span>
-            </div>
-            <PriceButtons price={m.price} item={m} onAdd={addToCart} />
-          </div>
-        ))}
+          ))
+        )}
       </div>
     );
   }
@@ -294,6 +314,9 @@ const Mesa = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <h2 className="text-2xl font-bold text-center mb-6">
+          {allowedCardapio === "2" ? "🍟 Porções e Bebidas" : "🍱 Marmitas"}
+        </h2>
         <div className="flex justify-center mb-6 space-x-4">
           {tabs.map((t) => (
             <button
