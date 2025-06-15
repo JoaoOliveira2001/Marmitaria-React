@@ -225,10 +225,13 @@ const Mesa = () => {
       setPedidosMesa(updated);
       localStorage.setItem("pedidosMesa", JSON.stringify(updated));
       setCart([]);
-      toast.success("Pedido adicionado!", {
-        position: "bottom-right",
-        autoClose: 1500,
-      });
+      toast.success(
+        "Tudo certo! Seu pedido foi enviado para a cozinha. Um atendente virá à sua mesa em breve com a sua refeição.",
+        {
+          position: "bottom-right",
+          autoClose: 3000,
+        },
+      );
     } catch (err) {
       console.error("Erro na requisição:", err);
       alert("Erro ao registrar pedido");
@@ -580,8 +583,8 @@ const Mesa = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 text-center space-y-4">
             <p className="text-lg font-semibold">
-              Pedido enviado com sucesso! Um atendente irá até sua mesa em
-              breve. Obrigado!
+              Estamos fechando sua conta. Por favor, aguarde — um atendente virá
+              à sua mesa em breve para finalizar o pagamento.
             </p>
             <button
               onClick={() => setShowSuccess(false)}
