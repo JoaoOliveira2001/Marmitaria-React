@@ -15,6 +15,7 @@ export default function MesasMenu() {
     }
   });
   const [openTable, setOpenTable] = useState(null);
+  const [freedTable, setFreedTable] = useState(null);
 
   useEffect(() => {
     const fetchMesas = () => {
@@ -63,16 +64,24 @@ export default function MesasMenu() {
       console.error("Erro ao liberar mesa", err);
     }
     setMesasOcupadas((prev) => prev.filter((m) => m !== String(mesa)));
-    setOpenTable(null);
     setCheckoutRequests((prev) => {
       const updated = prev.filter((m) => m !== String(mesa));
-      localStorage.setItem("checkoutRequests", JSON.stringify(updated));
+      const value = JSON.stringify(updated);
+      localStorage.setItem("checkoutRequests", value);
+      window.dispatchEvent(
+        new StorageEvent("storage", { key: "checkoutRequests", newValue: value })
+      );
       return updated;
     });
+    setFreedTable(mesa);
+    setTimeout(() => {
+      setFreedTable(null);
+      setOpenTable(null);
+    }, 1500);
   };
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-40 bg-[#5d3d29] text-[#fff4e4] p-4 space-y-2 overflow-y-auto z-40">
+    <aside className="fixed top-0 left-0 h-full w-48 bg-[#5d3d29] text-[#fff4e4] p-4 space-y-2 overflow-y-auto z-40">
       <h2 className="text-lg font-bold mb-4">Mesas</h2>
       {tables.map((t) => {
         const isOccupied = mesasOcupadas.includes(String(t));
@@ -93,7 +102,7 @@ export default function MesasMenu() {
               Mesa {t}
             </button>
             {isOpen && (
-              <div className="absolute left-full top-0 ml-2 bg-white text-[#5d3d29] rounded shadow p-2 space-y-2 z-50">
+              <div className="absolute left-full top-0 ml-2 w-56 bg-white text-[#5d3d29] rounded shadow p-2 space-y-2 z-50">
                 <a
                   href={`/#/mesa?mesa=${t}`}
                   target="_blank"
@@ -104,9 +113,11 @@ export default function MesasMenu() {
                 </a>
                 <button
                   onClick={() => freeTable(t)}
-                  className="w-full bg-green-500 text-white px-2 py-1 rounded"
+                  className={`w-full px-2 py-1 rounded ${
+                    freedTable === t ? "bg-green-600 text-white" : "bg-green-500 text-white"
+                  }`}
                 >
-                  ✔ Liberar Mesa
+                  {freedTable === t ? "✔ Mesa Liberada" : "✔ Liberar Mesa"}
                 </button>
               </div>
             )}
