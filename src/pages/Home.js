@@ -311,7 +311,7 @@ const Home = () => {
 
   // Build the menu section based on day/time and selected tab
   let menuSection;
-  if (day === 1 || !allowedCardapio) {
+  if (day === 2 || !allowedCardapio) {
     menuSection = (
       <p className="text-center font-bold text-red-500">
         Estamos fechados neste horário
