@@ -310,7 +310,7 @@ const Mesa = () => {
 
   // Build menu or show closed message
   let menuSection;
-  if (day === 1 || !allowedCardapio) {
+  if (day === 2 || !allowedCardapio) {
     menuSection = (
       <p className="text-center font-bold text-red-500">
         Estamos fechados neste horário
