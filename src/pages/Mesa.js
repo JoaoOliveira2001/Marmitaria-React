@@ -283,6 +283,20 @@ const Mesa = () => {
       setMesa(null);
       localStorage.removeItem("pedidosMesa");
       localStorage.removeItem("mesaAtual");
+      try {
+        const list = JSON.parse(
+          localStorage.getItem("checkoutRequests") || "[]",
+        );
+        if (!list.includes(String(mesa))) {
+          list.push(String(mesa));
+          localStorage.setItem("checkoutRequests", JSON.stringify(list));
+        }
+      } catch {
+        localStorage.setItem(
+          "checkoutRequests",
+          JSON.stringify([String(mesa)]),
+        );
+      }
       setShowOrders(false);
       setShowConfirmation(false);
       setShowSuccess(true);

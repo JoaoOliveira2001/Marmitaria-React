@@ -24,6 +24,13 @@ const Dashboard = () => {
   const [autorizado, setAutorizado] = useState(false);
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("today");
+  const [checkoutRequests, setCheckoutRequests] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("checkoutRequests") || "[]");
+    } catch {
+      return [];
+    }
+  });
 
   useEffect(() => {
     fetch(API_URL)
@@ -35,6 +42,21 @@ const Dashboard = () => {
   useEffect(() => {
     const autorizadoLocal = localStorage.getItem("autorizado");
     setAutorizado(autorizadoLocal === "true");
+  }, []);
+
+  useEffect(() => {
+    const handler = () => {
+      try {
+        setCheckoutRequests(
+          JSON.parse(localStorage.getItem("checkoutRequests") || "[]"),
+        );
+      } catch {
+        setCheckoutRequests([]);
+      }
+    };
+    handler();
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
   }, []);
 
   if (!autorizado) {
@@ -160,7 +182,19 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#fff4e4]">
-      <MesasMenu />
+      <MesasMenu checkoutRequests={checkoutRequests} />
+      {checkoutRequests.length > 0 && (
+        <div className="fixed top-0 right-0 m-4 w-60 space-y-2 z-50">
+          {checkoutRequests.map((m) => (
+            <div
+              key={m}
+              className="bg-red-100 border border-red-500 text-red-700 p-2 rounded shadow"
+            >
+              Table {m} requested to close the bill.
+            </div>
+          ))}
+        </div>
+      )}
       <div className="ml-40">
       <header className="bg-[#5d3d29] text-[#fff4e4] py-6">
         <div className="container mx-auto px-4 flex justify-between items-center">
