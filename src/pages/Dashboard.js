@@ -24,12 +24,33 @@ const Dashboard = () => {
   const [autorizado, setAutorizado] = useState(false);
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("today");
+  const [checkoutRequests, setCheckoutRequests] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("checkoutRequests") || "[]");
+    } catch {
+      return [];
+    }
+  });
 
   useEffect(() => {
     fetch(API_URL)
       .then((res) => res.json())
       .then((data) => setOrders(data))
       .catch((err) => console.error("Falha ao buscar API", err));
+  }, []);
+
+  useEffect(() => {
+    const handleStorage = (e) => {
+      if (e.key === "checkoutRequests") {
+        try {
+          setCheckoutRequests(JSON.parse(e.newValue || "[]"));
+        } catch {
+          setCheckoutRequests([]);
+        }
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
   useEffect(() => {
@@ -161,6 +182,13 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-[#fff4e4]">
       <MesasMenu />
+      {checkoutRequests.length > 0 && (
+        <div className="fixed top-0 right-0 m-4 w-64 bg-red-100 border border-red-500 text-[#5d3d29] p-4 space-y-2 z-50">
+          {checkoutRequests.map((m) => (
+            <p key={m}>Mesa {m} solicitou fechar a conta.</p>
+          ))}
+        </div>
+      )}
       <div className="ml-40">
       <header className="bg-[#5d3d29] text-[#fff4e4] py-6">
         <div className="container mx-auto px-4 flex justify-between items-center">
