@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginPedidos from "../components/LoginPedidos";
-import MesasMenu from "../dashboard/components/MesasMenu";
+import Mesas from "../dashboard/components/Mesas";
 import OrdersList from "../dashboard/Orders";
 import { Line } from "react-chartjs-2";
 import {
@@ -160,8 +160,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#fff4e4]">
-      <MesasMenu />
-      <div className="ml-40">
       <header className="bg-[#5d3d29] text-[#fff4e4] py-6">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Painel</h1>
@@ -173,8 +171,8 @@ const Dashboard = () => {
           </button>
         </div>
       </header>
-
       <div className="container mx-auto px-4 py-8">
+        <Mesas />
         <div className="flex justify-center mb-6 space-x-2">
           {[
             ["today", "Hoje"],
