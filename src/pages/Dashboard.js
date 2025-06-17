@@ -32,6 +32,18 @@ const Dashboard = () => {
     }
   });
 
+  const clearCheckoutRequest = (mesa) => {
+    setCheckoutRequests((prev) => {
+      const updated = prev.filter((m) => m !== mesa);
+      const value = JSON.stringify(updated);
+      localStorage.setItem("checkoutRequests", value);
+      window.dispatchEvent(
+        new StorageEvent("storage", { key: "checkoutRequests", newValue: value })
+      );
+      return updated;
+    });
+  };
+
   useEffect(() => {
     fetch(API_URL)
       .then((res) => res.json())
@@ -185,7 +197,15 @@ const Dashboard = () => {
       {checkoutRequests.length > 0 && (
         <div className="fixed top-0 right-0 m-4 w-64 bg-red-100 border border-red-500 text-[#5d3d29] p-4 space-y-2 z-50">
           {checkoutRequests.map((m) => (
-            <p key={m}>Mesa {m} solicitou fechar a conta.</p>
+            <div key={m} className="flex justify-between items-center">
+              <p>Mesa {m} solicitou fechar a conta.</p>
+              <button
+                onClick={() => clearCheckoutRequest(m)}
+                className="text-sm text-red-700 hover:underline"
+              >
+                Ok
+              </button>
+            </div>
           ))}
         </div>
       )}
