@@ -81,7 +81,7 @@ export default function MesasMenu() {
   };
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-48 bg-[#5d3d29] text-[#fff4e4] p-4 space-y-2 overflow-y-auto z-40">
+    <aside className="fixed top-0 left-0 h-full w-48 md:w-60 bg-[#5d3d29] text-[#fff4e4] p-4 space-y-2 overflow-y-auto z-40">
       <h2 className="text-lg font-bold mb-4">Mesas</h2>
       {tables.map((t) => {
         const isOccupied = mesasOcupadas.includes(String(t));
@@ -91,18 +91,18 @@ export default function MesasMenu() {
           <div key={t} className="relative">
             <button
               onClick={() => setOpenTable((prev) => (prev === t ? null : t))}
-              className={`w-full rounded px-2 py-1 text-center focus:outline-none ${
+              className={`w-full rounded px-2 py-2 text-center focus:outline-none ${
                 isCheckout
                   ? "bg-red-100 border-2 border-red-500 text-[#5d3d29]"
                   : isOccupied
-                  ? "bg-yellow-300 text-[#5d3d29]"
-                  : "bg-[#fff4e4] text-[#5d3d29]"
+                    ? "bg-yellow-300 text-[#5d3d29]"
+                    : "bg-[#fff4e4] text-[#5d3d29]"
               }`}
             >
               Mesa {t}
             </button>
             {isOpen && (
-              <div className="absolute left-full top-0 ml-2 w-56 bg-white text-[#5d3d29] rounded shadow p-2 space-y-2 z-50">
+              <div className="absolute md:left-full md:top-0 md:ml-2 left-0 top-full mt-2 w-48 sm:w-56 md:w-60 bg-white text-[#5d3d29] rounded shadow p-2 space-y-2 z-50">
                 <a
                   href={`/#/mesa?mesa=${t}`}
                   target="_blank"
