@@ -278,6 +278,19 @@ const Mesa = () => {
         body: JSON.stringify({ mesa: String(mesa).trim() }),
       });
 
+      try {
+        const stored = JSON.parse(localStorage.getItem("checkoutRequests") || "[]");
+        if (!stored.includes(String(mesa))) {
+          const updated = [...stored, String(mesa)];
+          localStorage.setItem("checkoutRequests", JSON.stringify(updated));
+        } else {
+          // trigger storage event
+          localStorage.setItem("checkoutRequests", JSON.stringify(stored));
+        }
+      } catch {
+        localStorage.setItem("checkoutRequests", JSON.stringify([String(mesa)]));
+      }
+
       setPedidosMesa([]);
       setCart([]);
       setMesa(null);
