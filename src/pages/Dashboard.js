@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [autorizado, setAutorizado] = useState(false);
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("today");
+  const [pendingCheckout, setPendingCheckout] = useState([]);
 
   useEffect(() => {
     fetch(API_URL)
@@ -160,7 +161,14 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#fff4e4]">
-      <MesasMenu />
+      <MesasMenu onCheckoutRequests={setPendingCheckout} />
+      {pendingCheckout.length > 0 && (
+        <div className="fixed top-4 right-4 w-60 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 space-y-1 z-50 rounded shadow">
+          {pendingCheckout.map((m) => (
+            <p key={m}>Mesa {m} solicitou fechar a conta.</p>
+          ))}
+        </div>
+      )}
       <div className="ml-40">
       <header className="bg-[#5d3d29] text-[#fff4e4] py-6">
         <div className="container mx-auto px-4 flex justify-between items-center">
