@@ -5,7 +5,7 @@ const MESAS_API =
 
 const tables = Array.from({ length: 15 }, (_, i) => i + 1);
 
-export default function MesasMenu() {
+export default function MesasMenu({ checkoutRequests = [] }) {
   const [mesasOcupadas, setMesasOcupadas] = useState([]);
 
   useEffect(() => {
@@ -35,6 +35,7 @@ export default function MesasMenu() {
       <h2 className="text-lg font-bold mb-4">Mesas</h2>
       {tables.map((t) => {
         const isOccupied = mesasOcupadas.includes(String(t));
+        const isCheckout = checkoutRequests.includes(String(t));
         return (
           <a
             key={t}
@@ -42,7 +43,11 @@ export default function MesasMenu() {
             target="_blank"
             rel="noopener noreferrer"
             className={`block rounded px-2 py-1 text-center ${
-              isOccupied ? "bg-yellow-300 text-[#5d3d29]" : "bg-[#fff4e4] text-[#5d3d29]"
+              isCheckout
+                ? "bg-red-200 border-red-500 border text-[#5d3d29]"
+                : isOccupied
+                ? "bg-yellow-300 text-[#5d3d29]"
+                : "bg-[#fff4e4] text-[#5d3d29]"
             }`}
           >
             Mesa {t}
