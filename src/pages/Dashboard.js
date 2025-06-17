@@ -32,7 +32,16 @@ const Dashboard = () => {
     }
   });
 
-  const clearCheckoutRequest = (mesa) => {
+  const clearCheckoutRequest = async (mesa) => {
+    try {
+      await fetch("/api/limpaMesa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mesa: String(mesa) }),
+      });
+    } catch (err) {
+      console.error("Erro ao liberar mesa", err);
+    }
     setCheckoutRequests((prev) => {
       const updated = prev.filter((m) => m !== mesa);
       const value = JSON.stringify(updated);
@@ -203,7 +212,7 @@ const Dashboard = () => {
                 onClick={() => clearCheckoutRequest(m)}
                 className="text-sm text-red-700 hover:underline"
               >
-                Ok
+                ✔ Atendido – Liberar Mesa
               </button>
             </div>
           ))}
