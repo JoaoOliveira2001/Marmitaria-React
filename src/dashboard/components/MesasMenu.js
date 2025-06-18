@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { APPS_SCRIPT_BASE } from "../../apiConfig";
-
 // Endpoint to retrieve active table numbers from the spreadsheet
-const MESAS_API = `${APPS_SCRIPT_BASE}?acao=buscarMesas`;
+const MESAS_API = "/api/mesas";
 
 const tables = Array.from({ length: 15 }, (_, i) => i + 1);
 

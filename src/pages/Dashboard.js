@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import LoginPedidos from "../components/LoginPedidos";
 import MesasMenu from "../dashboard/components/MesasMenu";
 import OrdersList from "../dashboard/Orders";
-import { APPS_SCRIPT_BASE } from "../apiConfig";
 import { Line } from "react-chartjs-2";
 import {
   Chart,
@@ -18,7 +17,7 @@ import {
 Chart.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 // Endpoint to fetch the full list of orders for statistics
-const API_URL = `${APPS_SCRIPT_BASE}?acao=buscarPedidos`;
+const API_URL = "/api/pedidos";
 
 const Dashboard = () => {
   const navigate = useNavigate();

@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { APPS_SCRIPT_BASE } from "../apiConfig";
-
 // Endpoint that returns the list of orders waiting to be printed
-const ORDERS_API = `${APPS_SCRIPT_BASE}?acao=buscarPedidos`;
+const ORDERS_API = "/api/pedidos";
 
 function parseItems(order) {
   if (Array.isArray(order.itensFormatados)) {

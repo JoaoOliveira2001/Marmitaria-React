@@ -14,7 +14,6 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PriceButtons, { parsePrices } from "../components/PriceButtons";
-import { APPS_SCRIPT_BASE } from "../apiConfig";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -49,7 +48,7 @@ const Home = () => {
 
   useEffect(() => {
     // Load menu items
-    const url = `${APPS_SCRIPT_BASE}?acao=buscarCardapio`;
+    const url = "/api/cardapio";
 
     fetch(url, { cache: "no-cache" })
       .then((res) => {
@@ -73,7 +72,7 @@ const Home = () => {
 
   // carrega horários de funcionamento dos cardápios
   useEffect(() => {
-    const url = `${APPS_SCRIPT_BASE}?acao=buscarHorarios`;
+    const url = "/api/horarios";
     fetch(url, { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);

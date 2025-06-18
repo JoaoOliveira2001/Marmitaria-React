@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { APPS_SCRIPT_BASE } from "../apiConfig";
 import { useLocation } from "react-router-dom";
 import {
   ShoppingCart,
@@ -48,7 +47,7 @@ const Mesa = () => {
   }, [location.search]);
 
   useEffect(() => {
-    const url = `${APPS_SCRIPT_BASE}?acao=buscarCardapio`;
+    const url = "/api/cardapio";
     fetch(url, { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
@@ -69,7 +68,7 @@ const Mesa = () => {
 
   // carrega horários de funcionamento dos cardápios
   useEffect(() => {
-    const url = `${APPS_SCRIPT_BASE}?acao=buscarHorarios`;
+    const url = "/api/horarios";
     fetch(url, { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
