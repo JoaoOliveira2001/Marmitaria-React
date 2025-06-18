@@ -19,18 +19,37 @@ Chart.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, L
 const API_URL =
   "https://script.google.com/macros/s/AKfycbwHrRUQZIWj8edBBQA-2tBA6J-mIVTypi5w5BFfBULIb5G1vpposGqQ2I3l-b3tjTO_/exec";
 
+const MESAS_API =
+  "https://script.google.com/macros/s/AKfycbzcncEtTmtS7DrJdfN5dTAaQbNr02ha_Psql6vdlbjOI8gJEM5ioayiKMpRwUxzzHd_/exec";
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [autorizado, setAutorizado] = useState(false);
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("today");
-  const [checkoutRequests, setCheckoutRequests] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("checkoutRequests") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const [checkoutRequests, setCheckoutRequests] = useState([]);
+
+  const fetchCheckoutRequests = () => {
+    fetch(MESAS_API)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.mesas)) {
+          const req = data.mesas
+            .filter((m) => {
+              const status = String(m.status || "").toLowerCase().trim();
+              return status === "fechar conta";
+            })
+            .map((m) => String(m.mesa ?? m.numero ?? m.id ?? m));
+          setCheckoutRequests(req);
+        } else {
+          setCheckoutRequests([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar mesas", err);
+        setCheckoutRequests([]);
+      });
+  };
 
   const clearCheckoutRequest = async (mesa) => {
     try {
@@ -42,15 +61,7 @@ const Dashboard = () => {
     } catch (err) {
       console.error("Erro ao liberar mesa", err);
     }
-    setCheckoutRequests((prev) => {
-      const updated = prev.filter((m) => m !== mesa);
-      const value = JSON.stringify(updated);
-      localStorage.setItem("checkoutRequests", value);
-      window.dispatchEvent(
-        new StorageEvent("storage", { key: "checkoutRequests", newValue: value })
-      );
-      return updated;
-    });
+    setCheckoutRequests((prev) => prev.filter((m) => m !== mesa));
   };
 
   useEffect(() => {
@@ -61,17 +72,9 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    const handleStorage = (e) => {
-      if (e.key === "checkoutRequests") {
-        try {
-          setCheckoutRequests(JSON.parse(e.newValue || "[]"));
-        } catch {
-          setCheckoutRequests([]);
-        }
-      }
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    fetchCheckoutRequests();
+    const id = setInterval(fetchCheckoutRequests, 60000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {

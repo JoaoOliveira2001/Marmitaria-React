@@ -3,17 +3,12 @@ import React, { useEffect, useState } from "react";
 const MESAS_API =
   "https://script.google.com/macros/s/AKfycbzcncEtTmtS7DrJdfN5dTAaQbNr02ha_Psql6vdlbjOI8gJEM5ioayiKMpRwUxzzHd_/exec";
 
+
 const tables = Array.from({ length: 15 }, (_, i) => i + 1);
 
 export default function MesasMenu() {
   const [mesasOcupadas, setMesasOcupadas] = useState([]);
-  const [checkoutRequests, setCheckoutRequests] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("checkoutRequests") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const [checkoutRequests, setCheckoutRequests] = useState([]);
   const [openTable, setOpenTable] = useState(null);
   const [freedTable, setFreedTable] = useState(null);
 
@@ -23,15 +18,27 @@ export default function MesasMenu() {
         .then((res) => res.json())
         .then((data) => {
           if (data.success && Array.isArray(data.mesas)) {
-            const unique = Array.from(new Set(data.mesas.map(String)));
-            setMesasOcupadas(unique);
+            const ocupadas = [];
+            const checkout = [];
+            data.mesas.forEach((m) => {
+              const num = m.mesa ?? m.numero ?? m.id ?? m;
+              ocupadas.push(String(num));
+              const status = String(m.status || "").toLowerCase().trim();
+              if (status === "fechar conta") {
+                checkout.push(String(num));
+              }
+            });
+            setMesasOcupadas(Array.from(new Set(ocupadas)));
+            setCheckoutRequests(checkout);
           } else {
             setMesasOcupadas([]);
+            setCheckoutRequests([]);
           }
         })
         .catch((err) => {
           console.error("Erro ao buscar mesas", err);
           setMesasOcupadas([]);
+          setCheckoutRequests([]);
         });
     };
     fetchMesas();
@@ -39,19 +46,7 @@ export default function MesasMenu() {
     return () => clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    const handleStorage = (e) => {
-      if (e.key === "checkoutRequests") {
-        try {
-          setCheckoutRequests(JSON.parse(e.newValue || "[]"));
-        } catch {
-          setCheckoutRequests([]);
-        }
-      }
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, []);
+
 
   const freeTable = async (mesa) => {
     try {
@@ -64,15 +59,7 @@ export default function MesasMenu() {
       console.error("Erro ao liberar mesa", err);
     }
     setMesasOcupadas((prev) => prev.filter((m) => m !== String(mesa)));
-    setCheckoutRequests((prev) => {
-      const updated = prev.filter((m) => m !== String(mesa));
-      const value = JSON.stringify(updated);
-      localStorage.setItem("checkoutRequests", value);
-      window.dispatchEvent(
-        new StorageEvent("storage", { key: "checkoutRequests", newValue: value })
-      );
-      return updated;
-    });
+    setCheckoutRequests((prev) => prev.filter((m) => m !== String(mesa)));
     setFreedTable(mesa);
     setTimeout(() => {
       setFreedTable(null);
