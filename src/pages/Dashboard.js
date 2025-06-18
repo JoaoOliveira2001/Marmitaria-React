@@ -19,6 +19,9 @@ Chart.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, L
 const API_URL =
   "https://script.google.com/macros/s/AKfycbwHrRUQZIWj8edBBQA-2tBA6J-mIVTypi5w5BFfBULIb5G1vpposGqQ2I3l-b3tjTO_/exec";
 
+const MESAS_API =
+  "https://script.google.com/macros/s/AKfycbzcncEtTmtS7DrJdfN5dTAaQbNr02ha_Psql6vdlbjOI8gJEM5ioayiKMpRwUxzzHd_/exec";
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [autorizado, setAutorizado] = useState(false);
@@ -27,15 +30,21 @@ const Dashboard = () => {
   const [checkoutRequests, setCheckoutRequests] = useState([]);
 
   const fetchCheckoutRequests = () => {
-    fetch("https://script.google.com/macros/s/AKfycby-AGwFtoIX_k-qgXQpiniZCVOp0eAu6XoRdqDaUYo-A-GYQx0VmpFCMFukMyYiOX9B/exec")
+    fetch(MESAS_API)
       .then((res) => res.json())
       .then((data) => {
-        const req = Array.isArray(data.mesas)
-          ? data.mesas
-              .filter((m) => String(m.status).toLowerCase() === "fechar conta")
-              .map((m) => String(m.mesa))
-          : [];
-        setCheckoutRequests(req);
+        if (data.success && Array.isArray(data.mesas)) {
+          const req = data.mesas
+            .filter(
+              (m) =>
+                m.status &&
+                String(m.status).toLowerCase() === "fechar conta"
+            )
+            .map((m) => String(m.mesa ?? m.numero ?? m.id ?? m));
+          setCheckoutRequests(req);
+        } else {
+          setCheckoutRequests([]);
+        }
       })
       .catch((err) => {
         console.error("Erro ao buscar mesas", err);
