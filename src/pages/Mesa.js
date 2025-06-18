@@ -10,6 +10,7 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PriceButtons, { parsePrices } from "../components/PriceButtons";
+import { moverParaFecharConta } from "../utils/gsActions";
 
 const Mesa = () => {
   const location = useLocation();
@@ -271,22 +272,15 @@ const Mesa = () => {
         alert("Erro ao fechar conta");
         return;
       }
-
-      // Atualiza status da mesa via API proxy para evitar CORS
-      const gsResponse = await fetch("/api/fechar-conta", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mesa: String(mesa) }),
-      });
-
-      if (gsResponse.ok) {
+      // Atualiza status da mesa via API
+      try {
+        await moverParaFecharConta(String(mesa));
         toast.success("Conta enviada para fechamento!", {
           position: "bottom-right",
           autoClose: 2000,
         });
-      } else {
-        const text = await gsResponse.text();
-        console.error("Erro ao avisar Apps Script:", text);
+      } catch (err) {
+        console.error("Erro ao avisar Apps Script:", err);
       }
 
       try {
