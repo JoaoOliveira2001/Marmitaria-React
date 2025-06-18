@@ -276,7 +276,7 @@ const Mesa = () => {
       const gsResponse = await fetch("/api/fechar-conta", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ acao: "fecharConta", mesa: String(mesa) }),
+        body: JSON.stringify({ mesa: String(mesa) }),
       });
 
       if (gsResponse.ok) {
