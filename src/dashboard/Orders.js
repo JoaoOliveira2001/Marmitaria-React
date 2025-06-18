@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
+import { APPS_SCRIPT_BASE } from "../apiConfig";
 
-const ORDERS_API =
-  "https://script.google.com/macros/s/AKfycbx99ZMXtaHbwS_hq_PxrLK4gBRxhDfa_YsHLU0FujJkv52rKkGyXU6jeRJhP9LioL2Y/exec";
+// Endpoint that returns the list of orders waiting to be printed
+const ORDERS_API = `${APPS_SCRIPT_BASE}?acao=buscarPedidos`;
 
 function parseItems(order) {
   if (Array.isArray(order.itensFormatados)) {
@@ -40,7 +41,7 @@ export default function OrdersList() {
   const orderKey = (o) => `${o.Mesa}_${o.Data}_${o.Total}`;
 
   const fetchOrders = () => {
-    fetch(ORDERS_API)
+    fetch(ORDERS_API, { cache: "no-cache" })
       .then((res) => res.json())
       .then((data) => {
         const pedidos = data.pedidos || data;

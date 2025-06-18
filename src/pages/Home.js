@@ -14,6 +14,7 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PriceButtons, { parsePrices } from "../components/PriceButtons";
+import { APPS_SCRIPT_BASE } from "../apiConfig";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -47,11 +48,10 @@ const Home = () => {
   const cartRef = useRef(null);
 
   useEffect(() => {
-    // Endpoint do seu Web App do Apps Script
-    const url =
-      "https://script.google.com/macros/s/AKfycbyYDPV06sKgZMVDEnGlih52_SNiLtQaXocYBzF37fu3rvZmdO5SVzLIo3Az9HotBE4N/exec";
+    // Load menu items
+    const url = `${APPS_SCRIPT_BASE}?acao=buscarCardapio`;
 
-    fetch(url)
+    fetch(url, { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         return res.json();
@@ -73,9 +73,8 @@ const Home = () => {
 
   // carrega horários de funcionamento dos cardápios
   useEffect(() => {
-    const url =
-      "https://script.google.com/macros/s/AKfycbzokXTguI-RRjMaVSmSwEStnDupPEgHXcMqIRX2Ss-f0tq2WiwTcQHxYztIgurtuN3Z/exec";
-    fetch(url)
+    const url = `${APPS_SCRIPT_BASE}?acao=buscarHorarios`;
+    fetch(url, { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         return res.json();

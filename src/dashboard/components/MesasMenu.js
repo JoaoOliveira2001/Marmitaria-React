@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { APPS_SCRIPT_BASE } from "../../apiConfig";
 
-const MESAS_API =
-  "https://script.google.com/macros/s/AKfycbzcncEtTmtS7DrJdfN5dTAaQbNr02ha_Psql6vdlbjOI8gJEM5ioayiKMpRwUxzzHd_/exec";
+// Endpoint to retrieve active table numbers from the spreadsheet
+const MESAS_API = `${APPS_SCRIPT_BASE}?acao=buscarMesas`;
 
 const tables = Array.from({ length: 15 }, (_, i) => i + 1);
 
@@ -19,7 +20,7 @@ export default function MesasMenu() {
 
   useEffect(() => {
     const fetchMesas = () => {
-      fetch(MESAS_API)
+      fetch(MESAS_API, { cache: "no-cache" })
         .then((res) => res.json())
         .then((data) => {
           if (data.success && Array.isArray(data.mesas)) {

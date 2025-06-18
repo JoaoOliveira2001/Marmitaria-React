@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { APPS_SCRIPT_BASE } from "../apiConfig";
 import { useLocation } from "react-router-dom";
 import {
   ShoppingCart,
@@ -47,9 +48,8 @@ const Mesa = () => {
   }, [location.search]);
 
   useEffect(() => {
-    const url =
-      "https://script.google.com/macros/s/AKfycbyYDPV06sKgZMVDEnGlih52_SNiLtQaXocYBzF37fu3rvZmdO5SVzLIo3Az9HotBE4N/exec";
-    fetch(url)
+    const url = `${APPS_SCRIPT_BASE}?acao=buscarCardapio`;
+    fetch(url, { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         return res.json();
@@ -69,9 +69,8 @@ const Mesa = () => {
 
   // carrega horários de funcionamento dos cardápios
   useEffect(() => {
-    const url =
-      "https://script.google.com/macros/s/AKfycbzokXTguI-RRjMaVSmSwEStnDupPEgHXcMqIRX2Ss-f0tq2WiwTcQHxYztIgurtuN3Z/exec";
-    fetch(url)
+    const url = `${APPS_SCRIPT_BASE}?acao=buscarHorarios`;
+    fetch(url, { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         return res.json();
