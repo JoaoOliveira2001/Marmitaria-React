@@ -24,13 +24,24 @@ const Dashboard = () => {
   const [autorizado, setAutorizado] = useState(false);
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("today");
-  const [checkoutRequests, setCheckoutRequests] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("checkoutRequests") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const [checkoutRequests, setCheckoutRequests] = useState([]);
+
+  const fetchCheckoutRequests = () => {
+    fetch("https://script.google.com/macros/s/AKfycby-AGwFtoIX_k-qgXQpiniZCVOp0eAu6XoRdqDaUYo-A-GYQx0VmpFCMFukMyYiOX9B/exec")
+      .then((res) => res.json())
+      .then((data) => {
+        const req = Array.isArray(data.mesas)
+          ? data.mesas
+              .filter((m) => String(m.status).toLowerCase() === "fechar conta")
+              .map((m) => String(m.mesa))
+          : [];
+        setCheckoutRequests(req);
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar mesas", err);
+        setCheckoutRequests([]);
+      });
+  };
 
   const clearCheckoutRequest = async (mesa) => {
     try {
@@ -42,15 +53,7 @@ const Dashboard = () => {
     } catch (err) {
       console.error("Erro ao liberar mesa", err);
     }
-    setCheckoutRequests((prev) => {
-      const updated = prev.filter((m) => m !== mesa);
-      const value = JSON.stringify(updated);
-      localStorage.setItem("checkoutRequests", value);
-      window.dispatchEvent(
-        new StorageEvent("storage", { key: "checkoutRequests", newValue: value })
-      );
-      return updated;
-    });
+    setCheckoutRequests((prev) => prev.filter((m) => m !== mesa));
   };
 
   useEffect(() => {
@@ -61,17 +64,9 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    const handleStorage = (e) => {
-      if (e.key === "checkoutRequests") {
-        try {
-          setCheckoutRequests(JSON.parse(e.newValue || "[]"));
-        } catch {
-          setCheckoutRequests([]);
-        }
-      }
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    fetchCheckoutRequests();
+    const id = setInterval(fetchCheckoutRequests, 60000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
