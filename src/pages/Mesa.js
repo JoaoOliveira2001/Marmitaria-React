@@ -48,8 +48,8 @@ const Mesa = () => {
 
   useEffect(() => {
     const url =
-      "https://script.google.com/macros/s/AKfycbyYDPV06sKgZMVDEnGlih52_SNiLtQaXocYBzF37fu3rvZmdO5SVzLIo3Az9HotBE4N/exec";
-    fetch(url)
+      "https://script.google.com/macros/s/AKfycbxIcGhc0fURMzbTv5sRf5uNyQ7iLKcQ_D7JTYCyfwCY-QWGf8T3FeuJLe0KwnkJtVuH/exec?acao=buscarCardapio";
+    fetch(url, { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         return res.json();
@@ -70,8 +70,8 @@ const Mesa = () => {
   // carrega horários de funcionamento dos cardápios
   useEffect(() => {
     const url =
-      "https://script.google.com/macros/s/AKfycbzokXTguI-RRjMaVSmSwEStnDupPEgHXcMqIRX2Ss-f0tq2WiwTcQHxYztIgurtuN3Z/exec";
-    fetch(url)
+      "https://script.google.com/macros/s/AKfycbxIcGhc0fURMzbTv5sRf5uNyQ7iLKcQ_D7JTYCyfwCY-QWGf8T3FeuJLe0KwnkJtVuH/exec?acao=buscarHorarios";
+    fetch(url, { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         return res.json();

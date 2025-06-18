@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 
+// Endpoint centralizado no Apps Script
 const ORDERS_API =
-  "https://script.google.com/macros/s/AKfycbx99ZMXtaHbwS_hq_PxrLK4gBRxhDfa_YsHLU0FujJkv52rKkGyXU6jeRJhP9LioL2Y/exec";
+  "https://script.google.com/macros/s/AKfycbxIcGhc0fURMzbTv5sRf5uNyQ7iLKcQ_D7JTYCyfwCY-QWGf8T3FeuJLe0KwnkJtVuH/exec?acao=buscarPedidos";
 
 function parseItems(order) {
   if (Array.isArray(order.itensFormatados)) {
@@ -40,7 +41,7 @@ export default function OrdersList() {
   const orderKey = (o) => `${o.Mesa}_${o.Data}_${o.Total}`;
 
   const fetchOrders = () => {
-    fetch(ORDERS_API)
+    fetch(ORDERS_API, { cache: "no-cache" })
       .then((res) => res.json())
       .then((data) => {
         const pedidos = data.pedidos || data;

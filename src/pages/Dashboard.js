@@ -16,8 +16,9 @@ import {
 
 Chart.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
 
+// Endpoint centralizado no Apps Script
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbwHrRUQZIWj8edBBQA-2tBA6J-mIVTypi5w5BFfBULIb5G1vpposGqQ2I3l-b3tjTO_/exec";
+  "https://script.google.com/macros/s/AKfycbxIcGhc0fURMzbTv5sRf5uNyQ7iLKcQ_D7JTYCyfwCY-QWGf8T3FeuJLe0KwnkJtVuH/exec?acao=buscarPedidos";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetch(API_URL)
+    fetch(API_URL, { cache: "no-cache" })
       .then((res) => res.json())
       .then((data) => setOrders(data))
       .catch((err) => console.error("Falha ao buscar API", err));
