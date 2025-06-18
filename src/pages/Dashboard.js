@@ -32,6 +32,30 @@ const Dashboard = () => {
     }
   });
 
+  const fetchFecharContaPedidos = async () => {
+    try {
+      const res = await fetch(
+        "https://script.google.com/macros/s/AKfycby4EkTXdD3-3_N-caEaaEUitz3nbgKe3X5lUJTJ2TwFeM-hChHUe1CIIvy_7x7m9Tmd/exec",
+        { cache: "no-cache" }
+      );
+      if (!res.ok) throw new Error(`Erro ${res.status}`);
+      const data = await res.json();
+      const mesas = Array.isArray(data.pedidos)
+        ? data.pedidos
+            .filter((p) => p.status === "Pendente")
+            .map((p) => String(p.Mesa))
+        : [];
+      const value = JSON.stringify(mesas);
+      localStorage.setItem("checkoutRequests", value);
+      window.dispatchEvent(
+        new StorageEvent("storage", { key: "checkoutRequests", newValue: value })
+      );
+      setCheckoutRequests(mesas);
+    } catch (err) {
+      console.error("Falha ao buscar pedidos de fechamento", err);
+    }
+  };
+
   const clearCheckoutRequest = async (mesa) => {
     try {
       await fetch("/api/limpaMesa", {
@@ -72,6 +96,12 @@ const Dashboard = () => {
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  useEffect(() => {
+    fetchFecharContaPedidos();
+    const id = setInterval(fetchFecharContaPedidos, 30000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
