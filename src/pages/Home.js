@@ -47,11 +47,10 @@ const Home = () => {
   const cartRef = useRef(null);
 
   useEffect(() => {
-    // Endpoint do seu Web App do Apps Script
-    const url =
-      "https://script.google.com/macros/s/AKfycbyYDPV06sKgZMVDEnGlih52_SNiLtQaXocYBzF37fu3rvZmdO5SVzLIo3Az9HotBE4N/exec";
+    // Load menu items
+    const url = "/api/cardapio";
 
-    fetch(url)
+    fetch(url, { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         return res.json();
@@ -73,9 +72,8 @@ const Home = () => {
 
   // carrega horários de funcionamento dos cardápios
   useEffect(() => {
-    const url =
-      "https://script.google.com/macros/s/AKfycbzokXTguI-RRjMaVSmSwEStnDupPEgHXcMqIRX2Ss-f0tq2WiwTcQHxYztIgurtuN3Z/exec";
-    fetch(url)
+    const url = "/api/horarios";
+    fetch(url, { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         return res.json();

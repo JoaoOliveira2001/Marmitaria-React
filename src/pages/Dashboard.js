@@ -16,8 +16,8 @@ import {
 
 Chart.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbwHrRUQZIWj8edBBQA-2tBA6J-mIVTypi5w5BFfBULIb5G1vpposGqQ2I3l-b3tjTO_/exec";
+// Endpoint to fetch the full list of orders for statistics
+const API_URL = "/api/pedidos";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetch(API_URL)
+    fetch(API_URL, { cache: "no-cache" })
       .then((res) => res.json())
       .then((data) => setOrders(data))
       .catch((err) => console.error("Falha ao buscar API", err));
