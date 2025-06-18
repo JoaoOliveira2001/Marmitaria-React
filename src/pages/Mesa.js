@@ -272,11 +272,22 @@ const Mesa = () => {
         return;
       }
 
-      await fetch("/api/limpaMesa", {
+      // Atualiza status da mesa via API proxy para evitar CORS
+      const gsResponse = await fetch("/api/fechar-conta", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mesa: String(mesa).trim() }),
+        body: JSON.stringify({ acao: "fecharConta", mesa: String(mesa) }),
       });
+
+      if (gsResponse.ok) {
+        toast.success("Conta enviada para fechamento!", {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+      } else {
+        const text = await gsResponse.text();
+        console.error("Erro ao avisar Apps Script:", text);
+      }
 
       try {
         const stored = JSON.parse(localStorage.getItem("checkoutRequests") || "[]");
