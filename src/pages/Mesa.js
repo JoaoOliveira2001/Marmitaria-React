@@ -272,15 +272,12 @@ const Mesa = () => {
         return;
       }
 
-      // Atualiza status da mesa na planilha via Apps Script
-      const gsResponse = await fetch(
-        "https://script.google.com/macros/s/AKfycby-AGwFtoIX_k-qgXQpiniZCVOp0eAu6XoRdqDaUYo-A-GYQx0VmpFCMFukMyYiOX9B/exec",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ acao: "fecharConta", mesa: String(mesa) }),
-        },
-      );
+      // Atualiza status da mesa via API proxy para evitar CORS
+      const gsResponse = await fetch("/api/fechar-conta", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ acao: "fecharConta", mesa: String(mesa) }),
+      });
 
       if (gsResponse.ok) {
         toast.success("Conta enviada para fechamento!", {
