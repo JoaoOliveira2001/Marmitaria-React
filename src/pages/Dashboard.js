@@ -35,11 +35,10 @@ const Dashboard = () => {
       .then((data) => {
         if (data.success && Array.isArray(data.mesas)) {
           const req = data.mesas
-            .filter(
-              (m) =>
-                m.status &&
-                String(m.status).toLowerCase() === "fechar conta"
-            )
+            .filter((m) => {
+              const status = String(m.status || "").toLowerCase().trim();
+              return status === "fechar conta";
+            })
             .map((m) => String(m.mesa ?? m.numero ?? m.id ?? m));
           setCheckoutRequests(req);
         } else {

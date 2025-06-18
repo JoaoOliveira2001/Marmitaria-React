@@ -23,10 +23,8 @@ export default function MesasMenu() {
             data.mesas.forEach((m) => {
               const num = m.mesa ?? m.numero ?? m.id ?? m;
               ocupadas.push(String(num));
-              if (
-                m.status &&
-                String(m.status).toLowerCase() === "fechar conta"
-              ) {
+              const status = String(m.status || "").toLowerCase().trim();
+              if (status === "fechar conta") {
                 checkout.push(String(num));
               }
             });
