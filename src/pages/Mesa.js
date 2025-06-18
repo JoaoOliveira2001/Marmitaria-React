@@ -278,6 +278,26 @@ const Mesa = () => {
         body: JSON.stringify({ mesa: String(mesa).trim() }),
       });
 
+      // Atualiza status da mesa na planilha via Apps Script
+      const gsResponse = await fetch(
+        "https://script.google.com/macros/s/AKfycby-AGwFtoIX_k-qgXQpiniZCVOp0eAu6XoRdqDaUYo-A-GYQx0VmpFCMFukMyYiOX9B/exec",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ acao: "fecharConta", mesa: String(mesa) }),
+        },
+      );
+
+      if (gsResponse.ok) {
+        toast.success("Conta enviada para fechamento!", {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+      } else {
+        const text = await gsResponse.text();
+        console.error("Erro ao avisar Apps Script:", text);
+      }
+
       try {
         const stored = JSON.parse(localStorage.getItem("checkoutRequests") || "[]");
         if (!stored.includes(String(mesa))) {
