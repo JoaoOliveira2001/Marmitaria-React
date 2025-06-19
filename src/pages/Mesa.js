@@ -122,7 +122,7 @@ const Mesa = () => {
         ),
       );
     } else {
-      setCart([...cart, { ...item, quantity: 1 }]);
+      setCart([...cart, { ...item, quantity: 1, observations: "" }]);
     }
     toast.success(`${item.name} adicionado!`, {
       position: "bottom-right",
@@ -146,6 +146,14 @@ const Mesa = () => {
         ),
       );
     }
+  };
+
+  const updateObservations = (index, observations) => {
+    setCart(
+      cart.map((item, idx) =>
+        idx === index ? { ...item, observations } : item,
+      ),
+    );
   };
 
   const getTotalPrice = () => {
@@ -191,7 +199,13 @@ const Mesa = () => {
     }
 
     const produtos = cart
-      .map((item) => `${item.name} x${item.quantity}`)
+      .map((item) => {
+        let desc = `${item.name} x${item.quantity}`;
+        if (item.observations && item.observations.trim()) {
+          desc += ` (Obs: ${item.observations})`;
+        }
+        return desc;
+      })
       .join(" | ");
 
     const payload = {
@@ -438,28 +452,37 @@ const Mesa = () => {
           ) : (
             <div className="space-y-4 mb-4">
               {cart.map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center">
-                  <div>
-                    <p className="font-semibold">{item.name}</p>
-                    <p className="text-sm text-[#5d3d29]">
-                      R$ {item.price.toFixed(2)}
-                    </p>
+                <div key={idx} className="bg-gray-50 p-4 rounded-lg space-y-2">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-semibold">{item.name}</p>
+                      <p className="text-sm text-[#5d3d29]">
+                        R$ {item.price.toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => removeFromCart(item.id, item.price)}
+                        className="bg-red-500 text-white p-1 rounded-full"
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button
+                        onClick={() => addToCart(item)}
+                        className="bg-green-500 text-white p-1 rounded-full"
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => removeFromCart(item.id, item.price)}
-                      className="bg-red-500 text-white p-1 rounded-full"
-                    >
-                      <Minus size={14} />
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button
-                      onClick={() => addToCart(item)}
-                      className="bg-green-500 text-white p-1 rounded-full"
-                    >
-                      <Plus size={14} />
-                    </button>
-                  </div>
+                  <textarea
+                    value={item.observations || ""}
+                    onChange={(e) => updateObservations(idx, e.target.value)}
+                    placeholder="Observações..."
+                    className="w-full p-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#5d3d29] focus:border-transparent"
+                    rows="2"
+                  />
                 </div>
               ))}
             </div>
@@ -522,14 +545,21 @@ const Mesa = () => {
                     {expandedOrder === idx && (
                       <ul className="mt-2 text-sm text-gray-700 space-y-1">
                         {p.items.map((it, i) => (
-                          <li key={i} className="flex justify-between">
-                            <span>
-                              {it.name} x{it.quantity}
-                            </span>
-                            <span>
-                              R$ {(it.price * it.quantity).toFixed(2)}
-                            </span>
-                          </li>
+                          <React.Fragment key={i}>
+                            <li className="flex justify-between">
+                              <span>
+                                {it.name} x{it.quantity}
+                              </span>
+                              <span>
+                                R$ {(it.price * it.quantity).toFixed(2)}
+                              </span>
+                            </li>
+                            {it.observations && (
+                              <li className="text-xs text-gray-500 italic ml-2">
+                                Obs: {it.observations}
+                              </li>
+                            )}
+                          </React.Fragment>
                         ))}
                         <li className="font-semibold flex justify-between pt-2">
                           <span>Total</span>
