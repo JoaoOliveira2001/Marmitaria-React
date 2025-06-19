@@ -332,29 +332,7 @@ const Dashboard = () => {
         </div>
         <hr className="my-6" />
 
-        <div className="grid md:grid-cols-2 gap-6 items-start">
-          <div className="bg-white p-6 rounded shadow space-y-2">
-            <h2 className="font-bold text-[#5d3d29] text-lg mb-2">
-              Resumo ({filterLabel})
-            </h2>
-            <p>Total de pedidos: {totalOrders}</p>
-            <p>Faturamento: R$ {formatCurrency(totalRevenue)}</p>
-            <div>
-              Mais Vendidos:
-              {topProductEntries.length > 0 ? (
-                <ul className="list-disc ml-5">
-                  {topProductEntries.map(([name, qty]) => (
-                    <li key={name}>{name} (x{qty})</li>
-                  ))}
-                </ul>
-              ) : (
-                <p>Sem vendas hoje</p>
-              )}
-            </div>
-            <p>Quantidade média: {avgQuantity.toFixed(2)}</p>
-            <p>Pagamento mais usado: {mostPayment}</p>
-            <p>Cliente com mais pedidos: {topCustomer}</p>
-          </div>
+        <div className="grid md:grid-cols-1 gap-6 items-start">
           <div className="bg-white p-6 rounded shadow">
             <Line data={lineData} options={lineOptions} />
           </div>
