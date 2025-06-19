@@ -64,8 +64,9 @@ const Dashboard = () => {
     setFreeError(null);
     try {
       const resp = await liberarMesa(String(mesa));
-      if (!resp || resp.success !== true) {
-        throw new Error('Falha na liberacao');
+      const ok = resp && (resp.success === true || resp.success === "true");
+      if (!ok) {
+        throw new Error("Falha na liberacao");
       }
       setCheckoutRequests((prev) => {
         const updated = prev.filter((m) => m !== mesa);
@@ -76,6 +77,15 @@ const Dashboard = () => {
         );
         return updated;
       });
+
+      setTimeout(() => {
+        fetchFecharContaPedidos();
+        const val = String(Date.now());
+        localStorage.setItem("refreshData", val);
+        window.dispatchEvent(
+          new StorageEvent("storage", { key: "refreshData", newValue: val })
+        );
+      }, 1000);
     } catch (err) {
       console.error("Erro ao liberar mesa", err);
       setFreeError(err);
