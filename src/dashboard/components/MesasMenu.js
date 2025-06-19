@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { liberarMesa } from "../../utils/gsActions";
 
+// Endpoint centralizado no Apps Script
 const MESAS_API =
-  "https://script.google.com/macros/s/AKfycbzcncEtTmtS7DrJdfN5dTAaQbNr02ha_Psql6vdlbjOI8gJEM5ioayiKMpRwUxzzHd_/exec";
+  "https://script.google.com/macros/s/AKfycbxIcGhc0fURMzbTv5sRf5uNyQ7iLKcQ_D7JTYCyfwCY-QWGf8T3FeuJLe0KwnkJtVuH/exec?acao=buscarMesas";
 
 const tables = Array.from({ length: 15 }, (_, i) => i + 1);
 
@@ -20,7 +21,7 @@ export default function MesasMenu() {
 
   useEffect(() => {
     const fetchMesas = () => {
-      fetch(MESAS_API)
+      fetch(MESAS_API, { cache: "no-cache" })
         .then((res) => res.json())
         .then((data) => {
           if (data.success && Array.isArray(data.mesas)) {
