@@ -5,7 +5,17 @@ const ORDERS_API =
 
 function parseItems(order) {
   if (Array.isArray(order.itensFormatados)) {
-    return order.itensFormatados.map((it) => ({ nome: it.nome || it.name, qtd: it.qtd || it.quantidade || it.qty || 1 }));
+    return order.itensFormatados.map((it) => ({
+      nome: it.nome || it.name,
+      qtd: it.qtd || it.quantidade || it.qty || 1,
+      obs:
+        it.observacoes ||
+        it.observacao ||
+        it.observation ||
+        it.obs ||
+        it.observations ||
+        "",
+    }));
   }
   const produtos = order["Produto(s)"] || "";
   return produtos
@@ -13,8 +23,13 @@ function parseItems(order) {
     .map((p) => p.trim())
     .filter(Boolean)
     .map((p) => {
-      const m = p.match(/(.+?) x(\d+)/i);
-      if (m) return { nome: m[1].trim(), qtd: parseInt(m[2], 10) };
+      const m = p.match(/(.+?) x(\d+)(?: \(Obs: (.+)\))?/i);
+      if (m)
+        return {
+          nome: m[1].trim(),
+          qtd: parseInt(m[2], 10),
+          obs: m[3] ? m[3].trim() : "",
+        };
       return { nome: p, qtd: 1 };
     });
 }
@@ -135,7 +150,12 @@ export default function OrdersList() {
 <h1>COMANDA - Mesa ${order.Mesa}</h1>
 <p>${formatTime(order.Data)}</p>
 <ul>
-${items.map((it) => `<li>${it.nome} x${it.qtd}</li>`).join("")}
+${items
+  .map(
+    (it) =>
+      `<li>${it.nome} x${it.qtd}${it.obs ? `<br><small>Obs: ${it.obs}</small>` : ""}</li>`
+  )
+  .join("")}
 </ul>
 <p class="total">Total: R$ ${order.Total}</p>
 <script>window.print();</script>
@@ -180,10 +200,15 @@ ${items.map((it) => `<li>${it.nome} x${it.qtd}</li>`).join("")}
             </div>
             <ul className="mt-2">
               {items.map((it, i) => (
-                <li key={i} className="flex justify-between">
-                  <span>{it.nome}</span>
-                  <span>x{it.qtd}</span>
-                </li>
+                <React.Fragment key={i}>
+                  <li className="flex justify-between">
+                    <span>{it.nome}</span>
+                    <span>x{it.qtd}</span>
+                  </li>
+                  {it.obs && (
+                    <li className="text-xs text-gray-500 italic ml-2">Obs: {it.obs}</li>
+                  )}
+                </React.Fragment>
               ))}
             </ul>
             <button
@@ -213,10 +238,17 @@ ${items.map((it) => `<li>${it.nome} x${it.qtd}</li>`).join("")}
                   </div>
                   <ul className="mt-2">
                     {items.map((it, i) => (
-                      <li key={i} className="flex justify-between">
-                        <span>{it.nome}</span>
-                        <span>x{it.qtd}</span>
-                      </li>
+                      <React.Fragment key={i}>
+                        <li className="flex justify-between">
+                          <span>{it.nome}</span>
+                          <span>x{it.qtd}</span>
+                        </li>
+                        {it.obs && (
+                          <li className="text-xs text-gray-500 italic ml-2">
+                            Obs: {it.obs}
+                          </li>
+                        )}
+                      </React.Fragment>
                     ))}
                   </ul>
                 </div>
