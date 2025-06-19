@@ -10,7 +10,6 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PriceButtons, { parsePrices } from "../components/PriceButtons";
-import { moverParaFecharConta } from "../utils/gsActions";
 import moverMesa from "../Menu";
 
 const Mesa = () => {
@@ -274,13 +273,12 @@ const Mesa = () => {
         return;
       }
       // Atualiza status da mesa via API
-      try {
-        await moverParaFecharConta(String(mesa));
-        await moverMesa(String(mesa));
-        toast.success("Conta enviada para fechamento!", {
-          position: "bottom-right",
-          autoClose: 2000,
-        });
+        try {
+          await moverMesa(String(mesa));
+          toast.success("Conta enviada para fechamento!", {
+            position: "bottom-right",
+            autoClose: 2000,
+          });
       } catch (err) {
         console.error("Erro ao avisar Apps Script:", err);
       }
