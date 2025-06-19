@@ -33,23 +33,7 @@ export async function fecharContaMesa(mesa) {
 }
 
 export async function moverParaFecharConta(mesa) {
-  const response = await fetch('/api/fechar-conta', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mesa }),
-  });
-
-  const text = await response.text();
-
-  if (!response.ok) {
-    throw new Error(text || `Erro ${response.status}`);
-  }
-
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
+  return callGs({ acao: 'moverParaFecharConta', mesa });
 }
 
 export async function liberarMesa(mesa) {

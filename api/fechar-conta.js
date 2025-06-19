@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   try {
     const mesa = String(req.body?.mesa || "").trim();
 
-    const url = "https://script.google.com/macros/s/AKfycbz-vrgnernNri7aEAisTo36S3djpVF5zzt6alAW5HsmnkBA8h0DYyHEpIMLNqDNthRe/exec";
+    const url = "https://script.google.com/macros/s/AKfycbzjc-rRauOqdbVARiH_Ft1P75-iHjBtDChXQIO1Uz4UZ-hYaBNj1UaagMPtC4MN2w/exec";
 
     const response = await fetch(url, {
       method: "POST",
