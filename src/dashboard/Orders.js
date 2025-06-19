@@ -64,7 +64,7 @@ export default function OrdersList() {
 
   useEffect(() => {
     fetchOrders();
-    const id = setInterval(fetchOrders, 60000);
+    const id = setInterval(fetchOrders, 5000);
     return () => clearInterval(id);
   }, []);
 

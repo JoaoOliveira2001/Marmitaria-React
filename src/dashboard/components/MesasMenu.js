@@ -37,7 +37,7 @@ export default function MesasMenu() {
 
   useEffect(() => {
     fetchMesas();
-    const id = setInterval(fetchMesas, 60000);
+    const id = setInterval(fetchMesas, 5000);
     return () => clearInterval(id);
   }, []);
 

@@ -95,10 +95,15 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then((data) => setOrders(data))
-      .catch((err) => console.error("Falha ao buscar API", err));
+    const fetchOrders = () => {
+      fetch(API_URL)
+        .then((res) => res.json())
+        .then((data) => setOrders(data))
+        .catch((err) => console.error("Falha ao buscar API", err));
+    };
+    fetchOrders();
+    const id = setInterval(fetchOrders, 5000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -117,7 +122,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchFecharContaPedidos();
-    const id = setInterval(fetchFecharContaPedidos, 30000);
+    const id = setInterval(fetchFecharContaPedidos, 5000);
     return () => clearInterval(id);
   }, []);
 
