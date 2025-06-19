@@ -66,9 +66,9 @@ const Home = () => {
         console.log("Itens carregados:", normalized.length);
       })
       .catch((err) => {
-      console.error("Falha ao carregar cardápio1:", err);
-      setCardapio1([]);
-    });
+        console.error("Falha ao carregar cardápio1:", err);
+        setCardapio1([]);
+      });
   }, []); // roda só uma vez, ao montar o componente
 
   // carrega horários de funcionamento dos cardápios
@@ -95,8 +95,8 @@ const Home = () => {
     if (existing) {
       setCart(
         cart.map((ci) =>
-          ci.id === item.id ? { ...ci, quantity: ci.quantity + 1 } : ci,
-        ),
+          ci.id === item.id ? { ...ci, quantity: ci.quantity + 1 } : ci
+        )
       );
     } else {
       setCart([...cart, { ...item, quantity: 1, observations: "" }]);
@@ -144,7 +144,6 @@ const Home = () => {
   const day = now.getDay(); // 0=Dom,1=Seg,2=Ter…
   const hour = now.getHours(); // 0–23
 
-
   const removeFromCart = (id) => {
     const existingItem = cart.find((item) => item.id === id);
     if (existingItem.quantity === 1) {
@@ -152,15 +151,15 @@ const Home = () => {
     } else {
       setCart(
         cart.map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
-        ),
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+        )
       );
     }
   };
 
   const updateObservations = (id, observations) => {
     setCart(
-      cart.map((item) => (item.id === id ? { ...item, observations } : item)),
+      cart.map((item) => (item.id === id ? { ...item, observations } : item))
     );
   };
 
@@ -190,7 +189,7 @@ const Home = () => {
 
     const marmitasInCart = cart.filter((item) => item.type === "marmita");
     const adicionaisInCart = cart.filter(
-      (item) => item.type === "bebida" || item.type === "adicional",
+      (item) => item.type === "bebida" || item.type === "adicional"
     );
 
     if (marmitasInCart.length > 0) {
@@ -229,14 +228,14 @@ const Home = () => {
 
     message += `\n\n*Frete:* R$ ${frete.toFixed(2)}\n`;
     message += `*Total: R$ ${(parseFloat(getTotalPrice()) + frete).toFixed(
-      2,
+      2
     )}*\n Por favor, confirme meu pedido!`;
 
-    const phoneNumber = "11972434175";
+    const phoneNumber = "5511972434175";
     const encodedMessage = encodeURIComponent(message);
     window.open(
       `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
-      "_blank",
+      "_blank"
     );
   };
 
@@ -261,7 +260,7 @@ const Home = () => {
           (item) =>
             `${item.name} x${item.quantity}${
               item.observations ? ` (Obs: ${item.observations})` : ""
-            }`,
+            }`
         )
         .join(" | "),
       quantidade: cart.reduce((tot, item) => tot + item.quantity, 0),
@@ -324,7 +323,7 @@ const Home = () => {
       { key: "bebida", label: "Bebidas" },
     ];
     const filtered = cardapio1.filter(
-      (item) => item.type === activeType && item.cardapio === allowedCardapio,
+      (item) => item.type === activeType && item.cardapio === allowedCardapio
     );
     if (filtered.length === 0) {
       console.warn("Lista vazia após filtragem", {
@@ -341,7 +340,11 @@ const Home = () => {
             <button
               key={t.key}
               onClick={() => setActiveType(t.key)}
-              className={`px-4 py-2 rounded-full font-semibold ${activeType === t.key ? "bg-[#5d3d29] text-white" : "bg-gray-200 text-gray-700"}`}
+              className={`px-4 py-2 rounded-full font-semibold ${
+                activeType === t.key
+                  ? "bg-[#5d3d29] text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
             >
               {t.label}
             </button>
@@ -448,7 +451,9 @@ const Home = () => {
           <div className="lg:w-2/3">
             {/* Marmitas Section */}
             <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-              {allowedCardapio === "2" ? "🍟 Porções e Bebidas" : "🍱 Nosso Cardápio"}
+              {allowedCardapio === "2"
+                ? "🍟 Porções e Bebidas"
+                : "🍱 Nosso Cardápio"}
             </h2>
 
             <section className="mb-12">{menuSection}</section>
