@@ -251,7 +251,11 @@ const Mesa = () => {
   };
 
   const confirmarFechamento = async () => {
-    const { items: produtos, total } = resumoPedidos;
+    const { items, total } = resumoPedidos;
+
+    const produtos = items
+      .map((it) => `${it.name} x${it.quantity}`)
+      .join(" | ");
 
     const payload = {
       mesa,
