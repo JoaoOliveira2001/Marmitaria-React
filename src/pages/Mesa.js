@@ -12,6 +12,9 @@ import "react-toastify/dist/ReactToastify.css";
 import PriceButtons, { parsePrices } from "../components/PriceButtons";
 import { moverParaFecharConta } from "../utils/gsActions";
 
+const FECHAR_CONTA_URL =
+  "https://script.google.com/macros/s/AKfycbz-vrgnernNri7aEAisTo36S3djpVF5zzt6alAW5HsmnkBA8h0DYyHEpIMLNqDNthRe/exec";
+
 const Mesa = () => {
   const location = useLocation();
   const [mesa, setMesa] = useState(null);
@@ -275,6 +278,11 @@ const Mesa = () => {
       // Atualiza status da mesa via API
       try {
         await moverParaFecharConta(String(mesa));
+        await fetch(FECHAR_CONTA_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mesa: String(mesa) }),
+        });
         toast.success("Conta enviada para fechamento!", {
           position: "bottom-right",
           autoClose: 2000,
