@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginPedidos from "../components/LoginPedidos";
-import MesasMenu from "../dashboard/components/MesasMenu";
+import ListaMesas from "../dashboard/components/ListaMesas";
+import AlertasFechamento from "../dashboard/components/AlertasFechamento";
+import PainelResumo from "../dashboard/components/PainelResumo";
+import PainelGrafico from "../dashboard/components/PainelGrafico";
 import OrdersList from "../dashboard/Orders";
 import { liberarMesa } from "../utils/gsActions";
-import { Line } from "react-chartjs-2";
 import {
   Chart,
   LineElement,
@@ -236,16 +238,25 @@ const Dashboard = () => {
     labels: lineLabels,
     datasets: [
       {
+        label: "Pedidos por dia do mês",
         data: dailyCounts,
         borderColor: "#5d3d29",
         backgroundColor: "#fff4e4",
         fill: false,
+        tension: 0.4,
       },
     ],
   };
   const lineOptions = {
     responsive: true,
-    plugins: { legend: { display: false } },
+    plugins: {
+      legend: { display: true, labels: { color: "#5d3d29" } },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `${ctx.parsed.y} pedidos`,
+        },
+      },
+    },
     scales: { y: { beginAtZero: true } },
   };
 
@@ -254,91 +265,36 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#fff4e4]">
-      <MesasMenu />
-      {checkoutRequests.length > 0 && (
-        <div className="fixed top-0 right-0 m-4 w-64 bg-red-100 border border-red-500 text-[#5d3d29] p-4 space-y-2 z-50">
-          {checkoutRequests.map((m) => (
-            <div key={m} className="flex justify-between items-center">
-              <p>Mesa {m} solicitou fechar a conta.</p>
-              <div className="flex flex-col items-end">
-                <button
-                  onClick={() => clearCheckoutRequest(m)}
-                  disabled={freeLoading}
-                  className="text-sm text-red-700 hover:underline disabled:opacity-50"
-                >
-                  {freeLoading ? 'Aguarde...' : '✔ Atendido – Liberar Mesa'}
-                </button>
-                {freeError && (
-                  <span className="text-xs text-red-500">Erro ao liberar</span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <ListaMesas />
+      <AlertasFechamento
+        mesas={checkoutRequests}
+        onAtender={clearCheckoutRequest}
+        loading={freeLoading}
+        error={freeError}
+      />
       <div className="ml-48 md:ml-60">
       <header className="bg-[#5d3d29] text-[#fff4e4] py-6">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Painel</h1>
           <button
             onClick={() => navigate("/")}
-            className="bg-[#fff4e4] text-[#5d3d29] px-4 py-2 rounded"
+            className="bg-[#fff4e4] text-[#5d3d29] px-4 py-2 rounded shadow hover:bg-[#f8e8d0]"
           >
             Início
           </button>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center mb-6 space-x-2">
-          {[
-            ["today", "Hoje"],
-            ["week", "Semana"],
-            ["month", "Mês"],
-          ].map(([val, label]) => (
-            <button
-              key={val}
-              onClick={() => setFilter(val)}
-              className={`border px-3 py-1 rounded-full ${
-                filter === val
-                  ? "bg-[#5d3d29] text-[#fff4e4]"
-                  : "bg-white text-[#5d3d29]"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white p-4 rounded shadow text-center">
-            <div className="text-2xl font-bold text-[#5d3d29]">
-              R$ {formatCurrency(revenueToday)}
-            </div>
-            <div className="text-sm text-gray-500">Faturamento Hoje</div>
-          </div>
-          <div className="bg-white p-4 rounded shadow text-center">
-            <div className="text-2xl font-bold text-[#5d3d29]">
-              R$ {formatCurrency(revenueWeek)}
-            </div>
-            <div className="text-sm text-gray-500">Últimos 7 dias</div>
-          </div>
-          <div className="bg-white p-4 rounded shadow text-center">
-            <div className="text-2xl font-bold text-[#5d3d29]">
-              R$ {formatCurrency(revenueMonth)}
-            </div>
-            <div className="text-sm text-gray-500">Últimos 30 dias</div>
-          </div>
-        </div>
-        <hr className="my-6" />
-
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        <PainelResumo
+          revenueToday={formatCurrency(revenueToday)}
+          revenueWeek={formatCurrency(revenueWeek)}
+          revenueMonth={formatCurrency(revenueMonth)}
+          filter={filter}
+          setFilter={setFilter}
+        />
         <OrdersList />
-        <hr className="my-6" />
-        <div className="grid md:grid-cols-1 gap-6 items-start">
-          <div className="bg-white p-6 rounded shadow">
-            <Line data={lineData} options={lineOptions} />
-          </div>
-        </div>
+        <PainelGrafico data={lineData} options={lineOptions} />
       </div>
     </div>
     </div>
