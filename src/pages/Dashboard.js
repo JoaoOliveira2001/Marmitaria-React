@@ -332,13 +332,13 @@ const Dashboard = () => {
         </div>
         <hr className="my-6" />
 
+        <OrdersList />
+        <hr className="my-6" />
         <div className="grid md:grid-cols-1 gap-6 items-start">
           <div className="bg-white p-6 rounded shadow">
             <Line data={lineData} options={lineOptions} />
           </div>
         </div>
-        <hr className="my-6" />
-        <OrdersList />
       </div>
     </div>
     </div>
