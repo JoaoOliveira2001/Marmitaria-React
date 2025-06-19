@@ -4,6 +4,7 @@ import LoginPedidos from "../components/LoginPedidos";
 import MesasMenu from "../dashboard/components/MesasMenu";
 import OrdersList from "../dashboard/Orders";
 import { liberarMesa } from "../utils/gsActions";
+import { TrendingUp, CalendarDays, PiggyBank } from "lucide-react";
 import { Line } from "react-chartjs-2";
 import {
   Chart,
@@ -223,6 +224,9 @@ const Dashboard = () => {
     (a, b) => b[1] - a[1]
   );
 
+  const hasSummary =
+    filtered.length > 0 && !Number.isNaN(totalRevenue) && topProductEntries;
+
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
   const lineLabels = Array.from({ length: daysInMonth }, (_, i) => String(i + 1));
   const dailyCounts = new Array(daysInMonth).fill(0);
@@ -236,6 +240,7 @@ const Dashboard = () => {
     labels: lineLabels,
     datasets: [
       {
+        label: "Pedidos por dia do mês",
         data: dailyCounts,
         borderColor: "#5d3d29",
         backgroundColor: "#fff4e4",
@@ -245,7 +250,15 @@ const Dashboard = () => {
   };
   const lineOptions = {
     responsive: true,
-    plugins: { legend: { display: false } },
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `${ctx.parsed.y} pedidos`,
+        },
+      },
+    },
     scales: { y: { beginAtZero: true } },
   };
 
@@ -256,24 +269,24 @@ const Dashboard = () => {
     <div className="min-h-screen bg-[#fff4e4]">
       <MesasMenu />
       {checkoutRequests.length > 0 && (
-        <div className="fixed top-0 right-0 m-4 w-64 bg-red-100 border border-red-500 text-[#5d3d29] p-4 space-y-2 z-50">
-          {checkoutRequests.map((m) => (
-            <div key={m} className="flex justify-between items-center">
-              <p>Mesa {m} solicitou fechar a conta.</p>
-              <div className="flex flex-col items-end">
+        <div className="fixed top-0 inset-x-0 flex justify-center mt-2 z-50">
+          <div className="space-y-2 w-72">
+            {checkoutRequests.map((m) => (
+              <div
+                key={m}
+                className="bg-red-100 border border-red-500 text-[#5d3d29] p-4 rounded shadow flex justify-between items-center"
+              >
+                <p>Mesa {m} solicitou fechar a conta</p>
                 <button
                   onClick={() => clearCheckoutRequest(m)}
                   disabled={freeLoading}
                   className="text-sm text-red-700 hover:underline disabled:opacity-50"
                 >
-                  {freeLoading ? 'Aguarde...' : '✔ Atendido – Liberar Mesa'}
+                  {freeLoading ? 'Aguarde...' : '✔ Atendido'}
                 </button>
-                {freeError && (
-                  <span className="text-xs text-red-500">Erro ao liberar</span>
-                )}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
       <div className="ml-48 md:ml-60">
@@ -282,7 +295,7 @@ const Dashboard = () => {
           <h1 className="text-2xl font-bold">Painel</h1>
           <button
             onClick={() => navigate("/")}
-            className="bg-[#fff4e4] text-[#5d3d29] px-4 py-2 rounded"
+            className="bg-white text-[#5d3d29] px-4 py-2 rounded border hover:bg-[#fff4e4]"
           >
             Início
           </button>
@@ -311,19 +324,22 @@ const Dashboard = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white p-4 rounded shadow text-center">
+          <div className="bg-white p-4 rounded shadow text-center flex flex-col items-center gap-1">
+            <TrendingUp className="text-[#5d3d29]" />
             <div className="text-2xl font-bold text-[#5d3d29]">
               R$ {formatCurrency(revenueToday)}
             </div>
             <div className="text-sm text-gray-500">Faturamento Hoje</div>
           </div>
-          <div className="bg-white p-4 rounded shadow text-center">
+          <div className="bg-white p-4 rounded shadow text-center flex flex-col items-center gap-1">
+            <CalendarDays className="text-[#5d3d29]" />
             <div className="text-2xl font-bold text-[#5d3d29]">
               R$ {formatCurrency(revenueWeek)}
             </div>
             <div className="text-sm text-gray-500">Últimos 7 dias</div>
           </div>
-          <div className="bg-white p-4 rounded shadow text-center">
+          <div className="bg-white p-4 rounded shadow text-center flex flex-col items-center gap-1">
+            <PiggyBank className="text-[#5d3d29]" />
             <div className="text-2xl font-bold text-[#5d3d29]">
               R$ {formatCurrency(revenueMonth)}
             </div>
@@ -337,25 +353,31 @@ const Dashboard = () => {
             <h2 className="font-bold text-[#5d3d29] text-lg mb-2">
               Resumo ({filterLabel})
             </h2>
-            <p>Total de pedidos: {totalOrders}</p>
-            <p>Faturamento: R$ {formatCurrency(totalRevenue)}</p>
-            <div>
-              Mais Vendidos:
-              {topProductEntries.length > 0 ? (
-                <ul className="list-disc ml-5">
-                  {topProductEntries.map(([name, qty]) => (
-                    <li key={name}>{name} (x{qty})</li>
-                  ))}
-                </ul>
-              ) : (
-                <p>Sem vendas hoje</p>
-              )}
-            </div>
-            <p>Quantidade média: {avgQuantity.toFixed(2)}</p>
-            <p>Pagamento mais usado: {mostPayment}</p>
-            <p>Cliente com mais pedidos: {topCustomer}</p>
+            {hasSummary ? (
+              <>
+                <p>Total de pedidos: {totalOrders}</p>
+                <p>Faturamento: R$ {formatCurrency(totalRevenue)}</p>
+                <div>
+                  Mais Vendidos:
+                  {topProductEntries.length > 0 ? (
+                    <ul className="list-disc ml-5">
+                      {topProductEntries.map(([name, qty]) => (
+                        <li key={name}>{name} (x{qty})</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>Sem vendas hoje</p>
+                  )}
+                </div>
+                <p>Quantidade média: {avgQuantity.toFixed(2)}</p>
+                <p>Pagamento mais usado: {mostPayment}</p>
+                <p>Cliente com mais pedidos: {topCustomer}</p>
+              </>
+            ) : (
+              <p>Resumo indisponível no momento</p>
+            )}
           </div>
-          <div className="bg-white p-6 rounded shadow">
+          <div className="bg-white p-6 rounded shadow" style={{ height: 300 }}>
             <Line data={lineData} options={lineOptions} />
           </div>
         </div>
