@@ -37,27 +37,27 @@ export async function moverParaFecharConta(mesa) {
 }
 
 export async function liberarMesa(mesa) {
-  const response = await fetch('/api/limpaMesa', {
+  const url =
+    'https://script.google.com/macros/s/AKfycbw3q0WCN1EO2A6bS5no9-71AutpAOLpS6L1yNFxetwGcNxdd-Fx92vPZpzRxKwSCT1g/exec';
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mesa }),
+    body: JSON.stringify({ acao: 'limparMesa', mesa }),
   });
 
-  const text = await response.text();
-
   if (!response.ok) {
+    const text = await response.text();
     throw new Error(text || `Erro ${response.status}`);
   }
 
-  try {
-    const data = JSON.parse(text);
-    if (data.success !== true) {
-      throw new Error('Operacao falhou');
-    }
-    return data;
-  } catch {
-    return text;
+  const data = await response.json();
+
+  if (!data.success) {
+    throw new Error(data.message || 'Operacao falhou');
   }
+
+  return data;
 }
 
 export default {
