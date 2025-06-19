@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import LoginPedidos from "../components/LoginPedidos";
 import MesasMenu from "../dashboard/components/MesasMenu";
 import OrdersList from "../dashboard/Orders";
+import { liberarMesa } from "../utils/gsActions";
 import { Line } from "react-chartjs-2";
 import {
   Chart,
@@ -31,26 +32,56 @@ const Dashboard = () => {
       return [];
     }
   });
+  const [freeLoading, setFreeLoading] = useState(false);
+  const [freeError, setFreeError] = useState(null);
 
-  const clearCheckoutRequest = async (mesa) => {
+  const fetchFecharContaPedidos = async () => {
     try {
-      await fetch("/api/limpaMesa", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mesa: String(mesa) }),
-      });
-    } catch (err) {
-      console.error("Erro ao liberar mesa", err);
-    }
-    setCheckoutRequests((prev) => {
-      const updated = prev.filter((m) => m !== mesa);
-      const value = JSON.stringify(updated);
+      const res = await fetch(
+        "https://script.google.com/macros/s/AKfycby4EkTXdD3-3_N-caEaaEUitz3nbgKe3X5lUJTJ2TwFeM-hChHUe1CIIvy_7x7m9Tmd/exec",
+        { cache: "no-cache" }
+      );
+      if (!res.ok) throw new Error(`Erro ${res.status}`);
+      const data = await res.json();
+      const mesas = Array.isArray(data.pedidos)
+        ? data.pedidos
+            .filter((p) => p.status === "Pendente")
+            .map((p) => String(p.Mesa))
+        : [];
+      const value = JSON.stringify(mesas);
       localStorage.setItem("checkoutRequests", value);
       window.dispatchEvent(
         new StorageEvent("storage", { key: "checkoutRequests", newValue: value })
       );
-      return updated;
-    });
+      setCheckoutRequests(mesas);
+    } catch (err) {
+      console.error("Falha ao buscar pedidos de fechamento", err);
+    }
+  };
+
+  const clearCheckoutRequest = async (mesa) => {
+    setFreeLoading(true);
+    setFreeError(null);
+    try {
+      const resp = await liberarMesa(String(mesa));
+      if (!resp || resp.success !== true) {
+        throw new Error('Falha na liberacao');
+      }
+      setCheckoutRequests((prev) => {
+        const updated = prev.filter((m) => m !== mesa);
+        const value = JSON.stringify(updated);
+        localStorage.setItem("checkoutRequests", value);
+        window.dispatchEvent(
+          new StorageEvent("storage", { key: "checkoutRequests", newValue: value })
+        );
+        return updated;
+      });
+    } catch (err) {
+      console.error("Erro ao liberar mesa", err);
+      setFreeError(err);
+    } finally {
+      setFreeLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -72,6 +103,12 @@ const Dashboard = () => {
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  useEffect(() => {
+    fetchFecharContaPedidos();
+    const id = setInterval(fetchFecharContaPedidos, 30000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -208,12 +245,18 @@ const Dashboard = () => {
           {checkoutRequests.map((m) => (
             <div key={m} className="flex justify-between items-center">
               <p>Mesa {m} solicitou fechar a conta.</p>
-              <button
-                onClick={() => clearCheckoutRequest(m)}
-                className="text-sm text-red-700 hover:underline"
-              >
-                ✔ Atendido – Liberar Mesa
-              </button>
+              <div className="flex flex-col items-end">
+                <button
+                  onClick={() => clearCheckoutRequest(m)}
+                  disabled={freeLoading}
+                  className="text-sm text-red-700 hover:underline disabled:opacity-50"
+                >
+                  {freeLoading ? 'Aguarde...' : '✔ Atendido – Liberar Mesa'}
+                </button>
+                {freeError && (
+                  <span className="text-xs text-red-500">Erro ao liberar</span>
+                )}
+              </div>
             </div>
           ))}
         </div>

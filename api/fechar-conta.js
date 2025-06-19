@@ -4,14 +4,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const data = req.body;
+    const mesa = String(req.body?.mesa || "").trim();
 
-    const url = "https://script.google.com/macros/s/AKfycby-AGwFtoIX_k-qgXQpiniZCVOp0eAu6XoRdqDaUYo-A-GYQx0VmpFCMFukMyYiOX9B/exec";
+    const url = "https://script.google.com/macros/s/AKfycbzjc-rRauOqdbVARiH_Ft1P75-iHjBtDChXQIO1Uz4UZ-hYaBNj1UaagMPtC4MN2w/exec";
 
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify({ mesa }),
     });
 
     const text = await response.text();
