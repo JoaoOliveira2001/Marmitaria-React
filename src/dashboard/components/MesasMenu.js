@@ -102,15 +102,15 @@ export default function MesasMenu() {
           <div key={t} className="relative">
             <button
               onClick={() => setOpenTable((prev) => (prev === t ? null : t))}
-              className={`w-full rounded px-2 py-2 text-center focus:outline-none ${
+              className={`w-full rounded px-2 py-1 text-center focus:outline-none ${
                 isCheckout
-                  ? "bg-red-100 border-2 border-red-500 text-[#5d3d29]"
+                  ? "bg-red-200 border-2 border-red-500 text-[#5d3d29]"
                   : isOccupied
                     ? "bg-yellow-300 text-[#5d3d29]"
                     : "bg-[#fff4e4] text-[#5d3d29]"
               }`}
             >
-              Mesa {t}
+              Mesa {t} {isCheckout ? "⚠️" : isOccupied ? "🔴" : "🟢"}
             </button>
             {isOpen && (
               <div className="absolute md:left-full md:top-0 md:ml-2 left-0 top-full mt-2 w-48 sm:w-56 md:w-60 bg-white text-[#5d3d29] rounded shadow p-2 space-y-2 z-50">
