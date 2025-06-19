@@ -63,10 +63,7 @@ const Dashboard = () => {
     setFreeLoading(true);
     setFreeError(null);
     try {
-      const resp = await liberarMesa(String(mesa));
-      if (!resp || resp.success !== true) {
-        throw new Error('Falha na liberacao');
-      }
+      await liberarMesa(String(mesa));
       setCheckoutRequests((prev) => {
         const updated = prev.filter((m) => m !== mesa);
         const value = JSON.stringify(updated);
