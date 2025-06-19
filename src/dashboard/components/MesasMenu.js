@@ -18,23 +18,24 @@ export default function MesasMenu() {
   const [openTable, setOpenTable] = useState(null);
   const [freedTable, setFreedTable] = useState(null);
 
-  useEffect(() => {
-    const fetchMesas = () => {
-      fetch(MESAS_API)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success && Array.isArray(data.mesas)) {
-            const unique = Array.from(new Set(data.mesas.map(String)));
-            setMesasOcupadas(unique);
-          } else {
-            setMesasOcupadas([]);
-          }
-        })
-        .catch((err) => {
-          console.error("Erro ao buscar mesas", err);
+  const fetchMesas = () => {
+    fetch(MESAS_API)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.mesas)) {
+          const unique = Array.from(new Set(data.mesas.map(String)));
+          setMesasOcupadas(unique);
+        } else {
           setMesasOcupadas([]);
-        });
-    };
+        }
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar mesas", err);
+        setMesasOcupadas([]);
+      });
+  };
+
+  useEffect(() => {
     fetchMesas();
     const id = setInterval(fetchMesas, 60000);
     return () => clearInterval(id);
@@ -48,6 +49,8 @@ export default function MesasMenu() {
         } catch {
           setCheckoutRequests([]);
         }
+      } else if (e.key === "refreshData") {
+        fetchMesas();
       }
     };
     window.addEventListener("storage", handleStorage);
@@ -57,7 +60,8 @@ export default function MesasMenu() {
   const freeTable = async (mesa) => {
     try {
       const resp = await liberarMesa(String(mesa));
-      if (!resp || resp.success !== true) {
+      const ok = resp && (resp.success === true || resp.success === "true");
+      if (!ok) {
         throw new Error('Falha na liberacao');
       }
     } catch (err) {
@@ -73,6 +77,13 @@ export default function MesasMenu() {
       );
       return updated;
     });
+    setTimeout(() => {
+      const val = String(Date.now());
+      localStorage.setItem("refreshData", val);
+      window.dispatchEvent(
+        new StorageEvent("storage", { key: "refreshData", newValue: val })
+      );
+    }, 1000);
     setFreedTable(mesa);
     setTimeout(() => {
       setFreedTable(null);

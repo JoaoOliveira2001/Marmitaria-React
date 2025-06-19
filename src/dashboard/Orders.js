@@ -68,6 +68,16 @@ export default function OrdersList() {
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    const handleStorage = (e) => {
+      if (e.key === "refreshData") {
+        fetchOrders();
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
   // Detect new orders and mark them as unseen
   useEffect(() => {
     const prev = prevOrdersRef.current;
