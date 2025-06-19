@@ -232,7 +232,7 @@ const Home = () => {
       2,
     )}*\n Por favor, confirme meu pedido!`;
 
-    const phoneNumber = "11936186513";
+    const phoneNumber = "11972434175";
     const encodedMessage = encodeURIComponent(message);
     window.open(
       `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
