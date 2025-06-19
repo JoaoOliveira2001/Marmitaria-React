@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { liberarMesa } from "../../utils/gsActions";
 
 const MESAS_API =
   "https://script.google.com/macros/s/AKfycbzcncEtTmtS7DrJdfN5dTAaQbNr02ha_Psql6vdlbjOI8gJEM5ioayiKMpRwUxzzHd_/exec";
@@ -55,11 +56,10 @@ export default function MesasMenu() {
 
   const freeTable = async (mesa) => {
     try {
-      await fetch("/api/limpaMesa", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mesa: String(mesa) }),
-      });
+      const resp = await liberarMesa(String(mesa));
+      if (!resp || resp.success !== true) {
+        throw new Error('Falha na liberacao');
+      }
     } catch (err) {
       console.error("Erro ao liberar mesa", err);
     }

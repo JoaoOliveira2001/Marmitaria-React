@@ -5,9 +5,10 @@ export default async function handler(req, res) {
 
   try {
     const mesa = String(req.body?.mesa || "").trim();
-    const payload = { mesa };
+    const payload = { acao: "limparMesa", mesa };
 
-    const url = "https://script.google.com/macros/s/AKfycbxtHy6Vk6CDa3i6HKT6pYpaaVWovvtB8KZt6vdx8um3xLwzTiicHYB2BxdIMhgdt08l/exec";
+    const url =
+      "https://script.google.com/macros/s/AKfycbw3q0WCN1EO2A6bS5no9-71AutpAOLpS6L1yNFxetwGcNxdd-Fx92vPZpzRxKwSCT1g/exec";
 
     const response = await fetch(url, {
       method: "POST",
@@ -21,7 +22,11 @@ export default async function handler(req, res) {
       return res.status(response.status).send(text);
     }
 
-    res.status(200).send(text);
+    try {
+      res.status(200).json(JSON.parse(text));
+    } catch {
+      res.status(200).send(text);
+    }
   } catch (error) {
     console.error("Erro ao limpar mesa:", error);
     res.status(500).json({ error: "Erro interno ao limpar mesa", details: error.message });
