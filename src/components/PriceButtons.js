@@ -12,7 +12,7 @@ export function parsePrices(price, item = {}) {
       values = [Number(price)];
     } else {
       values = String(price)
-        .split(',')
+        .split(",")
         .map((p) => parseFloat(p.trim()))
         .filter((n) => !Number.isNaN(n));
     }
@@ -33,7 +33,7 @@ export function parsePrices(price, item = {}) {
 // Renders size buttons based on available prices
 export default function PriceButtons({ price, item = {}, onAdd = () => {} }) {
   const prices = parsePrices(price, item);
-  const sizeLabels = ["P", "M", "G"];
+  const sizeLabels = ["Mini", "Grande", "Extra Grande"];
 
   if (!prices.length) return null;
 
@@ -54,9 +54,7 @@ export default function PriceButtons({ price, item = {}, onAdd = () => {} }) {
       {prices.map((val, idx) => (
         <button
           key={idx}
-          onClick={() =>
-            onAdd({ ...item, price: val, size: sizeLabels[idx] })
-          }
+          onClick={() => onAdd({ ...item, price: val, size: sizeLabels[idx] })}
           className="bg-gradient-to-r bg-[#5d3d29] text-white px-4 py-2 rounded-full"
         >
           {sizeLabels[idx]} - R$ {val.toFixed(2)}
