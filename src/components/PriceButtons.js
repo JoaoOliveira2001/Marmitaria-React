@@ -33,7 +33,7 @@ export function parsePrices(price, item = {}) {
 // Renders size buttons based on available prices
 export default function PriceButtons({ price, item = {}, onAdd = () => {} }) {
   const prices = parsePrices(price, item);
-  const sizeLabels = ["Mini", "Grande", "Extra Grande"];
+  const sizeLabels = ["Mini", "G", "EXG"];
 
   if (!prices.length) return null;
 
