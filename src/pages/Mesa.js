@@ -11,6 +11,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PriceButtons, { parsePrices } from "../components/PriceButtons";
 import moverMesa from "../Menu";
+import { salvarPedidoMesa } from "../utils/gsActions";
 
 const Mesa = () => {
   const location = useLocation();
@@ -217,18 +218,7 @@ const Mesa = () => {
     };
 
     try {
-      const response = await fetch("/api/cria", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const text = await response.text();
-        console.error("Erro ao registrar pedido:", text);
-        alert("Erro ao registrar pedido");
-        return;
-      }
+      await salvarPedidoMesa(payload);
 
       const pedido = {
         items: cart,
