@@ -753,7 +753,7 @@ const Home = () => {
               <div className="space-y-2 text-gray-400">
                 <div className="flex items-center">
                   <Phone size={16} className="mr-2" />
-                  (11) 4002-8922
+                  +55 11 97243-4175
                 </div>
                 <div className="flex items-center">
                   <MapPin size={16} className="mr-2" />
