@@ -653,7 +653,7 @@ const Home = () => {
                                 onChange={(e) => {
                                   const local = e.target.value;
                                   setLocalEntrega(local);
-                                  if (local === "pinhal") setFrete(5);
+                                  if (local === "pinhal") setFrete(10);
                                   else if (local === "jacare") setFrete(4);
                                   else if (local === "cabreuva") setFrete(20);
                                   else if (local === "vilareijo") setFrete(5);
@@ -666,7 +666,9 @@ const Home = () => {
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                               >
                                 <option value="">Selecione</option>
-                                <option value="pinhal">Pinhal - R$ 5,00</option>
+                                <option value="pinhal">
+                                  Pinhal - R$ 10,00
+                                </option>
                                 <option value="vilareijo">
                                   Vilareijo - R$ 5,00
                                 </option>
