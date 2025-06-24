@@ -188,6 +188,7 @@ const Home = () => {
     message += `\n`;
 
     const marmitasInCart = cart.filter((item) => item.type === "marmita");
+    const porcoesInCart = cart.filter((item) => item.type === "porcao");
     const adicionaisInCart = cart.filter(
       (item) => item.type === "bebida" || item.type === "adicional"
     );
@@ -202,6 +203,16 @@ const Home = () => {
           message += `\n   Obs: ${item.observations}`;
         }
         message += `\n`;
+      });
+      message += `\n`;
+    }
+
+    if (porcoesInCart.length > 0) {
+      message += "*Porções:*\n";
+      porcoesInCart.forEach((item) => {
+        message += `• ${item.name} (${item.quantity}x) - R$ ${(
+          item.price * item.quantity
+        ).toFixed(2)}\n`;
       });
       message += `\n`;
     }
