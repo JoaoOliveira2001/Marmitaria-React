@@ -655,16 +655,30 @@ const Home = () => {
                                   setLocalEntrega(local);
                                   if (local === "pinhal") setFrete(5);
                                   else if (local === "jacare") setFrete(4);
-                                  else if (local === "cabreuva") setFrete(13);
+                                  else if (local === "cabreuva") setFrete(20);
+                                  else if (local === "vilareijo") setFrete(5);
+                                  else if (local === "condominio") setFrete(8);
+                                  else if (local === "cururu") setFrete(7);
+                                  else if (local === "colina") setFrete(4);
+                                  else if (local === "n6") setFrete(6);
                                   else setFrete(0);
                                 }}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                               >
                                 <option value="">Selecione</option>
                                 <option value="pinhal">Pinhal - R$ 5,00</option>
+                                <option value="vilareijo">
+                                  Vilareijo - R$ 5,00
+                                </option>
+                                <option value="condominio">
+                                  Condominio - R$ 8,00
+                                </option>
+                                <option value="cururu">Cururu - R$ 7,00</option>
+                                <option value="colina">Colina - R$ 4,00</option>
                                 <option value="jacare">Jacaré - R$ 4,00</option>
+                                <option value="n6">N6 - R$ 6,00</option>
                                 <option value="cabreuva">
-                                  Cabreúva - R$ 13,00
+                                  Cabreúva - R$ 20,00
                                 </option>
                               </select>
                             </div>
