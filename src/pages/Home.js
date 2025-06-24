@@ -226,7 +226,7 @@ const Home = () => {
       message += `\n*Observações Gerais:*\n${observacoes}`;
     }
 
-    message += `\n\n*Frete:* R$ ${frete.toFixed(2)}\n`;
+    message += `\n\n*Taxa de Entrega:* R$ ${frete.toFixed(2)}\n`;
     message += `*Total: R$ ${(parseFloat(getTotalPrice()) + frete).toFixed(
       2
     )}*\n Por favor, confirme meu pedido!`;
