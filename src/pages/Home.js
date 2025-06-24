@@ -657,10 +657,12 @@ const Home = () => {
                                   else if (local === "jacare") setFrete(4);
                                   else if (local === "cabreuva") setFrete(20);
                                   else if (local === "vilareijo") setFrete(5);
+                                  else if (local === "cai") setFrete(10);
                                   else if (local === "condominio") setFrete(8);
                                   else if (local === "cururu") setFrete(7);
                                   else if (local === "colina") setFrete(4);
-                                  else if (local === "n6") setFrete(6);
+                                  else if (local === "bonfim") setFrete(6);
+                                  else if (local === "novo") setFrete(6);
                                   else setFrete(0);
                                 }}
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
@@ -678,7 +680,8 @@ const Home = () => {
                                 <option value="cururu">Cururu - R$ 7,00</option>
                                 <option value="colina">Colina - R$ 4,00</option>
                                 <option value="jacare">Jacaré - R$ 4,00</option>
-                                <option value="n6">N6 - R$ 6,00</option>
+                                <option value="cai">Caí - R$ 10,00</option>
+                                <option value="bonfim">Bonfim - R$ 6,00</option>
                                 <option value="cabreuva">
                                   Cabreúva - R$ 20,00
                                 </option>
