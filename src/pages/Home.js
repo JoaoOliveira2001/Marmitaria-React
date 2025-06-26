@@ -196,7 +196,8 @@ const Home = () => {
     if (marmitasInCart.length > 0) {
       message += "*Marmitas:*\n";
       marmitasInCart.forEach((item) => {
-        message += `• ${item.name} (${item.quantity}x) - R$ ${(
+        const itemName = item.size ? `${item.name} - ${item.size}` : item.name;
+        message += `• ${itemName} (${item.quantity}x) - R$ ${(
           item.price * item.quantity
         ).toFixed(2)}`;
         if (item.observations && item.observations.trim()) {
@@ -210,7 +211,8 @@ const Home = () => {
     if (porcoesInCart.length > 0) {
       message += "*Porções:*\n";
       porcoesInCart.forEach((item) => {
-        message += `• ${item.name} (${item.quantity}x) - R$ ${(
+        const itemName = item.size ? `${item.name} - ${item.size}` : item.name;
+        message += `• ${itemName} (${item.quantity}x) - R$ ${(
           item.price * item.quantity
         ).toFixed(2)}\n`;
       });
@@ -220,7 +222,8 @@ const Home = () => {
     if (adicionaisInCart.length > 0) {
       message += "*Adicionais:*\n";
       adicionaisInCart.forEach((item) => {
-        message += `• ${item.name} (${item.quantity}x) - R$ ${(
+        const itemName = item.size ? `${item.name} - ${item.size}` : item.name;
+        message += `• ${itemName} (${item.quantity}x) - R$ ${(
           item.price * item.quantity
         ).toFixed(2)}\n`;
       });
