@@ -196,7 +196,11 @@ const Home = () => {
     if (marmitasInCart.length > 0) {
       message += "*Marmitas:*\n";
       marmitasInCart.forEach((item) => {
-        message += `• ${item.name} (${item.quantity}x) - R$ ${(
+        const nameWithSize =
+          item.size && !item.name.includes(item.size)
+            ? `${item.name} ${item.size}`
+            : item.name;
+        message += `• ${nameWithSize} (${item.quantity}x) - R$ ${(
           item.price * item.quantity
         ).toFixed(2)}`;
         if (item.observations && item.observations.trim()) {
@@ -267,12 +271,15 @@ const Home = () => {
           ? `${endereco}, ${numero}${complemento ? ` - ${complemento}` : ""}`
           : "Retirada",
       produtos: cart
-        .map(
-          (item) =>
-            `${item.name} x${item.quantity}${
-              item.observations ? ` (Obs: ${item.observations})` : ""
-            }`
-        )
+        .map((item) => {
+          const nameWithSize =
+            item.size && !item.name.includes(item.size)
+              ? `${item.name} ${item.size}`
+              : item.name;
+          return `${nameWithSize} x${item.quantity}${
+            item.observations ? ` (Obs: ${item.observations})` : ""
+          }`;
+        })
         .join(" | "),
       quantidade: cart.reduce((tot, item) => tot + item.quantity, 0),
       total: getTotalPrice(),
