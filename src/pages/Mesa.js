@@ -356,9 +356,13 @@ const Mesa = () => {
     menuSection = (
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         {filtered.length === 0 ? (
-          <p className="col-span-2 text-center text-red-500 font-semibold">
-            Nenhum item disponível
-          </p>
+          <div className="col-span-2 text-center text-red-500 font-semibold space-y-1">
+            <p>🔒 No momento, este cardápio está indisponível.</p>
+            <p>
+              🕒 Marmitas: das {horarios.inicioCardapio1 ?? horarios.cardapio1?.inicio}h às {horarios.fimCardapio1 ?? horarios.cardapio1?.fim}h |
+              Porções e Bebidas: das {horarios.inicioCardapio2 ?? horarios.cardapio2?.inicio}h às {horarios.fimCardapio2 ?? horarios.cardapio2?.fim}h
+            </p>
+          </div>
         ) : (
           filtered.map((m) => (
             <div
