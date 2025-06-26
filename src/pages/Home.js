@@ -34,10 +34,8 @@ const Home = () => {
   const [now, setNow] = useState(new Date());
   const [allowedCardapio, setAllowedCardapio] = useState(null);
   const [cardapio1, setCardapio1] = useState([]);
-  const [horarios, setHorarios] = useState({
-    cardapio1: { inicio: 10, fim: 15 },
-    cardapio2: { inicio: 15, fim: 22 },
-  });
+  // Horários dos cardápios carregados dinamicamente pela API
+  const [horarios, setHorarios] = useState(null);
   const [horariosError, setHorariosError] = useState(false);
   const [tipoEntrega, setTipoEntrega] = useState("retirada");
   const [localEntrega, setLocalEntrega] = useState("");
@@ -57,38 +55,36 @@ const Home = () => {
         return res.json();
       })
       .then((data) => {
-        // data é um array de objetos { id, name, description, price, image, time, type, Cardapio }
-        const normalized = data.map((it) => ({
+        // A API pode retornar { items: [...], config: {...} }
+        const items = Array.isArray(data) ? data : data.items || [];
+        const normalized = items.map((it) => ({
           ...it,
           cardapio: String(it.cardapio ?? it.Cardapio ?? ""),
         }));
         setCardapio1(normalized);
-        console.log("Itens carregados:", normalized.length);
-      })
-      .catch((err) => {
-        console.error("Falha ao carregar cardápio1:", err);
-        setCardapio1([]);
-      });
-  }, []); // roda só uma vez, ao montar o componente
 
-  // carrega horários de funcionamento dos cardápios
-  useEffect(() => {
-    const url =
-      "https://script.google.com/macros/s/AKfycbzokXTguI-RRjMaVSmSwEStnDupPEgHXcMqIRX2Ss-f0tq2WiwTcQHxYztIgurtuN3Z/exec";
-    fetch(url)
-      .then((res) => {
-        if (!res.ok) throw new Error(`Erro ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        setHorarios(data);
+        if (data.config) {
+          setHorarios({
+            cardapio1: {
+              inicio: Number(data.config.inicioCardapio1),
+              fim: Number(data.config.fimCardapio1),
+            },
+            cardapio2: {
+              inicio: Number(data.config.inicioCardapio2),
+              fim: Number(data.config.fimCardapio2),
+            },
+          });
+        }
+
+        console.log("Itens carregados:", normalized.length);
         setHorariosError(false);
       })
       .catch((err) => {
-        console.error("Falha ao carregar horários:", err);
+        console.error("Falha ao carregar cardápio ou horários:", err);
+        setCardapio1([]);
         setHorariosError(true);
       });
-  }, []);
+  }, []); // roda só uma vez, ao montar o componente
 
   const addToCart = (item) => {
     const existing = cart.find((ci) => ci.id === item.id);
@@ -124,6 +120,7 @@ const Home = () => {
 
   // determina qual cardápio deve ser exibido de acordo com o horário
   useEffect(() => {
+    if (!horarios) return;
     const h = now.getHours();
     let menu = null;
     const { cardapio1, cardapio2 } = horarios;
@@ -143,6 +140,17 @@ const Home = () => {
 
   const day = now.getDay(); // 0=Dom,1=Seg,2=Ter…
   const hour = now.getHours(); // 0–23
+
+  // calcula o próximo horário disponível para exibir o cardápio
+  const proximoHorario = React.useMemo(() => {
+    if (!horarios) return null;
+    const { cardapio1, cardapio2 } = horarios;
+    if (day === 1) return cardapio1.inicio; // fechado na segunda
+    if (hour < cardapio1.inicio) return cardapio1.inicio;
+    if (hour >= cardapio1.fim && hour < cardapio2.inicio) return cardapio2.inicio;
+    if (hour >= cardapio2.fim) return cardapio1.inicio;
+    return null;
+  }, [horarios, day, hour]);
 
   const removeFromCart = (id) => {
     const existingItem = cart.find((item) => item.id === id);
@@ -324,7 +332,9 @@ const Home = () => {
   if (day === 1 || !allowedCardapio) {
     menuSection = (
       <p className="text-center font-bold text-red-500">
-        Estamos fechados neste horário
+        {proximoHorario
+          ? `\u23F0 O card\u00E1pio estar\u00E1 dispon\u00EDvel a partir das ${proximoHorario}h. Volte mais tarde!`
+          : "Fora do hor\u00E1rio de funcionamento"}
       </p>
     );
   } else {
@@ -364,7 +374,11 @@ const Home = () => {
         <div className="grid md:grid-cols-2 gap-6">
           {filtered.length === 0 ? (
             <p className="col-span-2 text-center text-red-500 font-semibold">
-              Nenhum item disponível
+              {allowedCardapio
+                ? "Nenhum item disponível"
+                : proximoHorario
+                ? `\u23F0 O card\u00E1pio estar\u00E1 dispon\u00EDvel a partir das ${proximoHorario}h. Volte mais tarde!`
+                : "Fora do hor\u00E1rio de funcionamento"}
             </p>
           ) : (
             filtered.map((m) => (
