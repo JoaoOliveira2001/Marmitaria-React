@@ -196,7 +196,8 @@ const Home = () => {
     if (marmitasInCart.length > 0) {
       message += "*Marmitas:*\n";
       marmitasInCart.forEach((item) => {
-        message += `• ${item.name} (${item.quantity}x) - R$ ${(
+        const tamanho = item.size ? ` ${item.size}` : "";
+        message += `• ${item.name}${tamanho} (${item.quantity}x) - R$ ${(
           item.price * item.quantity
         ).toFixed(2)}`;
         if (item.observations && item.observations.trim()) {
