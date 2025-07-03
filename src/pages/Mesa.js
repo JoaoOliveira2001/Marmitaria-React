@@ -302,6 +302,16 @@ const Mesa = () => {
       }
 
       try {
+        await fetch("/api/fechar-conta", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mesa: String(mesa) }),
+        });
+      } catch (err) {
+        console.error("Erro ao consolidar pedidos:", err);
+      }
+
+      try {
         const stored = JSON.parse(localStorage.getItem("checkoutRequests") || "[]");
         if (!stored.includes(String(mesa))) {
           const updated = [...stored, String(mesa)];
