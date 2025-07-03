@@ -291,12 +291,17 @@ const Mesa = () => {
         return;
       }
       // Atualiza status da mesa via API
-        try {
-          await moverMesa(String(mesa));
-          toast.success("Conta enviada para fechamento!", {
-            position: "bottom-right",
-            autoClose: 2000,
-          });
+      try {
+        await moverMesa(String(mesa));
+        await fetch("/api/fechar-conta", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mesa }),
+        });
+        toast.success("Conta enviada para fechamento!", {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
       } catch (err) {
         console.error("Erro ao avisar Apps Script:", err);
       }
