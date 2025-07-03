@@ -6,7 +6,9 @@ export default async function handler(req, res) {
   try {
     const data = req.body;
 
-  const url = "https://script.google.com/macros/s/AKfycbzh-rW0Q4BZyB3K4ET7Qi2jwQCK6wE5dKbjidN7UmQuI7ZzVnnNb0lUQ09OG-7uUjYu/exec";
+  // Endpoint do Apps Script responsável por registrar pedidos na cozinha
+  const url =
+    "https://script.google.com/macros/s/AKfycbwH9p5r-17jVFZSop41Esd2uQ_hxbJOdbt40NJgFh3G2Y3NpnMmUvmlr55VGzrp91Qq/exec";
 
     const response = await fetch(url, {
       method: "POST",
