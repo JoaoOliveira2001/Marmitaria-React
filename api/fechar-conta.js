@@ -6,12 +6,13 @@ export default async function handler(req, res) {
   try {
     const mesa = String(req.body?.mesa || "").trim();
 
-    const url = "https://script.google.com/macros/s/AKfycbzjc-rRauOqdbVARiH_Ft1P75-iHjBtDChXQIO1Uz4UZ-hYaBNj1UaagMPtC4MN2w/exec";
+    const url =
+      "https://script.google.com/macros/s/AKfycbyqxikwY94QYctHheT0-tE36fM_Wd2YUZ4ZJDB-r5Uem5fhwF_mFvpI8qGNJzRMqwnN/exec";
 
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mesa }),
+      body: JSON.stringify({ acao: "fecharConta", mesa }),
     });
 
     const text = await response.text();
