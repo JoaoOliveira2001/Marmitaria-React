@@ -281,6 +281,8 @@ const Mesa = () => {
       status: "Finalized",
     };
 
+    const pedidosSalvos = JSON.parse(localStorage.getItem("pedidosMesa") || "[]");
+
     setClosingTab(true);
     setShowSuccess(true);
     setShowConfirmation(false);
@@ -325,11 +327,10 @@ const Mesa = () => {
       }
 
       try {
-        const pedidos = JSON.parse(localStorage.getItem("pedidosMesa") || "[]");
         await fetch("/api/webhook-fechar-conta", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mesa: String(mesa), pedidos }),
+          body: JSON.stringify({ mesa: String(mesa), pedidos: pedidosSalvos }),
         });
       } catch (err) {
         console.error("Erro ao enviar itens para webhook:", err);
