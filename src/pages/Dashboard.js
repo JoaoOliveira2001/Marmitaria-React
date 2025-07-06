@@ -272,7 +272,7 @@ const Dashboard = () => {
         loading={freeLoading}
         error={freeError}
       />
-      <div className="ml-48 md:ml-60">
+      <div className="ml-60 md:ml-72">
       <header className="bg-[#5d3d29] text-[#fff4e4] py-6">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Painel</h1>
