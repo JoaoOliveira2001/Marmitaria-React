@@ -320,6 +320,32 @@ const Home = () => {
     }
   };
 
+  const camposObrigatoriosVazios = () => {
+    const faltando = [];
+    if (!nome.trim()) faltando.push("Nome");
+    if (!telefone.trim()) faltando.push("Telefone");
+    if (!pagamento) faltando.push("Forma de Pagamento");
+    if (tipoEntrega === "entrega") {
+      if (!endereco.trim()) faltando.push("Endereço");
+      if (!numero.trim()) faltando.push("Número");
+      if (!bairro.trim()) faltando.push("Bairro");
+      if (!cidade.trim()) faltando.push("Cidade");
+      if (!localEntrega.trim()) faltando.push("Local de Entrega");
+    }
+    return faltando;
+  };
+
+  const isFormularioValido = () => camposObrigatoriosVazios().length === 0;
+
+  const handleFinalizarClick = () => {
+    const faltando = camposObrigatoriosVazios();
+    if (faltando.length > 0) {
+      toast.error(`Preencha: ${faltando.join(", ")}`);
+      return;
+    }
+    finalizarPedido();
+  };
+
   // allowedCardapio é atualizado no efeito acima
 
   // Build the menu section based on day/time and selected tab
@@ -748,11 +774,11 @@ const Home = () => {
                       </div>
 
                       <button
-                        onClick={() => {
-                          finalizarPedido();
-                          sendWhatsAppOrder();
-                        }}
-                        className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md mt-4"
+                        onClick={handleFinalizarClick}
+                        disabled={!isFormularioValido()}
+                        className={`w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md mt-4 ${
+                          !isFormularioValido() ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                       >
                         <Phone className="w-5 h-5" />
                         Finalizar Pedido
