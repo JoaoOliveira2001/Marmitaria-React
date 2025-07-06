@@ -34,6 +34,8 @@ const Mesa = () => {
   const cartRef = useRef(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [sendingOrder, setSendingOrder] = useState(false);
+  const [closingTab, setClosingTab] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -216,40 +218,41 @@ const Mesa = () => {
       status: "Pendente",
     };
 
+    setSendingOrder(true);
+
+    const pedido = {
+      items: cart,
+      quantidade: payload.quantidade,
+      total: parseFloat(payload.total),
+    };
+
+    const updated = [...pedidosMesa, pedido];
+    setPedidosMesa(updated);
+    localStorage.setItem("pedidosMesa", JSON.stringify(updated));
+    setCart([]);
+
+    toast.success(
+      "Tudo certo! Seu pedido foi enviado para a cozinha. Um atendente virá à sua mesa em breve com a sua refeição.",
+      {
+        position: "bottom-right",
+        autoClose: 3000,
+      },
+    );
+
     try {
       const response = await fetch("/api/cria", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       if (!response.ok) {
         const text = await response.text();
         console.error("Erro ao registrar pedido:", text);
-        alert("Erro ao registrar pedido");
-        return;
       }
-
-      const pedido = {
-        items: cart,
-        quantidade: payload.quantidade,
-        total: parseFloat(payload.total),
-      };
-
-      const updated = [...pedidosMesa, pedido];
-      setPedidosMesa(updated);
-      localStorage.setItem("pedidosMesa", JSON.stringify(updated));
-      setCart([]);
-      toast.success(
-        "Tudo certo! Seu pedido foi enviado para a cozinha. Um atendente virá à sua mesa em breve com a sua refeição.",
-        {
-          position: "bottom-right",
-          autoClose: 3000,
-        },
-      );
     } catch (err) {
       console.error("Erro na requisição:", err);
-      alert("Erro ao registrar pedido");
+    } finally {
+      setSendingOrder(false);
     }
   };
   const handleFecharConta = () => {
@@ -278,6 +281,18 @@ const Mesa = () => {
       status: "Finalized",
     };
 
+    setClosingTab(true);
+    setShowSuccess(true);
+    setShowConfirmation(false);
+
+    // limpar estado local imediatamente
+    setPedidosMesa([]);
+    setCart([]);
+    setMesa(null);
+    localStorage.removeItem("pedidosMesa");
+    localStorage.removeItem("mesaAtual");
+    setShowOrders(false);
+
     try {
       const response = await fetch("/api/enviar-pedido", {
         method: "POST",
@@ -287,18 +302,16 @@ const Mesa = () => {
       if (!response.ok) {
         const text = await response.text();
         console.error("Erro ao enviar pedido:", text);
-        alert("Erro ao fechar conta");
-        return;
-      }
-      // Atualiza status da mesa via API
+      } else {
         try {
           await moverMesa(String(mesa));
           toast.success("Conta enviada para fechamento!", {
             position: "bottom-right",
             autoClose: 2000,
           });
-      } catch (err) {
-        console.error("Erro ao avisar Apps Script:", err);
+        } catch (err) {
+          console.error("Erro ao avisar Apps Script:", err);
+        }
       }
 
       try {
@@ -334,18 +347,10 @@ const Mesa = () => {
       } catch {
         localStorage.setItem("checkoutRequests", JSON.stringify([String(mesa)]));
       }
-
-      setPedidosMesa([]);
-      setCart([]);
-      setMesa(null);
-      localStorage.removeItem("pedidosMesa");
-      localStorage.removeItem("mesaAtual");
-      setShowOrders(false);
-      setShowConfirmation(false);
-      setShowSuccess(true);
     } catch (err) {
       console.error("Erro na requisição:", err);
-      alert("Erro ao fechar conta");
+    } finally {
+      setClosingTab(false);
     }
   };
 
@@ -519,7 +524,12 @@ const Mesa = () => {
           </div>
           <button
             onClick={adicionarPedido}
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2"
+            disabled={sendingOrder}
+            className={`w-full text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 ${
+              sendingOrder
+                ? 'bg-green-300 cursor-not-allowed'
+                : 'bg-green-500 hover:bg-green-600'
+            }`}
           >
             <PhoneIcon /> Enviar pedido para cozinha
           </button>
@@ -647,7 +657,10 @@ const Mesa = () => {
               </button>
               <button
                 onClick={confirmarFechamento}
-                className="flex-1 bg-green-500 text-white py-2 rounded"
+                disabled={closingTab}
+                className={`flex-1 text-white py-2 rounded ${
+                  closingTab ? 'bg-green-300 cursor-not-allowed' : 'bg-green-500'
+                }`}
               >
                 Confirmar e Finalizar
               </button>
