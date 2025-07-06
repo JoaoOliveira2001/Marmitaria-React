@@ -92,7 +92,7 @@ export default function MesasMenu() {
   };
 
   return (
-    <aside className="fixed top-0 left-0 h-full w-48 md:w-60 bg-[#5d3d29] text-[#fff4e4] p-4 space-y-2 overflow-y-auto z-40">
+    <aside className="fixed top-0 left-0 h-full w-48 md:w-60 bg-[#5d3d29] text-[#fff4e4] p-4 space-y-2 overflow-y-auto z-[60]">
       <h2 className="text-lg font-bold mb-4">Mesas</h2>
       {tables.map((t) => {
         const isOccupied = mesasOcupadas.includes(String(t));
@@ -113,7 +113,7 @@ export default function MesasMenu() {
               Mesa {t}
             </button>
             {isOpen && (
-              <div className="absolute md:left-full md:top-0 md:ml-2 left-0 top-full mt-2 w-48 sm:w-56 md:w-60 bg-white text-[#5d3d29] rounded shadow p-2 space-y-2 z-50">
+              <div className="absolute md:left-full md:top-0 md:ml-2 left-0 top-full mt-2 w-48 sm:w-56 md:w-60 bg-white text-[#5d3d29] rounded shadow p-2 space-y-2 z-[70]">
                 <a
                   href={`/#/mesa?mesa=${t}`}
                   target="_blank"
