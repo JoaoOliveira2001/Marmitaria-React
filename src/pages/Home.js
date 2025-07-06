@@ -773,6 +773,12 @@ const Home = () => {
                         />
                       </div>
 
+                      {!isFormularioValido() && (
+                        <p className="text-sm text-red-500 mt-2">
+                          Preencha todos os dados antes de enviar o pedido.
+                        </p>
+                      )}
+
                       <button
                         onClick={handleFinalizarClick}
                         disabled={!isFormularioValido()}
