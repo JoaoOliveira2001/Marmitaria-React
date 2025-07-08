@@ -299,25 +299,21 @@ const Home = () => {
         // log de erro mais detalhado
         const text = await response.text();
         console.error("Erro ao enviar pedido:", text);
-        alert("Ocorreu um erro ao enviar o pedido.");
         return false;
       }
 
       // 4. se chegou aqui, foi sucesso
-      alert("Pedido enviado com sucesso!");
       return true;
     } catch (error) {
       console.error("Erro na requisição:", error);
-      alert("Não foi possível enviar o pedido. Tente novamente.");
       return false;
     }
   };
 
-  const finalizarPedido = async () => {
-    const enviado = await enviarPedido();
-    if (enviado) {
-      sendWhatsAppOrder();
-    }
+  const finalizarPedido = () => {
+    sendWhatsAppOrder();
+    // envio registrado em segundo plano; erros serão apenas logados
+    enviarPedido().catch((err) => console.error("Erro ao enviar pedido:", err));
   };
 
   const camposObrigatoriosVazios = () => {
