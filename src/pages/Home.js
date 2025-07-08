@@ -304,7 +304,6 @@ const Home = () => {
       }
 
       // 4. se chegou aqui, foi sucesso
-      alert("Pedido enviado com sucesso!");
       return true;
     } catch (error) {
       console.error("Erro na requisição:", error);
@@ -313,11 +312,10 @@ const Home = () => {
     }
   };
 
-  const finalizarPedido = async () => {
-    const enviado = await enviarPedido();
-    if (enviado) {
-      sendWhatsAppOrder();
-    }
+  const finalizarPedido = () => {
+    sendWhatsAppOrder();
+    // envio registrado em segundo plano; erros serão apenas logados
+    enviarPedido().catch((err) => console.error("Erro ao enviar pedido:", err));
   };
 
   const camposObrigatoriosVazios = () => {
