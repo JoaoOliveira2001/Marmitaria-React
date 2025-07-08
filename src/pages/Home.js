@@ -597,25 +597,28 @@ const Home = () => {
                       </span>
                     </div>
                     <div className="bg-white rounded-2xl shadow-lg p-6 mt-8 space-y-4">
-                      <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <h3 className="text-xl font-bold text-gray-800 mb-1 flex items-center gap-2">
                         <MapPin className="w-5 h-5 text-[#5d3d29]" />
                         Informações para Entrega
                       </h3>
+                      <p className="text-sm text-gray-600 mb-3">Campos marcados com <span className="text-red-500">*</span> são obrigatórios.</p>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input
                           type="text"
-                          placeholder="Nome Completo"
+                          placeholder="Nome Completo *"
                           value={nome}
                           onChange={(e) => setNome(e.target.value)}
+                          required
                           className="p-3 border border-gray-300 rounded-lg w-full"
                         />
 
                         <input
                           type="tel"
-                          placeholder="Telefone"
+                          placeholder="Telefone *"
                           value={telefone}
                           onChange={(e) => setTelefone(e.target.value)}
+                          required
                           className="p-3 border border-gray-300 rounded-lg w-full"
                         />
 
@@ -646,16 +649,18 @@ const Home = () => {
                           <>
                             <input
                               type="text"
-                              placeholder="Endereço"
+                              placeholder="Endereço *"
                               value={endereco}
                               onChange={(e) => setEndereco(e.target.value)}
+                              required
                               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                             />
                             <input
                               type="text"
-                              placeholder="Número"
+                              placeholder="Número *"
                               value={numero}
                               onChange={(e) => setNumero(e.target.value)}
+                              required
                               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                             />
                             <input
@@ -667,16 +672,18 @@ const Home = () => {
                             />
                             <input
                               type="text"
-                              placeholder="Bairro"
+                              placeholder="Bairro *"
                               value={bairro}
                               onChange={(e) => setBairro(e.target.value)}
+                              required
                               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                             />
                             <input
                               type="text"
-                              placeholder="Cidade"
+                              placeholder="Cidade *"
                               value={cidade}
                               onChange={(e) => setCidade(e.target.value)}
+                              required
                               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                             />
                             <input
@@ -690,10 +697,11 @@ const Home = () => {
                             {/* Local de entrega */}
                             <div className="mt-4">
                               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Local de Entrega
+                                Local de Entrega <span className="text-red-500">*</span>
                               </label>
                               <select
                                 value={localEntrega}
+                                required
                                 onChange={(e) => {
                                   const local = e.target.value;
                                   setLocalEntrega(local);
@@ -737,11 +745,12 @@ const Home = () => {
 
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Forma de Pagamento
+                          Forma de Pagamento <span className="text-red-500">*</span>
                         </label>
                         <select
                           value={pagamento}
                           onChange={(e) => setPagamento(e.target.value)}
+                          required
                           className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                         >
                           <option value="Pix">Pix</option>
@@ -772,6 +781,12 @@ const Home = () => {
                           className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#5d3d29]"
                         />
                       </div>
+
+                      {camposObrigatoriosVazios().length > 0 && (
+                        <p className="text-sm text-red-500 mt-2">
+                          Preencha: {camposObrigatoriosVazios().join(', ')}.
+                        </p>
+                      )}
 
                       <button
                         onClick={handleFinalizarClick}
