@@ -73,6 +73,22 @@ const [pedidos, setPedidos] = useState([
     );
   };
 
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPedido, setSelectedPedido] = useState(null);
+
+  const abrirModal = (pedido) => {
+    setSelectedPedido(pedido);
+    setShowModal(true);
+  };
+
+  const confirmarLiberacao = () => {
+    if (selectedPedido) {
+      marcarComoConcluido(selectedPedido.id);
+    }
+    setShowModal(false);
+    setSelectedPedido(null);
+  };
+
   const pedidosPendentes = pedidos.filter((p) => p.status === "pendente");
   const pedidosConcluidos = pedidos.filter((p) => p.status === "concluido");
 
@@ -164,11 +180,11 @@ const [pedidos, setPedidos] = useState([
 
       {pedido.status === "pendente" ? (
         <button
-          onClick={() => marcarComoConcluido(pedido.id)}
+          onClick={() => abrirModal(pedido)}
           className="w-full bg-[#5d3d29] hover:bg-[#5d3d29] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
         >
           <Package className="w-5 h-5" />
-          Marcar como Concluído
+          Liberar Mesa
         </button>
       ) : (
         <div className="w-full bg-green-100 text-green-800 font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
@@ -263,6 +279,30 @@ const [pedidos, setPedidos] = useState([
             <p className="text-gray-500">
               Os pedidos aparecerão aqui quando chegarem
             </p>
+          </div>
+        )}
+
+        {showModal && selectedPedido && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 space-y-4">
+              <h3 className="text-xl font-bold">Detalhes do Pedido</h3>
+              <div className="space-y-1 text-sm">
+                <p><span className="font-semibold">Cliente:</span> {selectedPedido.cliente}</p>
+                <p><span className="font-semibold">Horário:</span> {selectedPedido.horaPedido}</p>
+                <p><span className="font-semibold">Tamanho:</span> {selectedPedido.tamanho}</p>
+                <p><span className="font-semibold">Prato:</span> {selectedPedido.pratoPrincipal}</p>
+                <p><span className="font-semibold">Acompanhamentos:</span> {selectedPedido.acompanhamentos.join(', ')}</p>
+                <p><span className="font-semibold">Bebida:</span> {selectedPedido.bebida}</p>
+                {selectedPedido.observacoes && (
+                  <p><span className="font-semibold">Observações:</span> {selectedPedido.observacoes}</p>
+                )}
+              </div>
+              <p className="font-semibold">Tem certeza que deseja liberar esta mesa?</p>
+              <div className="flex gap-2 pt-2">
+                <button onClick={() => setShowModal(false)} className="flex-1 bg-gray-300 py-2 rounded">Cancelar</button>
+                <button onClick={confirmarLiberacao} className="flex-1 bg-green-600 text-white py-2 rounded">Confirmar Liberação</button>
+              </div>
+            </div>
           </div>
         )}
       </div>
