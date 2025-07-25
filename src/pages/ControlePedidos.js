@@ -59,9 +59,6 @@ const [pedidos, setPedidos] = useState([
     setAutorizado(autorizadoLocal === "true");
   }, []);
 
-  if (!autorizado) {
-    return <LoginPedidos onLogin={() => setAutorizado(true)} />;
-  }
 
   
 
@@ -75,6 +72,10 @@ const [pedidos, setPedidos] = useState([
 
   const [showModal, setShowModal] = useState(false);
   const [selectedPedido, setSelectedPedido] = useState(null);
+  if (!autorizado) {
+    return <LoginPedidos onLogin={() => setAutorizado(true)} />;
+  }
+
 
   const abrirModal = (pedido) => {
     setSelectedPedido(pedido);
