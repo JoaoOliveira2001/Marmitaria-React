@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const url = 'http://145.223.31.139:5678/webhook/fecharConta';
+    const url = 'http://93.127.210.229:5678/webhook/fecharConta';
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
