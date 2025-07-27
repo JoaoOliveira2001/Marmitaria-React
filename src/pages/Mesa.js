@@ -249,6 +249,15 @@ const Mesa = () => {
         const text = await response.text();
         console.error("Erro ao registrar pedido:", text);
       }
+      try {
+        await fetch("/api/webhook-mesas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } catch (err) {
+        console.error("Erro ao enviar dados ao webhook:", err);
+      }
     } catch (err) {
       console.error("Erro na requisição:", err);
     } finally {
