@@ -299,7 +299,6 @@ const Home = () => {
         // log de erro mais detalhado
         const text = await response.text();
         console.error("Erro ao enviar pedido:", text);
-        alert("Ocorreu um erro ao enviar o pedido.");
         return false;
       }
 
@@ -307,7 +306,6 @@ const Home = () => {
       return true;
     } catch (error) {
       console.error("Erro na requisição:", error);
-      alert("Não foi possível enviar o pedido. Tente novamente.");
       return false;
     }
   };
