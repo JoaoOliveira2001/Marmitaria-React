@@ -113,23 +113,7 @@ export default function MesasMenu() {
               Mesa {t}
             </button>
             {isOpen && (
-              <div className="absolute md:left-full md:top-0 md:ml-2 left-0 top-full mt-2 w-48 sm:w-56 md:w-60 bg-white text-[#5d3d29] rounded shadow p-2 space-y-2 z-50">
-                <a
-                  href={`/#/mesa?mesa=${t}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block bg-[#5d3d29] text-[#fff4e4] px-2 py-1 rounded text-center"
-                >
-                  Acessar Mesa
-                </a>
-                <button
-                  onClick={() => freeTable(t)}
-                  className={`w-full px-2 py-1 rounded ${
-                    freedTable === t ? "bg-green-600 text-white" : "bg-green-500 text-white"
-                  }`}
-                >
-                  {freedTable === t ? "✔ Mesa Liberada" : "✔ Liberar Mesa"}
-                </button>
+
               </div>
             )}
           </div>
